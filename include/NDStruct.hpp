@@ -33,18 +33,29 @@ typedef struct
 
 /**
  ******************************************************************************
- * @brief   Date Time request structure
- * @note    This is the request structure for #dpClientGetDateTime.
+ * @brief   node inform structure
+ * @note    This is the structure for node base inform
  ******************************************************************************
  */
 typedef struct
 {
-    ND_BOOLEAN			bApplyDST;
-
-    ndString			cOffset;
-
-    ndString			cTimeZone;
-}dpDateTimeReqSt;
+	//vpn节点的编号
+	ndString 	sNodeID;
+	//vpn节点的密码
+	ndString	sNodePwd;
+	//vpn节点的MAC地址
+	ndString 	sNodeMac;
+	//vpn节点的ip地址
+	ndULong 	lNodeIP;
+	//vpn节点所属的域
+	ndString 	sDomain;
+	//vpn节点所属域的key
+	ndString 	sDomainKey;
+	//vpn超级节点的IP地址
+	ndString 	sSuperNodeIP;
+	//vpn超级节点的端口号
+	ndString 	sSuperNodePort;
+}SNodeInform, *pSNodeInform;
 
 
 /**

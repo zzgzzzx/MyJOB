@@ -1,12 +1,12 @@
 /*********************************************************
-模块名       : 结点http协议
+模块名       : 节点http协议
 文件名       : HttpClientNode.cpp
 相关文件     : HttpClientNode.h
-文件实现功能 : 结点Htpp协议处理
+文件实现功能 : 节点Htpp协议处理
 作者         :lewis
 创建时间     :2017-09
 **********************************************************/
-#include "HttpClientNode.h"
+#include "HttpGeneral.hpp"
 
 /*********************************************************
 函数说明：构造函数
@@ -14,7 +14,7 @@
 出参说明：无
 返回值  ：无
 *********************************************************/
-CHttpClientNode::CHttpClientNode()
+CHttpGeneral::CHttpGeneral()
 {
 	mPNode = NULL;
 }
@@ -25,7 +25,7 @@ CHttpClientNode::CHttpClientNode()
 出参说明：无
 返回值  ：无
 *********************************************************/
-CHttpClientNode::CHttpClientNode(CNodeBase &node, ndString sip)
+CHttpGeneral::CHttpGeneral(CNodeBase &node, ndString sip)
 {
 	mPNode = &node;
 	mSrvIP = sip;
@@ -37,26 +37,52 @@ CHttpClientNode::CHttpClientNode(CNodeBase &node, ndString sip)
 出参说明：无
 返回值  ：无
 *********************************************************/
-CHttpClientNode::~CHttpClientNode()
+CHttpGeneral::CHttpGeneral()
 {
 
 }
 
-//节点初始化
-ndStatus CHttpClientNode::MakeNodeInitReq()
+/*********************************************************
+函数说明：节点初始化
+入参说明：无
+出参说明：无
+返回值  ：无
+*********************************************************/
+ndStatus CHttpGeneral::MakeNodeInitReq()
 {
 }
 
-ndStatus CHttpClientNode::AnalysisNodeInitRsp()
+/*********************************************************
+函数说明：节点初始化返回处理
+入参说明：无
+出参说明：无
+返回值  ：无
+*********************************************************/
+ndStatus CHttpGeneral::AnalysisNodeInitRsp()
+{
+	SNodeInform sNode;
+	//解析返回的数据到NdoeInform
+
+	mPNode->SetNodeInform(sNode);
+}
+
+/*********************************************************
+函数说明：节点Hello
+入参说明：无
+出参说明：无
+返回值  ：无
+*********************************************************/
+ndStatus CHttpGeneral::MakeNodeHelloReq()
 {
 }
 
-//节点Hello
-ndStatus CHttpClientNode::MakeNodeHelloReq()
-{
-}
-
-ndStatus CHttpClientNode::AnalysisNodeHelloRsp()
+/*********************************************************
+函数说明：节点Hello返回处理
+入参说明：无
+出参说明：无
+返回值  ：无
+*********************************************************/
+ndStatus CHttpGeneral::AnalysisNodeHelloRsp()
 {
 }
 	
@@ -67,7 +93,7 @@ ndStatus CHttpClientNode::AnalysisNodeHelloRsp()
 出参说明：无
 返回值  ：无
 *********************************************************/
-ndStatus CHttpClientNode::NodeInit()
+ndStatus CHttpGeneral::NodeInit()
 {
     //组装数据包
     ndStatus  ret = MakeNodeInitReq();
@@ -101,7 +127,7 @@ ndStatus CHttpClientNode::NodeInit()
 出参说明：无
 返回值  ：无
 *********************************************************/
-ndStatus CHttpClientNode::NodeHello()
+ndStatus CHttpGeneral::NodeHello()
 {
     //组装数据包
     ndStatus  ret = MakeNodeHelloReq();
@@ -133,7 +159,7 @@ ndStatus CHttpClientNode::NodeHello()
 出参说明：无
 返回值  ：无
 *********************************************************/
-ndStatus CHttpClientNode::PkgSendAndRecv()
+ndStatus CHttpGeneral::PkgSendAndRecv()
 {
     //判断服务器地址
     if(mSrvIP.empty()){
@@ -190,7 +216,7 @@ ndStatus CHttpClientNode::PkgSendAndRecv()
 出参说明：无
 返回值  ：无
 *********************************************************/
-void CHttpClientNode::AnalysisAuthHeader(ndString &head)
+void CHttpGeneral::AnalysisAuthHeader(ndString &head)
 {
 
 }
@@ -201,7 +227,7 @@ void CHttpClientNode::AnalysisAuthHeader(ndString &head)
 出参说明：无
 返回值  ：校验信息
 *********************************************************/
-string CHttpClientNode::GenerateAuthHeader()
+ndString CHttpGeneral::GenerateAuthHeader()
 {
     return NULL;
 }

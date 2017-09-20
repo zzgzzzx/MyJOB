@@ -6,8 +6,8 @@
 #ifndef VPN_NODEBASE_H
 #define VPN_NODEBASE_H
 
-#include "ndType.h"
-#include "HttpClient.h"
+#include "NDType.hpp"
+#include "HttpClient.hpp"
 
 /**
  * NodeBase Class
@@ -15,20 +15,8 @@
 class CNodeBase
 {
 protected:
-	//vpn结点的编号
-	ndString mNodeID;
-	//vpn结点的MAC地址
-	ndString mNodeMac;
-	//vpn结点的ip地址
-	ndULong mNodeIP;
-	//vpn结点所属的域
-	ndString mDomain;
-	//vpn结点所属域的key
-	ndString mDomainKey;
-	//vpn超级结点的IP地址
-	ndString mSuperNodeIP;
-	//vpn超级结点的端口号
-	ndString mSuperNodePort;	
+	//节点基本参数信息
+	SNodeInform mSNodeInform;
 	
     //返回的错误码
     ndULong  mErrCode;
@@ -53,6 +41,8 @@ public:
     void SetAsyncMode(ndCallbackFunction callbackFunction);
     //获取回调
     ndCallbackFunction GetCallBackFunction();
+
+	void SetNodeInform(SNodeInform &inform);
 
     //获取错误码
     ndULong GetLastErrCode();

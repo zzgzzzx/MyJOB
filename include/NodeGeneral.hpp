@@ -6,21 +6,21 @@
 #ifndef VPN_CLINETSRVBASE_H
 #define VPN_CLINETSRVBASE_H
 
-#include "ndType.h"
-#include "HttpClient.h"
-#include "NodeBase.h"
+#include "NDType.hpp"
+#include "HttpClient.hpp"
+#include "NodeBase.hpp"
 
 /**
  * ClientBase Class
  */
-class CNodeSrvBase: public CNodeBase
+class CNodeGeneral: public CNodeBase
 {
 protected:
     //访问的中心服务器IP
     ndString mCenterSrvIP;
 public:
-    CNodeSrvBase();
-    virtual ~CNodeSrvBase();
+    CNodeGeneral();
+    virtual CNodeGeneral();
 
     //数据处理前的初始化操作
     virtual ndStatus InitData();

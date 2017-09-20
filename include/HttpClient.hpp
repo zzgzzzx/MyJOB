@@ -7,8 +7,8 @@
 
 
 #include <curl.h>
-#include "ndType.h"
-#include "ndCommST.h"
+#include "NDType.hpp"
+#include "NDStruct.hpp"
 
 /*
 如果要在多线程方式下同时调用多个CHttpClient实例，

@@ -6,8 +6,8 @@
 作者         :lewis
 创建时间     :2017-09
 **********************************************************/
-#include "NodeSrvBase.h"
-#include "HttpClientNode.h"
+#include "NodeGeneral.hpp"
+#include "HttpGeneral.hpp"
 
 /*********************************************************
 函数说明：构造函数
@@ -15,7 +15,7 @@
 出参说明：无
 返回值  ：无
 *********************************************************/
-CNodeSrvBase::CNodeSrvBase()
+CNodeGeneral::CNodeGeneral()
 {
 }
 
@@ -25,7 +25,7 @@ CNodeSrvBase::CNodeSrvBase()
 出参说明：无
 返回值  ：无
 *********************************************************/
-CNodeSrvBase::~CNodeSrvBase()
+CNodeGeneral::CNodeGeneral()
 {
 }
 
@@ -36,7 +36,7 @@ CNodeSrvBase::~CNodeSrvBase()
 返回值  ：DP_SUCCESS-成功
           Others-失败
 *********************************************************/
-ndStatus CNodeSrvBase::InitData()
+ndStatus CNodeGeneral::InitData()
 {
     return ND_SUCCESS;
 }
@@ -48,10 +48,10 @@ ndStatus CNodeSrvBase::InitData()
 返回值  ：DP_SUCCESS-成功
           Others-失败
 *********************************************************/
-ndStatus CNodeSrvBase::NodeInit()
+ndStatus CNodeGeneral::NodeInit()
 {
     //与服务器通讯类
-    CHttpClientNode httpClient(*this, mCenterSrvIP);
+    CHttpGeneral httpClient(*this, mCenterSrvIP);
 
     //初始化操作
     ndStatus ret = httpClient.NodeInit();
@@ -61,7 +61,7 @@ ndStatus CNodeSrvBase::NodeInit()
 	}
 
 	////////////////////////////////////////////////////////
-	//结点实始处理
+	//结点初始化处理
 	////////////////////////////////////////////////////////
 }
 
@@ -72,10 +72,10 @@ ndStatus CNodeSrvBase::NodeInit()
 返回值  ：DP_SUCCESS-成功
           Others-失败
 *********************************************************/
-ndStatus CNodeSrvBase::NodeHello()
+ndStatus CNodeGeneral::NodeHello()
 {
     //与服务器通讯类
-    CHttpClientNode httpClient(*this, mCenterSrvIP);
+    CHttpGeneral httpClient(*this, mCenterSrvIP);
 
     //Hello
     httpClient.NodeHello();

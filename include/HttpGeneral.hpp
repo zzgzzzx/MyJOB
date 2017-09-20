@@ -6,9 +6,9 @@
 #ifndef VPN_NODE_HTTPCLIENT_H
 #define VPN_NODE_HTTPCLIENT_H
 
-#include "ndType.h"
-#include "HttpClient.h"
-#include "NodeBase.h"
+#include "NDType.hpp"
+#include "HttpClient.hpp"
+#include "NodeBase.hpp"
 
 
 using namespace network;
@@ -16,7 +16,7 @@ using namespace network;
 /**
  * CHttpClientNode Class
  */
-class CHttpClientNode : public CHttpClient
+class CHttpGeneral : public CHttpClient
 {
 private:
 	//结点信息
@@ -36,16 +36,16 @@ protected:
     virtual void AnalysisAuthHeader(ndString &head);
 
 	//节点初始化
-	ndStatus MakeNodeInitReq();
-	ndStatus AnalysisNodeInitRsp();
+	virtual ndStatus MakeNodeInitReq();
+	virtual ndStatus AnalysisNodeInitRsp();
 
 	//节点Hello
-	ndStatus MakeNodeHelloReq();
-	ndStatus AnalysisNodeHelloRsp();
+	virtual ndStatus MakeNodeHelloReq();
+	virtual ndStatus AnalysisNodeHelloRsp();
 
 public:
-    CHttpClientNode();
-	CHttpClientNode(CNodeBase &node, ndString sip);
+    CHttpGeneral();
+	CHttpGeneral(CNodeBase &node, ndString sip);
 
 	ndStatus NodeInit();
 	ndStatus NodeHello();
