@@ -16,7 +16,10 @@
  */
 class CHttpSrvNode : public CHttpGeneral
 {
-protected:
+public:
+	CHttpSrvNode(CNodeBase *node);	
+	
+protected:	
 	//节点初始化
 	virtual ndStatus MakeNodeInitReq();
 };

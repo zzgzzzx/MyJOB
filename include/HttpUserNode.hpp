@@ -16,6 +16,9 @@
  */
 class CHttpUserNode : public CHttpGeneral
 {
+public:
+	CHttpUserNode(CNodeBase *node);	
+	
 protected:
 	//节点初始化
 	virtual ndStatus MakeNodeInitReq();

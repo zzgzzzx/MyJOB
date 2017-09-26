@@ -21,14 +21,12 @@ class CHttpGeneral : public CHttpClient
 private:
 	//结点信息
 	CNodeBase *mPNode;
-	//服务器ip地址
-	ndString mSrvIP;
     //发送的数据buff
     ndString mSendBuf;
     //接收的数据buff
     ndString mRcvBuf;	
 	//数据包发送并接收处理
-	ndStatus PkgSendAndRecv();
+	ndStatus PkgSendAndRecv(ndString url);
 protected:
     //生成认证头
     virtual ndString GenerateAuthHeader();
@@ -45,12 +43,12 @@ protected:
 
 public:
     CHttpGeneral();
-	CHttpGeneral(CNodeBase &node, ndString sip);
+	CHttpGeneral(CNodeBase *node);
 
 	ndStatus NodeInit();
 	ndStatus NodeHello();
 	
-    virtual ~CHttpClientNode();
+    virtual ~CHttpGeneral();
 
 };
 

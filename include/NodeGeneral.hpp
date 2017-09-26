@@ -3,24 +3,23 @@
 // FJ-FZ
 //
 
-#ifndef VPN_CLINETSRVBASE_H
-#define VPN_CLINETSRVBASE_H
+#ifndef VPN_NODE_GENERAL_H
+#define VPN_NODE_GENERAL_H
 
-#include "NDType.hpp"
-#include "HttpClient.hpp"
 #include "NodeBase.hpp"
+#include "HttpGeneral.hpp"
 
 /**
- * ClientBase Class
+ * NodeGeneral Class
  */
 class CNodeGeneral: public CNodeBase
 {
 protected:
-    //访问的中心服务器IP
-    ndString mCenterSrvIP;
+	//通讯的客户端
+	CHttpGeneral *mPHttpClient;
 public:
     CNodeGeneral();
-    virtual CNodeGeneral();
+    virtual ~CNodeGeneral();
 
     //数据处理前的初始化操作
     virtual ndStatus InitData();
@@ -31,4 +30,4 @@ public:
 	virtual ndStatus NodeHello();
 };
 
-#endif //VPN_CLINETSRVBASE_H
+#endif //VPN_NODE_GENERAL_H

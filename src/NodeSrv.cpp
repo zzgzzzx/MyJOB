@@ -1,32 +1,34 @@
 /*********************************************************
-模块名       : 结点http协议
-文件名       : HttpUserNode.cpp
-相关文件     : HttpUserNode.h
-文件实现功能 : 结点Htpp协议处理
+模块名       : 服务节点类(Certificate\DP)
+文件名       : NodeSrv.cpp
+相关文件     : NodeSrv.h
+文件实现功能 : 服务节点实现
 作者         :lewis
 创建时间     :2017-09
 **********************************************************/
-#include "HttpUserNode.hpp"
+#include "NodeSrv.hpp"
+#include "HttpSrvNode.hpp"
 
 /*********************************************************
 函数说明：构造函数
-入参说明：Node(结点)
-出参说明：无
-返回值  ：无
-*********************************************************/
-CHttpUserNode::CHttpUserNode(CNodeBase *node):CHttpGeneral(node)
-{
-
-}
-
-
-/*********************************************************
-函数说明：节点初始化
 入参说明：无
 出参说明：无
 返回值  ：无
 *********************************************************/
-ndStatus CHttpUserNode::MakeNodeInitReq()
+CNodeSrv::CNodeSrv()
 {
-	return ND_ERROR_INVALID_PARAM;
+	mPHttpClient = new CHttpSrvNode(this);
+
 }
+
+/*********************************************************
+函数说明：析构函数
+入参说明：无
+出参说明：无
+返回值  ：无
+*********************************************************/
+CNodeSrv::~CNodeSrv()
+{
+	delete mPHttpClient;
+}
+

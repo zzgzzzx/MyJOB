@@ -11,6 +11,7 @@
 
 #include "MsgQueue.hpp"
 #include "TimerManager.hpp"
+#include "NodeBase.hpp"
 
 
 //**********************************
@@ -51,6 +52,8 @@ public:
 class CSuperVPNApp: public CBaseApp
 {
 private:
+	//节点
+	static CNodeBase *mPNode;
 	//系统数据初始化
 	bool InitSystem(void);
  
@@ -63,6 +66,8 @@ public:
 	CSuperVPNApp();
 	//析构函数
 	~CSuperVPNApp();	
+	//节点hello
+	static void NodeHelloFunc(ndULong param);	
 };
 
 #endif

@@ -8,6 +8,10 @@
 **********************************************************/
 #include "BaseApp.hpp"
 #include "NDFunc.hpp"
+#include "NodeUser.hpp"
+#include "NodeSrv.hpp"
+
+CNodeBase *CSuperVPNApp::mPNode;
 
 /*********************************************************
 函数说明：
@@ -36,6 +40,16 @@ bool CSuperVPNApp::InitApplication(void)
 *********************************************************/
 bool CSuperVPNApp::InitSystem(void)
 {
+	//节点初始化开始
+	mPNode->NodeInit();
+
+	//增加定时Hello
+	AfxInsertCircleTimer(TIMER_ID_NODE_HELLO_CHECK, TIMER_VALUE_NODE_HELLO_CHECK, NodeHelloFunc);
+
+	//循环等待保证不退出应用
+	while(true)
+		sleep(60);
+
 	return true;
 }
 
@@ -47,7 +61,11 @@ bool CSuperVPNApp::InitSystem(void)
 *********************************************************/
 CSuperVPNApp::CSuperVPNApp()
 {
-
+	#ifdef GENERAL_NODE_USER_APP
+		mPNode = new CNodeUser();
+	#else
+		mPNode = new CNodeSrv();
+	#endif
 }
 
 /*********************************************************
@@ -58,5 +76,17 @@ CSuperVPNApp::CSuperVPNApp()
 *********************************************************/
 CSuperVPNApp::~CSuperVPNApp()
 {
-
+	delete mPNode;
 }
+
+/*********************************************************
+函数说明：Hello的定时器函数
+入参说明：
+出参说明：
+返回值  ：
+*********************************************************/
+void CSuperVPNApp::NodeHelloFunc(ndULong param)
+{
+	mPNode->NodeHello();
+}
+

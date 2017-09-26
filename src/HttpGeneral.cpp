@@ -25,10 +25,9 @@ CHttpGeneral::CHttpGeneral()
 出参说明：无
 返回值  ：无
 *********************************************************/
-CHttpGeneral::CHttpGeneral(CNodeBase &node, ndString sip)
+CHttpGeneral::CHttpGeneral(CNodeBase *node)
 {
-	mPNode = &node;
-	mSrvIP = sip;
+	mPNode = node;
 }
 
 /*********************************************************
@@ -37,7 +36,7 @@ CHttpGeneral::CHttpGeneral(CNodeBase &node, ndString sip)
 出参说明：无
 返回值  ：无
 *********************************************************/
-CHttpGeneral::CHttpGeneral()
+CHttpGeneral::~CHttpGeneral()
 {
 
 }
@@ -50,6 +49,7 @@ CHttpGeneral::CHttpGeneral()
 *********************************************************/
 ndStatus CHttpGeneral::MakeNodeInitReq()
 {
+	return ND_SUCCESS;
 }
 
 /*********************************************************
@@ -64,6 +64,8 @@ ndStatus CHttpGeneral::AnalysisNodeInitRsp()
 	//解析返回的数据到NdoeInform
 
 	mPNode->SetNodeInform(sNode);
+	
+	return ND_SUCCESS;	
 }
 
 /*********************************************************
@@ -74,6 +76,7 @@ ndStatus CHttpGeneral::AnalysisNodeInitRsp()
 *********************************************************/
 ndStatus CHttpGeneral::MakeNodeHelloReq()
 {
+	return ND_SUCCESS;
 }
 
 /*********************************************************
@@ -84,6 +87,7 @@ ndStatus CHttpGeneral::MakeNodeHelloReq()
 *********************************************************/
 ndStatus CHttpGeneral::AnalysisNodeHelloRsp()
 {
+	return ND_SUCCESS;
 }
 	
 
@@ -103,7 +107,7 @@ ndStatus CHttpGeneral::NodeInit()
         return ret;
     }
 
-	ret = PkgSendAndRecv();
+	ret = PkgSendAndRecv(VPN_CENTER_URL);
 	if (ret != ND_SUCCESS)
 	{
 		TRACE("N2N run at[%s] PkgSendAndRecv Err ret=[%d]\n", __func__, ret);
@@ -137,7 +141,7 @@ ndStatus CHttpGeneral::NodeHello()
         return ret;
     }
 
-	ret = PkgSendAndRecv();
+	ret = PkgSendAndRecv(VPN_CENTER_URL);
 	if (ret != ND_SUCCESS)
 	{
 		TRACE("N2N run at[%s] PkgSendAndRecv Err ret=[%d]\n", __func__, ret);
@@ -159,10 +163,10 @@ ndStatus CHttpGeneral::NodeHello()
 出参说明：无
 返回值  ：无
 *********************************************************/
-ndStatus CHttpGeneral::PkgSendAndRecv()
+ndStatus CHttpGeneral::PkgSendAndRecv(ndString url)
 {
     //判断服务器地址
-    if(mSrvIP.empty()){
+    if(url.empty()){
         TRACE("N2N run at[%s] Http Server Empty Err\n", __func__);
         return ND_ERROR_INVALID_PARAM;
     }	
@@ -173,10 +177,10 @@ ndStatus CHttpGeneral::PkgSendAndRecv()
         return ND_ERROR_INVALID_PARAM;
     }
 
-    TRACE("N2N run at[%s] Begin Post Action\n ServerURL=[%s]\n Data=[%s]\n", __func__, mSrvIP.c_str(),mSendBuf.c_str());
+    TRACE("N2N run at[%s] Begin Post Action\n ServerURL=[%s]\n Data=[%s]\n", __func__, url.c_str(),mSendBuf.c_str());
     rePost:
     //发送服务端并接收返回
-    CURLcode rtn = Post(mSrvIP.c_str(), mSendBuf.c_str(), mRcvBuf);
+    CURLcode rtn = Post(url.c_str(), mSendBuf.c_str(), mRcvBuf);
 
     if(rtn != CURLE_OK){
         TRACE("N2N run at[CNodeSrvBase::DealActionWithModel] Http Post Err\n");

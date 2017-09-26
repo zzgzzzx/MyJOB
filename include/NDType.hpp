@@ -118,297 +118,146 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 #define ND_DLLEXPORT
 #endif
 
+/*---------------------------------------------------------------------------------------
 //系统支持的最大消息队列数
+-----------------------------------------------------------------------------------------*/
 #define MAX_FIFO_MSG_NUM 5000
 
-/**
- ******************************************************************************
- * @brief  CRC文件读取默认长度
- ******************************************************************************
- */
-#define MAX_READ_FILE_LEN (8*1024)
+/*---------------------------------------------------------------------------------------
+//定时器ID设置
+-----------------------------------------------------------------------------------------*/
+#define TIMER_ID_NODE_HELLO_CHECK	0x0001			//hello检测检测
 
-/**
- ******************************************************************************
- * @brief  SecurityKey Length
- ******************************************************************************
- */
-#define MAX_SECURITY_KEY_LEN  512
+/*---------------------------------------------------------------------------------------
+//定时器时间设置(秒数)
+-----------------------------------------------------------------------------------------*/
+#define TIMER_VALUE_NODE_HELLO_CHECK	60			//节点Hello检测
 
-/**
- ******************************************************************************
+
+/*---------------------------------------------------------------------------------------
  * @brief  curl连接服务器超时时间（秒）
- ******************************************************************************
- */
+-----------------------------------------------------------------------------------------*/
 #define VALUE_CURLOPT_CONNECTTIMEOUT 10
 
-/**
- ******************************************************************************
+/*---------------------------------------------------------------------------------------
  * @brief  curl接收数据超时时间（秒）
- ******************************************************************************
- */
+-----------------------------------------------------------------------------------------*/
 #define VALUE_CURLOPT_LOW_SPEED_TIME 30
 
-/**
- ******************************************************************************
+/*---------------------------------------------------------------------------------------
  * @brief  设备的key
- ******************************************************************************
- */
+-----------------------------------------------------------------------------------------*/
 #define BUILTIN_KEY  "ZEASN2016"
 
-/**
- ******************************************************************************
- * @brief  router服务器地址
- ******************************************************************************
- */
-//#define ROUTE_URL  "https://deviceportal.nettvservices.com/dp/route"
-//#define ROUTE_URL_CERT_CHECK  "http://deviceportal.nettvservices.com/route/dp/handle"
+/*---------------------------------------------------------------------------------------
+ * @brief  中心服务器地址
+-----------------------------------------------------------------------------------------*/
+#define VPN_CENTER_URL  "https://deviceportal.zeasn.tv/dp/route"
 
-#define ROUTE_URL  "https://deviceportal.zeasn.tv/dp/route"
-#define ROUTE_URL_CERT_CHECK  "https://deviceportal.zeasn.tv/route/dp/handle"
 
-/**
- ******************************************************************************
- * @brief  HTTP HEAD 标识
- ******************************************************************************
- */
-#define TAG_HEAD_AUTHENTICATE "WWW-Authenticate"
-
-//本地设备证书路径
-#define LOCAL_FILE_DEV_CERT_NAME "zeasn.device.crt"
-
-//本地设备私钥路径
-#define LOCAL_FILE_DEV_PRI_KEY_NAME "private.key"
-
-//本地设备私钥路径
-#define SERVER_CERT_FILE_NAME "opcacrt6.pem"
-
-//EVN GET返回码定义
-#define ENV_GET_ERR -1
-#define ENV_GET_NO_ATTACH 0
-#define ENV_GET_ATTACH 1
-
-//文件下载路径名称定义
-#define NODE_DOWNLOAD_FILE_PATH "DownFilePath"
-
-//证书路径名称定义
-#define NODE_FILE_PATH "NodeFilePath"
-
-//完整性校验的hash_method类别定义
-#define TYPE_INTEGRITY_CHECK_CRC32 "CRC32"
-#define TYPE_INTEGRITY_CHECK_MD5 "MD5"
-
-/**
- ******************************************************************************
- * @brief   DP Client specific error codes
- ******************************************************************************
- */
+/*---------------------------------------------------------------------------------------
+ * @brief   节点交易类型定义
+-----------------------------------------------------------------------------------------*/
 typedef enum
 {
-    /**
-     * Success 0
-     */
-    ND_SUCCESS = 0,
-
-    /**
-     * One of the input parameters(s) is(are) not valid 1
-     */
-    ND_ERROR_INVALID_PARAM,
-
-    /**
-     * Platform or OS error: e.g. out of memory or semaphore, task, queue error 2
-     */
-    ND_ERROR_PLATFORM_OS,
-
-    /**
-     * The device is not authenticated. 3
-     */
-     ND_ERROR_AUTHENTICATION_FAILED,
-
-    /**
-     * Resume feature is not supported in the device. 4
-     */
-     ND_ERROR_RESUME_NOT_SUPPORTED,
-
-    /**
-     * Network is not available. This happens if the device is not connected
-    to the network or if the server is down. 5
-     */
-     ND_ERROR_NETWORK_NOT_AVAILABLE,
-
-    /**
-     * The socket cannot be created 6
-     */
-     ND_ERROR_SOCKET_CREATION_FAILED,
-
-    /**
-     * The client could not send the request to the server.
-    This happens if the network is disconnected in between. 7
-     */
-     ND_ERROR_SEND_FAILED,
-
-    /**
-     * The client could not receive the request to the server.
-    This happens if server network is disconnected, timeout or
-    server not responding.  8
-     */
-    ND_ERROR_RECEIVE_FAILED,
-
-    /**
-     *  The response from the server is invalid. 9
-     */
-    ND_ERROR_SERVER,
-
-    /**
-     * The feature is unsupported 10
-     */
-    ND_ERROR_UNSUPPORTED,
-
-    /**
-     * Download is aborted by the user. 11
-     */
-    ND_ERROR_DOWNLOAD_ABORTED,
-
-    /**
-     * CRC check failed for downloadind file.  12
-     */
-	ND_ERROR_CRC_CHECK_FAILED,
-
-	/**
-	 * Indicates that the download is not in progress. 13
-	 */
-	ND_ERROR_DOWNLOAD_NOT_IN_PROGRESS,
-
-	/**
-	 * SIZE of a destination BUFFER is not enough for creating the ndString chunk 14
-	 */
-	ND_ERROR_SIZE_OVERFLOW,
-
-	/**
-	 * Indicates the failure of request encode 15
-	 */
-	ND_ERROR_MSG_ENCODE,
-
-	/**
-	 * Indicates the failure of response decode 16
-	 */
-	ND_ERROR_MSG_DECODE,
-
-	/**
-	* General error. 17
-	*/
-	ND_ERROR_GENERAL,
-
-	/**
-	* Server returned a failure for Requested operation 18
-	*/
-	ND_ERROR_OPERATION_FAILED,
-
-	/**
-	* Server returned error for incorrect details in request
-	Or Application placed invalid request to client 19
-	*/
-	ND_ERROR_INVALID_REQUEST,
-
-	/**
-	* Server returned error 20
-	*/
-	ND_ERROR_INVALID_RESPONSE,
-
-	/**
-	* load CA certificate err 21
-	*/
-	ND_ERROR_LOAD_CA_CERTIFICATE,
-
-
-	/**
-	* Need more data from application. 22
-	*/
-	ND_ERROR_NEED_MORE_DATA_FOR_UPLOAD,
-
-	/**
-	* Indicates data has been partially uploaded to the server. 23
-	*/
-	ND_ERROR_DATA_PARTIALLY_UPLOADED,
-
-	/**
-	* Device is not provisioned 24
-	*/
-	ND_ERROR_NOT_PROVISIONED,
-
-	/**
-	* General Network Error. 25
-	*/
-	ND_ERROR_NETWORK_GENERAL,
-
-	/**
-	* Server is not Reachable.26
-	*/
-	ND_ERROR_SERVER_NOT_REACHABLE,
-
-	/**
-	* Connection Timed out. 27
-	*/
-	ND_ERROR_CONNECT_TIMEDOUT,
-
-	/**
-	* Thread Already running. 28
-	*/
-	ND_ERROR_THREAD_ALREADY_RUNNING,
-
-	/**
-	* Data upload is aborted by the user. 29
-	*/
-	DP_ERROR_DATA_UPLOAD_ABORTED,
-
-	/**
-	* Indicates that the upload is not in progress. 30
-	*/
-	ND_ERROR_UPLOAD_NOT_IN_PROGRESS,
-
-	/**
-	* Indicates this device is Blocked or HTTP_403. 31
-	*/
-	ND_ERROR_FORBIDDEN_ERROR,
-
-	/**
-	* Indicates that Key provided for decryption is invalid. 32
-	*/
-	ND_ERROR_DECRYPTION_FAILED,
-
-	/**
-	* Call Open SSL lib return err. 33
-	*/
-	ND_ERROR_OPENSSL_LIB_CALL,
-
-	/**
-	* filedown complete
-	*/
-	ND_ERROR_DOWN_COMPLETE = 1001
-}ndErrorEn;
-
-/**
- ******************************************************************************
- * @brief   Node commands indicated by callback function.
- ******************************************************************************
- */
-typedef enum
-{
-	/**
-	* Action Init
-	*/
+	//节点init
 	ND_ACTION_NODE_INIT,
 
-	/**
-	* Action Hello
-	*/
-	ND_ACTION_NODE_HELLO,
-
-	/**
-	* Action Setting
-	*/
-	ND_ACTION_NODE_SETTING,
+	//节点hello
+	ND_ACTION_NODE_HELLO
 }ndActionEn;
+
+/**
+ ******************************************************************************
+ * @brief   返回码定义
+ ******************************************************************************
+ */
+typedef enum
+{
+    //成功
+    ND_SUCCESS = 0,
+
+    //参数无效
+    ND_ERROR_INVALID_PARAM,
+
+    //平台错误
+    ND_ERROR_PLATFORM_OS,
+
+    //认证失败
+    ND_ERROR_AUTHENTICATION_FAILED,
+
+    //系统不支持
+    ND_ERROR_RESUME_NOT_SUPPORTED,
+
+    //网络无效
+    ND_ERROR_NETWORK_NOT_AVAILABLE,
+
+    //创建socket失败
+    ND_ERROR_SOCKET_CREATION_FAILED,
+
+    //数据发送失败
+    ND_ERROR_SEND_FAILED,
+
+    //数据接收失败
+    ND_ERROR_RECEIVE_FAILED,
+
+    //服务器返回错误
+    ND_ERROR_SERVER,
+
+    //系统不支持
+    ND_ERROR_UNSUPPORTED,
+
+    //下载中断
+    ND_ERROR_DOWNLOAD_ABORTED,
+
+    //crc校验失败
+	ND_ERROR_CRC_CHECK_FAILED,
+
+	//长度溢出
+	ND_ERROR_SIZE_OVERFLOW,
+
+	//编码错误
+	ND_ERROR_MSG_ENCODE,
+
+	//解码错误
+	ND_ERROR_MSG_DECODE,
+
+	//普通错误
+	ND_ERROR_GENERAL,
+
+	//无效的请求
+	ND_ERROR_INVALID_REQUEST,
+
+	//应答无效
+	ND_ERROR_INVALID_RESPONSE,
+
+	//加载证书失败
+	ND_ERROR_LOAD_CA_CERTIFICATE,
+
+	//普通网络错误
+	ND_ERROR_NETWORK_GENERAL,
+
+	//网络不可达
+	ND_ERROR_SERVER_NOT_REACHABLE,
+
+	//连接超进
+	ND_ERROR_CONNECT_TIMEDOUT,
+
+	//线程已在运行中
+	ND_ERROR_THREAD_ALREADY_RUNNING,
+
+	//数据上传中断
+	DP_ERROR_DATA_UPLOAD_ABORTED,
+
+	//无权访问
+	ND_ERROR_FORBIDDEN_ERROR,
+
+	//解密失败
+	ND_ERROR_DECRYPTION_FAILED,
+
+	//调用openssl库失败
+	ND_ERROR_OPENSSL_LIB_CALL,
+}ndErrorEn;
 
 
 /**

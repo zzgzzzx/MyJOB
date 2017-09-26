@@ -25,7 +25,7 @@ CNodeGeneral::CNodeGeneral()
 出参说明：无
 返回值  ：无
 *********************************************************/
-CNodeGeneral::CNodeGeneral()
+CNodeGeneral::~CNodeGeneral()
 {
 }
 
@@ -50,11 +50,8 @@ ndStatus CNodeGeneral::InitData()
 *********************************************************/
 ndStatus CNodeGeneral::NodeInit()
 {
-    //与服务器通讯类
-    CHttpGeneral httpClient(*this, mCenterSrvIP);
-
     //初始化操作
-    ndStatus ret = httpClient.NodeInit();
+    ndStatus ret = mPHttpClient->NodeInit();
 	if (ret != ND_SUCCESS)
 	{
 		return ret;
@@ -74,10 +71,7 @@ ndStatus CNodeGeneral::NodeInit()
 *********************************************************/
 ndStatus CNodeGeneral::NodeHello()
 {
-    //与服务器通讯类
-    CHttpGeneral httpClient(*this, mCenterSrvIP);
-
     //Hello
-    httpClient.NodeHello();
+    mPHttpClient->NodeHello();
 }
 
