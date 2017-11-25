@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <limits.h>
-#include "cJosn/cJSON.h"
+#include "cJSON.h"
 
 static const char *ep;
 

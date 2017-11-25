@@ -54,7 +54,7 @@ void CTimerManager::ProcessVirtual(void)
 {
 	STimerNode *STNode;
 	
-	AfxWriteDebugLog("ROUTER SYSTEM TIMER BEGIN WORKING......");
+	AfxWriteDebugLog("SuperVPN run at [CTimerManager::ProcessVirtual] ROUTER SYSTEM TIMER BEGIN WORKING......");
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
 
 	while (true) 
@@ -113,7 +113,7 @@ int CTimerManager::InsertTimer(unsigned long callid,int timertype,unsigned long 
 
 	if (mTimerMap.find(callid,STNode))
 	{
-		AfxWriteDebugLog("INSERT TIMER ALREADY EXISTS!");
+		AfxWriteDebugLog("SuperVPN run at [CTimerManager::ProcessVirtual] INSERT TIMER ALREADY EXISTS!");
 		pthread_mutex_unlock(&m_Mutex);
 		return -1;
 	}
@@ -135,7 +135,7 @@ int CTimerManager::InsertTimer(unsigned long callid,int timertype,unsigned long 
 	
 	if (mTimerMap.size() == 1) pthread_cond_signal(&m_ProcessCond); //激活processcond条件变量
 
-	AfxWriteDebugLog("INSERT TIMER SUCCESS!");
+	AfxWriteDebugLog("SuperVPN run at [CTimerManager::ProcessVirtual] INSERT TIMER SUCCESS!");
 	pthread_mutex_unlock(&m_Mutex); 
 	
 	return 0;
@@ -153,7 +153,7 @@ int CTimerManager::DeleteTimer(int timertype,unsigned long callid)
 	STimerNode *STNode;
 	pthread_mutex_lock(&m_Mutex); 
 
-	AfxWriteDebugLog("DELETE TIMER Callid=[%lu]",callid);
+	AfxWriteDebugLog("SuperVPN run at [CTimerManager::ProcessVirtual] DELETE TIMER Callid=[%lu]",callid);
 
 	if (mTimerMap.find(callid,STNode))
 	{

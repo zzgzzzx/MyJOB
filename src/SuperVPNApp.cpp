@@ -22,10 +22,10 @@ CNodeBase *CSuperVPNApp::mPNode;
 bool CSuperVPNApp::InitApplication(void)
 {
 	//系统数据初始化
-	AfxWriteDebugLog("SYSTEM START BEGIN INIT SYSTEM...");
+	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitApplication] SYSTEM START BEGIN INIT SYSTEM...");
 	if (!InitSystem()) 
 	{
-		AfxWriteDebugLog("Init System Error......");
+		AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitApplication] Init System Error......");
 		cout<<"Init System Error......";
 		return false;
 	}

@@ -20,8 +20,13 @@ public:
 	CHttpUserNode(CNodeBase *node);	
 	
 protected:
-	//½Úµã³õÊ¼»¯
+	//Nodeåˆå§‹åŒ–
 	virtual ndStatus MakeNodeInitReq();
+	//Node Hello
+	virtual ndStatus MakeNodeHelloReq();
+	//Node Hello Response
+	virtual ndStatus AnalysisNodeHelloRsp();	
+
 };
 
 #endif //VPN_USER_NODE_HTTPCLIENT_H

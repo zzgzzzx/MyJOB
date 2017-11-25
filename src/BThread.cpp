@@ -56,6 +56,8 @@ int CBaseThread::Start(void)
 *************************************************/
 void* CBaseThread::EntryPoint(void * pArg)
 {
+	pthread_detach(pthread_self());
+
 	CBaseThread* poThread=(CBaseThread*)pArg;
 	poThread->ProcessVirtual();
 	return pArg;

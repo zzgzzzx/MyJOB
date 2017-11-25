@@ -119,6 +119,11 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 #endif
 
 /*---------------------------------------------------------------------------------------
+//VPN版本号
+-----------------------------------------------------------------------------------------*/
+#define SUPER_VPN_CLIENT_VER "1.0.0"
+
+/*---------------------------------------------------------------------------------------
 //系统支持的最大消息队列数
 -----------------------------------------------------------------------------------------*/
 #define MAX_FIFO_MSG_NUM 5000
@@ -135,28 +140,39 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 
 
 /*---------------------------------------------------------------------------------------
- * @brief  curl连接服务器超时时间（秒）
+//curl连接服务器超时时间（秒）
 -----------------------------------------------------------------------------------------*/
 #define VALUE_CURLOPT_CONNECTTIMEOUT 10
 
 /*---------------------------------------------------------------------------------------
- * @brief  curl接收数据超时时间（秒）
+//curl接收数据超时时间（秒）
 -----------------------------------------------------------------------------------------*/
 #define VALUE_CURLOPT_LOW_SPEED_TIME 30
 
 /*---------------------------------------------------------------------------------------
- * @brief  设备的key
+//设备的key
 -----------------------------------------------------------------------------------------*/
 #define BUILTIN_KEY  "ZEASN2016"
 
 /*---------------------------------------------------------------------------------------
- * @brief  中心服务器地址
+//中心服务器地址
 -----------------------------------------------------------------------------------------*/
-#define VPN_CENTER_URL  "https://deviceportal.zeasn.tv/dp/route"
+#define VPN_CENTER_USER_URL  "http://45.33.58.27:8080/anywhere/node/unode"
+#define VPN_CENTER_SRV_URL  "http://45.33.58.27:8080/anywhere/node/pnode"
 
 
 /*---------------------------------------------------------------------------------------
- * @brief   节点交易类型定义
+//数据包Action标签名称定义
+-----------------------------------------------------------------------------------------*/
+#define SUPER_ACTION_SERVER_NODE_HELLO "server-node-hello"
+#define SUPER_ACTION_USER_NODE_HELLO "user-node-hello"
+
+#define SUPER_ACTION_SERVER_NODE_SET "server-node-set"
+#define SUPER_ACTION_USER_NODE_SET "user-node-set"
+
+
+/*---------------------------------------------------------------------------------------
+//节点交易类型定义
 -----------------------------------------------------------------------------------------*/
 typedef enum
 {
@@ -169,93 +185,93 @@ typedef enum
 
 /**
  ******************************************************************************
- * @brief   返回码定义
+//返回码定义
  ******************************************************************************
  */
 typedef enum
 {
-    //成功
+    //成功0
     ND_SUCCESS = 0,
 
-    //参数无效
+    //参数无效1
     ND_ERROR_INVALID_PARAM,
 
-    //平台错误
+    //平台错误2
     ND_ERROR_PLATFORM_OS,
 
-    //认证失败
+    //认证失败3
     ND_ERROR_AUTHENTICATION_FAILED,
 
-    //系统不支持
+    //系统不支持4
     ND_ERROR_RESUME_NOT_SUPPORTED,
 
-    //网络无效
+    //网络无效5
     ND_ERROR_NETWORK_NOT_AVAILABLE,
 
-    //创建socket失败
+    //创建socket失败6
     ND_ERROR_SOCKET_CREATION_FAILED,
 
-    //数据发送失败
+    //数据发送失败7
     ND_ERROR_SEND_FAILED,
 
-    //数据接收失败
+    //数据接收失败8
     ND_ERROR_RECEIVE_FAILED,
 
-    //服务器返回错误
+    //服务器返回错误9
     ND_ERROR_SERVER,
 
-    //系统不支持
+    //系统不支持10
     ND_ERROR_UNSUPPORTED,
 
-    //下载中断
+    //下载中断11
     ND_ERROR_DOWNLOAD_ABORTED,
 
-    //crc校验失败
+    //crc校验失败12
 	ND_ERROR_CRC_CHECK_FAILED,
 
-	//长度溢出
+	//长度溢出13
 	ND_ERROR_SIZE_OVERFLOW,
 
-	//编码错误
+	//编码错误14
 	ND_ERROR_MSG_ENCODE,
 
-	//解码错误
+	//解码错误15
 	ND_ERROR_MSG_DECODE,
 
-	//普通错误
+	//普通错误16
 	ND_ERROR_GENERAL,
 
-	//无效的请求
+	//无效的请求17
 	ND_ERROR_INVALID_REQUEST,
 
-	//应答无效
+	//应答无效18
 	ND_ERROR_INVALID_RESPONSE,
 
-	//加载证书失败
+	//加载证书失败19
 	ND_ERROR_LOAD_CA_CERTIFICATE,
 
-	//普通网络错误
+	//普通网络错误20
 	ND_ERROR_NETWORK_GENERAL,
 
-	//网络不可达
+	//网络不可达21
 	ND_ERROR_SERVER_NOT_REACHABLE,
 
-	//连接超进
+	//连接超进22
 	ND_ERROR_CONNECT_TIMEDOUT,
 
-	//线程已在运行中
+	//线程已在运行中23
 	ND_ERROR_THREAD_ALREADY_RUNNING,
 
-	//数据上传中断
+	//数据上传中断24
 	DP_ERROR_DATA_UPLOAD_ABORTED,
 
-	//无权访问
+	//无权访问25
 	ND_ERROR_FORBIDDEN_ERROR,
 
-	//解密失败
+	//解密失败26
 	ND_ERROR_DECRYPTION_FAILED,
 
-	//调用openssl库失败
+	//调用openssl库失败27
 	ND_ERROR_OPENSSL_LIB_CALL,
 }ndErrorEn;
 

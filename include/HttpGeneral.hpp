@@ -19,15 +19,18 @@ using namespace network;
 class CHttpGeneral : public CHttpClient
 {
 private:
+	//数据包发送并接收处理
+	ndStatus PkgSendAndRecv(ndString url);
+protected:
 	//结点信息
-	CNodeBase *mPNode;
+	CNodeBase *mPNode;	
+	//服务端URL
+	ndString mSrvURL;
     //发送的数据buff
     ndString mSendBuf;
     //接收的数据buff
     ndString mRcvBuf;	
-	//数据包发送并接收处理
-	ndStatus PkgSendAndRecv(ndString url);
-protected:
+	
     //生成认证头
     virtual ndString GenerateAuthHeader();
 	//分析认证头

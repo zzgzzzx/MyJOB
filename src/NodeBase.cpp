@@ -7,6 +7,8 @@
 创建时间     :2017-09
 **********************************************************/
 #include "NodeBase.hpp"
+#include "NDFunc.hpp"
+
 
 /*********************************************************
 函数说明：构造函数
@@ -16,6 +18,10 @@
 *********************************************************/
 CNodeBase::CNodeBase()
 {
+	//获取本机的Mac地址
+	//mSNodeInform.sNodeMac = "bb:bb:bb:bb:bb:bc";
+	mSNodeInform.sNodeMac = "aa:aa:aa:aa:aa:cb";
+	
     mErrCode = ND_SUCCESS;
     mCallBackFunc = NULL;
 }
@@ -37,9 +43,21 @@ CNodeBase::~CNodeBase()
 出参说明：无
 返回值  ：无
 *********************************************************/
-
 void CNodeBase::SetNodeInform(SNodeInform &inform)
 {
+	inform.sNodeMac = mSNodeInform.sNodeMac;
+	mSNodeInform = inform;
+}
+
+/*********************************************************
+函数说明：获取节点参数信息
+入参说明：无
+出参说明：无
+返回值  ：无
+*********************************************************/
+SNodeInform CNodeBase::GetNodeInform()
+{
+	return mSNodeInform;
 }
 
 
@@ -98,9 +116,9 @@ void *CNodeBase::ThreadFunction(void *param)
     CNodeBase *clientBase = (CNodeBase*)(param);
     if (clientBase != NULL)
     {
-        TRACE("N2N run at [%s] Thread DealActionWithModel\n", __func__);
+        AfxWriteDebugLog("SuperVPN run at [CNodeBase::ThreadFunction] Thread DealActionWithModel");
         if(clientBase->GetLastErrCode() == ND_SUCCESS){
-            TRACE("N2N run at [%s] Set Last]\n", __func__);
+            AfxWriteDebugLog("SuperVPN run at [CNodeBase::ThreadFunction] Set Last]\n");
             clientBase->SetLastErrCode(ND_SUCCESS);
         }
         ndCallbackFunction callbackFunction = clientBase->GetCallBackFunction();
@@ -109,6 +127,6 @@ void *CNodeBase::ThreadFunction(void *param)
         }
         delete clientBase;
     }
-    TRACE("N2N run at [%s] Thread End\n", __func__);
+    AfxWriteDebugLog("SuperVPN run at [CNodeBase::ThreadFunction] Thread End\n");
     pthread_exit(0);
 }

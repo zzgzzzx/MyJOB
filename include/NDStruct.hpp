@@ -37,6 +37,26 @@ typedef struct
  * @note    This is the structure for node base inform
  ******************************************************************************
  */
+ typedef struct
+{
+	//vpn节点所属的域
+	ndString 	sDomain;
+	//vpn节点的ip地址
+	ndString 	lNodeIP;
+	//掩码
+	ndString	lMask;
+	//vpn节点所属域的key
+	ndString 	sDomainKey;
+}SDomain;
+
+ typedef struct
+{
+	 //vpn超级节点的IP地址
+	 ndString	 sSuperNodeIP;
+	 //vpn超级节点的端口号
+	 ndString	 sSuperNodePort;
+}SSupperNode;
+
 typedef struct
 {
 	//vpn节点的编号
@@ -45,16 +65,12 @@ typedef struct
 	ndString	sNodePwd;
 	//vpn节点的MAC地址
 	ndString 	sNodeMac;
-	//vpn节点的ip地址
-	ndULong 	lNodeIP;
-	//vpn节点所属的域
-	ndString 	sDomain;
-	//vpn节点所属域的key
-	ndString 	sDomainKey;
-	//vpn超级节点的IP地址
-	ndString 	sSuperNodeIP;
-	//vpn超级节点的端口号
-	ndString 	sSuperNodePort;
+	//HelloTime
+	ndInt32		lHelloTime;
+	//所属域的相关信息
+	vector<SSupperNode> mSupperNode;
+	//所属域的相关信息
+	list<SDomain> mDomainInforms;	
 }SNodeInform, *pSNodeInform;
 
 

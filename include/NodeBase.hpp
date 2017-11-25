@@ -44,6 +44,8 @@ public:
 
 	void SetNodeInform(SNodeInform &inform);
 
+	SNodeInform GetNodeInform();
+
     //»ñÈ¡´íÎóÂë
     ndULong GetLastErrCode();
     //ÉèÖÃ´íÎóÂë

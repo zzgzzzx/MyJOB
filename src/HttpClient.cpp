@@ -6,9 +6,9 @@
 作者         :lewis
 创建时间     :2017-09
 **********************************************************/
-#include "HttpClient.h"
-#include "NodeSrvBase.h"
-
+#include "HttpClient.hpp"
+#include "NodeSrv.hpp"
+#include "NDFunc.hpp"
 
 namespace network {
     CHttpClient::CHttpClient(void) :
@@ -28,15 +28,15 @@ namespace network {
 *********************************************************/
     static int OnDebug(CURL *, curl_infotype itype, char *pData, size_t size, void *) {
         if (itype == CURLINFO_TEXT) {
-            TRACE("N2N run at [%s] TEXT=[%s]\n", __func__, pData);
+            AfxWriteDebugLog("SuperVPN run at [%s] TEXT=[%s]", __func__, pData);
         } else if (itype == CURLINFO_HEADER_IN) {
-            TRACE("N2N run at [%s] HEADER_IN=[%s]\n", __func__, pData);
+            AfxWriteDebugLog("SuperVPN run at [%s] HEADER_IN=[%s]", __func__, pData);
         } else if (itype == CURLINFO_HEADER_OUT) {
-            TRACE("N2N run at [%s] HEADER_OUT=[%s]\n", __func__, pData);
+            AfxWriteDebugLog("SuperVPN run at [%s] HEADER_OUT=[%s]", __func__, pData);
         } else if (itype == CURLINFO_DATA_IN) {
-            TRACE("N2N run at [%s] DATA_IN=[%s]\n", __func__, pData);
+            AfxWriteDebugLog("SuperVPN run at [%s] DATA_IN=[%s]", __func__, pData);
         } else if (itype == CURLINFO_DATA_OUT) {
-            TRACE("N2N run at [%s] DATA_OUT=[%s]\n", __func__, pData);
+            AfxWriteDebugLog("SuperVPN run at [%s] DATA_OUT=[%s]", __func__, pData);
         }
         return 0;
     }
@@ -140,7 +140,7 @@ namespace network {
     CURLcode CHttpClient::Post(const char *pUrl, const char *pPost, ndString &strResponse)
     {
 //        if(GetCalPath().empty()){
-//            TRACE("N2N run at [%s] Server PEM IS NULL\n", __func__);
+//            AfxWriteDebugLog("SuperVPN run at [%s] Server PEM IS NULL", __func__);
 //            return CURLE_FAILED_INIT;
 //        }
 
@@ -178,7 +178,7 @@ namespace network {
         CURLcode res;
         CURL *curl = curl_easy_init();
         if (NULL == curl) {
-            TRACE("N2N run at [CHttpClient::Post] Curl Init Error\n");
+            AfxWriteDebugLog("SuperVPN run at [CHttpClient::Post] Curl Init Error");
             return CURLE_FAILED_INIT;
         }
 
@@ -188,7 +188,7 @@ namespace network {
         //headers = curl_slist_append(headers, GenerateAuthentication().c_str());
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
-        TRACE("N2N run at [CHttpClient::Post] Curl Easy Setopt URL=[%s]\n", pUrl);
+        AfxWriteDebugLog("SuperVPN run at [CHttpClient::Post] Curl Easy Setopt URL=[%s]", pUrl);
         if (m_bDebug) {
             curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
             curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, OnDebug);
@@ -205,16 +205,16 @@ namespace network {
         curl_easy_setopt(curl, CURLOPT_HEADERDATA, (void *) &strHeadData);
         curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
 
-        TRACE("N2N run at [CHttpClient::Post] Curl Add Header Inform\n");
+        AfxWriteDebugLog("SuperVPN run at [CHttpClient::Post] Curl Add Header Inform");
 
         if (pCookie != NULL) {
-            TRACE("N2N run at [CHttpClient::Post] Curl Set Cookie\n");
+            AfxWriteDebugLog("SuperVPN run at [CHttpClient::Post] Curl Set Cookie");
             curl_easy_setopt(curl, CURLOPT_COOKIEFILE, (void *) pCookie);
             curl_easy_setopt(curl, CURLOPT_COOKIEJAR, (void *) pCookie);
         }
 
         if (NULL == pCaPath) {
-            TRACE("N2N run at [CHttpClient::Post] Curl Set Not Support PEM\n");
+            AfxWriteDebugLog("SuperVPN run at [CHttpClient::Post] Curl Set Not Support PEM");
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, false);
 
@@ -227,13 +227,13 @@ namespace network {
         } else {
             //缺省情况就是PEM，所以无需设置，另外支持DER
             //curl_easy_setopt(curl,CURLOPT_SSLCERTTYPE,"PEM");
-            TRACE("N2N run at [CHttpClient::Post] Curl Set PEM=[%s]\n", pCaPath);
+            AfxWriteDebugLog("SuperVPN run at [CHttpClient::Post] Curl Set PEM=[%s]", pCaPath);
             curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, true);
             curl_easy_setopt(curl, CURLOPT_CAINFO, pCaPath);
 
             //服务端需要认证客户端的真实性，即双向认证。
             if (pClientCalPath != NULL) {
-                TRACE("N2N run at [CHttpClient::Post] Curl Set Client PEM\n");
+                AfxWriteDebugLog("SuperVPN run at [CHttpClient::Post] Curl Set Client PEM");
                 curl_easy_setopt(curl, CURLOPT_SSLCERT, pClientCalPath);
                 if(pClientCalPassword != NULL)
                     curl_easy_setopt(curl, CURLOPT_SSLCERTPASSWD, pClientCalPassword);
@@ -251,14 +251,14 @@ namespace network {
         //所以一定要设置CURLOPT_FOLLOWLOCATION为1,否则重定向后的数据不会返回。
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
 
-        TRACE("N2N run at [CHttpClient::Post] Begin perform\n");
+        AfxWriteDebugLog("SuperVPN run at [CHttpClient::Post] Begin send to server");
         res = curl_easy_perform(curl);
         //Router服务需要分析获取None、zKey、ZToken, 其他只分析None
         if(res != CURLE_OK)
-            TRACE("N2N run at [CHttpClient::Post] Curl Perform Err=[%d]???\n", res);
+            AfxWriteDebugLog("SuperVPN run at [CHttpClient::Post] Curl Perform Err=[%d]???", res);
 
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE , &mHttpRetcode);
-        TRACE("N2N run at [CHttpClient::Post] Http RetCode=[%d]\n", mHttpRetcode);
+        AfxWriteDebugLog("SuperVPN run at [CHttpClient::Post] Http RetCode=[%d]", mHttpRetcode);
 
         curl_easy_cleanup(curl);
 
@@ -276,14 +276,14 @@ namespace network {
         int bPos = sou.find(bFlag);
         if (bPos == string::npos) return false;
 
-        //TRACE("N2N run at [CHttpClient::GetSubString] SOU=[%s] bFlag=[%s] eFlag=[%s] bPOS=[%d]\n", sou.c_str(), bFlag.c_str(), eFlag.c_str(), bPos);
+        //AfxWriteDebugLog("SuperVPN run at [CHttpClient::GetSubString] SOU=[%s] bFlag=[%s] eFlag=[%s] bPOS=[%d]", sou.c_str(), bFlag.c_str(), eFlag.c_str(), bPos);
 
         string tmp = sou.substr(bPos+bFlag.length(), sou.length()-bPos-bFlag.length());
         int ePos = tmp.find(eFlag);
         if (ePos == string::npos) return false;
 
         out = tmp.substr(0, ePos);
-        //TRACE("N2N run at [CHttpClient::GetSubString] out=[%s]\n", out.c_str());
+        //AfxWriteDebugLog("SuperVPN run at [CHttpClient::GetSubString] out=[%s]", out.c_str());
 
         return true;
     }

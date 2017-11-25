@@ -217,7 +217,7 @@ int AfxGetAllIfName(vector<string> &vIFName)
 *********************************************************/
 bool AfxExecCmd(const char *cmd)
 {
-	AfxWriteDebugLog("Exec Cmd=[%s]",cmd);
+	AfxWriteDebugLog("SuperVPN run at [AfxExecCmd] Exec Cmd=[%s]",cmd);
 	int status = system(cmd);
 	if (status == -1)
 	{
