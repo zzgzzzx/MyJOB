@@ -8,6 +8,7 @@
 **********************************************************/
 #include "NodeUser.hpp"
 #include "HttpUserNode.hpp"
+#include "NDFunc.hpp"
 
 /*********************************************************
 函数说明：构造函数
@@ -18,6 +19,7 @@
 CNodeUser::CNodeUser()
 {
 	mPHttpClient = new CHttpUserNode(this);
+	AfxGetEthMac("eth0", mSNodeInform.sNodeMac);	
 }
 
 /*********************************************************

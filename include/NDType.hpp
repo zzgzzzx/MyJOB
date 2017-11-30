@@ -74,13 +74,6 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 #define TYPE_DEBUG_EXPORT_REMOTE	4	//4:远程监控输出 
 
 /*---------------------------------------------------------------------------------------
-//系统文件路径名称
------------------------------------------------------------------------------------------*/
-#define PATH_PROCNET_DEV		"/proc/net/dev"
-#define PATH_PROCNET_ARP		"/proc/net/arp"
-#define PATH_PROCNET_ROUTE	"/proc/net/route"
-
-/*---------------------------------------------------------------------------------------
 //日志文件名
 -----------------------------------------------------------------------------------------*/
 #define LOG_FILE_NAME	"/var/log/supervpn.log"
@@ -170,6 +163,8 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 #define SUPER_ACTION_SERVER_NODE_SET "server-node-set"
 #define SUPER_ACTION_USER_NODE_SET "user-node-set"
 
+#define VALUE_CURLOPT_DOWNLOAD_RETRY_TIMES 5
+#define VALUE_CURLOPT_POST_RETRY_TIMES 3
 
 /*---------------------------------------------------------------------------------------
 //节点交易类型定义

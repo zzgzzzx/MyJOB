@@ -40,6 +40,25 @@ bool CSuperVPNApp::InitApplication(void)
 *********************************************************/
 bool CSuperVPNApp::InitSystem(void)
 {
+	//版本升级检测
+    CHttpFileDown FileDown;
+    SDownloadFileReqSt downloadFileReqSt;
+    downloadFileReqSt.sLocalFile = "";
+    downloadFileReqSt.sUrl = "";
+    downloadFileReqSt.fFile = NULL;
+    downloadFileReqSt.iOffset = 0;
+    downloadFileReqSt.iCRC = 0;
+    downloadFileReqSt.iSize = 0;
+    if (!FileDown.SetDownFileReq(downloadFileReqSt))
+    {
+        return ND_ERROR_INVALID_REQUEST;
+    }
+    ndStatus ret = FileDown.ExecAction();
+    if(ret != ND_SUCCESS)
+    {
+        TRACE("SuperVPN run at [CCertificateSrv::GetSNInformAndCheck] Download Private Key Err=[%s] Code=[%d]\n", mKeyUrl.c_str(), ret);
+        return ret;
+    }
 	//节点初始化开始
 	mPNode->NodeInit();
 

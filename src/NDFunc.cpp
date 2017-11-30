@@ -183,32 +183,6 @@ static char *get_name(char *name, char *p)
 	return p;
 }
 
-int AfxGetAllIfName(vector<string> &vIFName)
-{
-	FILE *fh;
-	char buf[512];
-
-	if ((fh = fopen(PATH_PROCNET_DEV, "r")) == NULL) return 0;
-
-	fgets(buf, sizeof buf, fh);	/* eat line */
-	fgets(buf, sizeof buf, fh);	/* eat line */
-
-	while (fgets(buf, sizeof buf, fh)) 
-	{
-		char name[128];
-		get_name(name, buf);
-
-		if (strncmp(name, "eth", 3)) continue;
-		if (strchr(name, '.') != NULL) continue;
-
-		vIFName.push_back(name);
-	}
-
-	fclose(fh);
-
-	return vIFName.size();
-}
-
 /*********************************************************
 函数说明：执行系统命令
 入参说明：
@@ -318,18 +292,20 @@ char *AfxMacToStr(const ndUChar src[])
 出参说明：
 返回值  ：
 *********************************************************/
-void AfxGetEthMac(const char *ethname,ndUChar mac[])
+void AfxGetEthMac(const char *ethname, ndString &mac)
 {
 	ndUChar sMac[6];
+	char sTemp[64]={0};
 	int sd = 0;
 	struct  ifreq  if_data;
 
 	sd = socket(AF_INET, SOCK_DGRAM, 0);
 	strcpy( if_data.ifr_name, ethname );
 	ioctl( sd, SIOCGIFHWADDR, &if_data);
-	memcpy(mac, &if_data.ifr_hwaddr.sa_data, 6);
-	//memcpy(sMac,&if_data.ifr_hwaddr.sa_data,6);
-	//sprintf((char *)mac,"%02X-%02X-%02X-%02X-%02X-%02X",sMac[0],sMac[1],sMac[2],sMac[3],sMac[4],sMac[5]);
+	memcpy(sMac, &if_data.ifr_hwaddr.sa_data, 6);
+	sprintf(sTemp,"%02X-%02X-%02X-%02X-%02X-%02X",sMac[0],sMac[1],sMac[2],sMac[3],sMac[4],sMac[5]);
+	mac = sTemp;
+	
 	close( sd );
 }
 

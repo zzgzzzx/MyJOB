@@ -18,7 +18,7 @@ INCLUDE = -I../include -I../include/cJson -I/usr/include/curl -I/usr/local/ssl/i
 CFLAGS  = $(DFLAGS)
 CFLAGS += $(INCLUDE)
 
-OBJS=BaseApp.o BThread.o cJSON.o HttpClient.o HttpGeneral.o HttpUserNode.o HttpSrvNode.o MainServer.o NDFunc.o NodeBase.o NodeGeneral.o SuperVPNApp.o TimerManager.o NodeUser.o NodeSrv.o
+OBJS=BaseApp.o BThread.o cJSON.o HttpClient.o HttpGeneral.o HttpUserNode.o HttpSrvNode.o MainServer.o NDFunc.o NodeBase.o NodeGeneral.o SuperVPNApp.o TimerManager.o NodeUser.o NodeSrv.o HttpFileDown.o
 
 ALL:$(BIN)
 

@@ -20,7 +20,7 @@ CNodeBase::CNodeBase()
 {
 	//获取本机的Mac地址
 	//mSNodeInform.sNodeMac = "bb:bb:bb:bb:bb:bc";
-	mSNodeInform.sNodeMac = "aa:aa:aa:aa:aa:cb";
+	//mSNodeInform.sNodeMac = "aa:aa:aa:aa:aa:cb";
 	
     mErrCode = ND_SUCCESS;
     mCallBackFunc = NULL;

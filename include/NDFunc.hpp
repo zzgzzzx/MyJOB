@@ -33,6 +33,9 @@ bool AfxDeleteSingleTimer(unsigned long callid);
 //写调试日志
 void AfxWriteDebugLog(char *Format,...);
 
+//获取mac地址
+void AfxGetEthMac(const char *ethname, ndString &mac);
+	
 
 //网络序IP地址转成字符串
 inline char *AfxNetIPToStr(const ndULong &IP)

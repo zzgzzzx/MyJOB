@@ -8,6 +8,7 @@
 **********************************************************/
 #include "NodeSrv.hpp"
 #include "HttpSrvNode.hpp"
+#include "NDFunc.hpp"
 
 /*********************************************************
 函数说明：构造函数
@@ -18,7 +19,7 @@
 CNodeSrv::CNodeSrv()
 {
 	mPHttpClient = new CHttpSrvNode(this);
-
+	AfxGetEthMac("eth0", mSNodeInform.sNodeMac);	
 }
 
 /*********************************************************

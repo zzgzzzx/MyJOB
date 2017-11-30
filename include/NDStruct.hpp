@@ -73,6 +73,56 @@ typedef struct
 	list<SDomain> mDomainInforms;	
 }SNodeInform, *pSNodeInform;
 
+/*
+ ******************************************************************************
+ * @brief   File download request structure
+ * @note    This is the request structure for
+ ******************************************************************************
+ */
+typedef struct
+{
+    ndString	sUrl;
+    /**< URL of the file to be downloaded. */
+
+    ndString	sLocalFile;
+    /**< Paht of the file to be Save. */
+
+    FILE	*fFile;
+
+    ndDouble iSize;
+    /**< Size of the file in bytes. */
+
+    ndUInt32 iCRC;
+    /**< CRC-32 value of the file. If the value is 0, CRC check is not
+    perfomed by the client. */
+
+    ndULong iOffset;
+    /**< Offset of the file. When non-zero, a resume of an
+    existing download is requested. When download resume is not
+    supported for a certain download method,
+    an appropriate error is returned.*/
+}SDownloadFileReqSt;
+
+/**
+ ******************************************************************************
+ * @brief   File download response structure
+ * @note    This is the response structure for
+ *			#DownloadFile function.
+ ******************************************************************************
+ */
+typedef struct
+{
+    ndString	sUrl;
+    /**< URL of the file to be downloaded. */
+
+    ndBool		bIsDownloadComplete;
+    /**< Indicates whether download is complete or not. */
+
+    ndDouble	uiChunkOffset;
+    /**< Offset of the chunk. */
+}SDownloadFileRspSt;
+
+
 
 /**
  ******************************************************************************
