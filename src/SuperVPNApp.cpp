@@ -10,6 +10,7 @@
 #include "NDFunc.hpp"
 #include "NodeUser.hpp"
 #include "NodeSrv.hpp"
+#include "HttpUpdateCK.hpp"
 
 CNodeBase *CSuperVPNApp::mPNode;
 
@@ -41,24 +42,8 @@ bool CSuperVPNApp::InitApplication(void)
 bool CSuperVPNApp::InitSystem(void)
 {
 	//版本升级检测
-    CHttpFileDown FileDown;
-    SDownloadFileReqSt downloadFileReqSt;
-    downloadFileReqSt.sLocalFile = "";
-    downloadFileReqSt.sUrl = "";
-    downloadFileReqSt.fFile = NULL;
-    downloadFileReqSt.iOffset = 0;
-    downloadFileReqSt.iCRC = 0;
-    downloadFileReqSt.iSize = 0;
-    if (!FileDown.SetDownFileReq(downloadFileReqSt))
-    {
-        return ND_ERROR_INVALID_REQUEST;
-    }
-    ndStatus ret = FileDown.ExecAction();
-    if(ret != ND_SUCCESS)
-    {
-        TRACE("SuperVPN run at [CCertificateSrv::GetSNInformAndCheck] Download Private Key Err=[%s] Code=[%d]\n", mKeyUrl.c_str(), ret);
-        return ret;
-    }
+	UpdateCheck();
+
 	//节点初始化开始
 	mPNode->NodeInit();
 
@@ -66,11 +51,25 @@ bool CSuperVPNApp::InitSystem(void)
 	AfxInsertCircleTimer(TIMER_ID_NODE_HELLO_CHECK, TIMER_VALUE_NODE_HELLO_CHECK, NodeHelloFunc);
 
 	//循环等待保证不退出应用
-	while(true)
+	while(!mStopRun)
 		sleep(60);
 
 	return true;
 }
+
+/*********************************************************
+函数说明：版本测试升级
+入参说明：
+出参说明：
+返回值  ：
+*********************************************************/
+void CSuperVPNApp::UpdateCheck()
+{
+	CHttpUpdateCK httpUpdateCK;
+	if (httpUpdateCK.BeginUpdateCheck() == ND_SUCCESS)
+		mStopRun = true;
+}
+
 
 /*********************************************************
 函数说明：构造函数
@@ -80,6 +79,7 @@ bool CSuperVPNApp::InitSystem(void)
 *********************************************************/
 CSuperVPNApp::CSuperVPNApp()
 {
+	mStopRun = false;
 	#ifdef GENERAL_NODE_USER_APP
 		mPNode = new CNodeUser();
 	#else

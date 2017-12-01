@@ -1,7 +1,5 @@
-//
 // Created by lewis on 2017/3/18.
 // FZ-Zeasn
-//
 
 #ifndef VPN_DPCOMMSTR_H
 #define VPN_DPCOMMSTR_H
@@ -82,25 +80,11 @@ typedef struct
 typedef struct
 {
     ndString	sUrl;
-    /**< URL of the file to be downloaded. */
-
     ndString	sLocalFile;
-    /**< Paht of the file to be Save. */
-
     FILE	*fFile;
-
     ndDouble iSize;
-    /**< Size of the file in bytes. */
-
     ndUInt32 iCRC;
-    /**< CRC-32 value of the file. If the value is 0, CRC check is not
-    perfomed by the client. */
-
     ndULong iOffset;
-    /**< Offset of the file. When non-zero, a resume of an
-    existing download is requested. When download resume is not
-    supported for a certain download method,
-    an appropriate error is returned.*/
 }SDownloadFileReqSt;
 
 /**
@@ -112,16 +96,29 @@ typedef struct
  */
 typedef struct
 {
+	//下载的URL
     ndString	sUrl;
-    /**< URL of the file to be downloaded. */
-
+	//下否下载完成
     ndBool		bIsDownloadComplete;
-    /**< Indicates whether download is complete or not. */
-
+	//已下载的文件大小
     ndDouble	uiChunkOffset;
-    /**< Offset of the chunk. */
 }SDownloadFileRspSt;
 
+/**
+ ******************************************************************************
+ * @brief   upgrade response structure
+ * @note    This is the response structure for upate check
+ ******************************************************************************
+ */
+typedef struct
+{
+	//新的版本号
+    ndUInt32 	iVerCode;
+	//MD5校验值
+    ndString	sMD5;
+	//下载的URL链接地址
+    list<ndString> mDownLodURL;
+}SUpdateCKSt;
 
 
 /**

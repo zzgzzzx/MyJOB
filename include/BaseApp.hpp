@@ -54,9 +54,12 @@ class CSuperVPNApp: public CBaseApp
 private:
 	//节点
 	static CNodeBase *mPNode;
+	//是否需要退出标识
+	ndBool mStopRun;	
 	//系统数据初始化
 	bool InitSystem(void);
- 
+ 	//版本测试升级
+ 	void UpdateCheck();
 protected:
 	//应用程序初始化工作
 	bool InitApplication(void);

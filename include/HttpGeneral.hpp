@@ -18,9 +18,6 @@ using namespace network;
  */
 class CHttpGeneral : public CHttpClient
 {
-private:
-	//数据包发送并接收处理
-	ndStatus PkgSendAndRecv(ndString url);
 protected:
 	//结点信息
 	CNodeBase *mPNode;	
@@ -43,6 +40,9 @@ protected:
 	//节点Hello
 	virtual ndStatus MakeNodeHelloReq();
 	virtual ndStatus AnalysisNodeHelloRsp();
+
+	//数据包发送并接收处理
+	ndStatus PkgSendAndRecv(ndString url);	
 
 public:
     CHttpGeneral();
