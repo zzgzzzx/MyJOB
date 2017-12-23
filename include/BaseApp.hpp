@@ -58,8 +58,8 @@ private:
 	ndBool mStopRun;	
 	//系统数据初始化
 	bool InitSystem(void);
- 	//版本测试升级
- 	void UpdateCheck();
+ 	//系统运行环境检测
+ 	ndStatus RunEnvCheck();
 protected:
 	//应用程序初始化工作
 	bool InitApplication(void);

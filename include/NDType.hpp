@@ -114,7 +114,9 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 /*---------------------------------------------------------------------------------------
 //VPN版本号
 -----------------------------------------------------------------------------------------*/
-#define SUPER_VPN_CLIENT_VER "1000"
+#define SUPER_VPN_CLIENT_VER_SERVER "1009"
+#define SUPER_VPN_CLIENT_VER_NODE "1009"
+
 
 /*---------------------------------------------------------------------------------------
 //系统支持的最大消息队列数
@@ -151,12 +153,10 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 //中心服务器地址
 -----------------------------------------------------------------------------------------*/
 #define VPN_CENTER_USER_URL  "http://45.33.58.27:8080/anywhere/node/unode"
-#define VPN_CENTER_SRV_URL  "http://45.33.58.27:8080/anywhere/node/pnode"
 
-/*---------------------------------------------------------------------------------------
-//升级检测服务器地址
------------------------------------------------------------------------------------------*/
-#define VPN_UPGRADE_SRV_URL  "http://45.33.58.27:8080/anywhere/checkversion"
+#define VPN_CENTER_GW_URL  "http://45.33.58.27:8080/anywhere/node/unode"
+
+#define VPN_CENTER_SRV_URL  "http://45.33.58.27:8080/anywhere/node/pnode"
 
 /*---------------------------------------------------------------------------------------
 //升级文件的临时文件名
@@ -172,6 +172,11 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 
 #define SUPER_ACTION_SERVER_NODE_SET "server-node-set"
 #define SUPER_ACTION_USER_NODE_SET "user-node-set"
+
+#define SUPER_ACTION_USER_NODE_ROUTE "user-node-get-services"
+#define SUPER_ACTION_NODE_ENV_CHECK "run-env-check"
+
+
 
 #define VALUE_CURLOPT_DOWNLOAD_RETRY_TIMES 5
 #define VALUE_CURLOPT_POST_RETRY_TIMES 3

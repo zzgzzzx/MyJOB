@@ -76,6 +76,11 @@ inline ndULong AfxGetSrcIP(int socket)
 	return sa.sin_addr.s_addr;
 }
 
+bool AfxFileExist(const string filepath);
+ndDouble AfxFileSize(const string filepath);
+
+bool AfxCheckCmdExist(const string cmd);
+
 //÷¥––œµÕ≥√¸¡Ó
 bool AfxExecCmd(const char *cmd);
 

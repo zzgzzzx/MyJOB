@@ -29,6 +29,16 @@ typedef struct
 	ndInt16 LogDayNum;		//本地日志的存储的天数(天);
 }SLogConf, *pSLogConf;
 
+ /* 策略路由的信息 */
+ typedef struct
+{
+	 //vpn超级节点的IP地址
+	 ndString	 sServiceIP;
+	 //下游设备的ip地址
+	 ndString	 sDeviceIP;
+}SRouteInform;
+ 
+
 /**
  ******************************************************************************
  * @brief   node inform structure
@@ -106,8 +116,8 @@ typedef struct
 
 /**
  ******************************************************************************
- * @brief   upgrade response structure
- * @note    This is the response structure for upate check
+ * @brief   run env check structure
+ * @note    This is the response structure for run env check
  ******************************************************************************
  */
 typedef struct
@@ -118,54 +128,31 @@ typedef struct
     ndString	sMD5;
 	//下载的URL链接地址
     list<ndString> mDownLodURL;
-}SUpdateCKSt;
+}SNodeCKSt;
 
-
-/**
- ******************************************************************************
- * @brief   Service parameters
- * @note    This structure hold information about various service parameters
- *			in name-value format. The example of this can be Name="Country",
- *			cValue="NL". The name and value pairs are agreed between the
- *			server and device teams. The application must allocate enough
- *			memory to hold the data. Else, it may result in memory overflow
- *			or crash.
- ******************************************************************************
- */
 typedef struct
 {
-    ndString sName;
+	//MD5校验值
+    ndString	sMD5;
+	//下载的URL链接地址
+    list<ndString> mDownLodURL;
+}SEdgeCKSt;
 
-    ndString sValue;
-}dpResourceproperSt;
-
-/**
- ******************************************************************************
- * @brief   Service Portal structure
- * @note    This structure provides information about the service portal.
- ******************************************************************************
- */
 typedef struct
 {
-    ndString sName;
+	//MD5校验值
+    ndString	sMD5;
+	//下载的URL链接地址
+    list<ndString> mDownLodURL;
+}SIPTableCKSt;
 
-    ndString sValue;
-
-    list<dpResourceproperSt> lpropertys;
-}dpResourceSt;
-
-/**
- ******************************************************************************
- * @brief   Service Portal response structure
- * @note    This is the response structure for #dpClientGetServicePortals
- ******************************************************************************
- */
 typedef struct
 {
-    ndUInt32 uiResourceReturned;
+	SNodeCKSt node;
+	SEdgeCKSt edge;
+	SIPTableCKSt iptable;
+}SRunEnvCKSt;
 
-    list<dpResourceSt> lResource;
-}dpResourceRspSt;
 
 //字符串动态数组定义
 typedef vector<string> StrVector;

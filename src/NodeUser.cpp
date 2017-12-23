@@ -9,6 +9,7 @@
 #include "NodeUser.hpp"
 #include "HttpUserNode.hpp"
 #include "NDFunc.hpp"
+#include "NodeGateway.hpp"
 
 /*********************************************************
 函数说明：构造函数
@@ -19,7 +20,6 @@
 CNodeUser::CNodeUser()
 {
 	mPHttpClient = new CHttpUserNode(this);
-	AfxGetEthMac("eth0", mSNodeInform.sNodeMac);	
 }
 
 /*********************************************************
@@ -30,5 +30,28 @@ CNodeUser::CNodeUser()
 *********************************************************/
 CNodeUser::~CNodeUser()
 {
-	delete mPHttpClient;
 }
+
+/*********************************************************
+函数说明：结点初始化，向服务器申请配置信息
+入参说明：无
+出参说明：无
+返回值  ：无
+*********************************************************/
+ndStatus CNodeUser::NodeInit()
+{
+	ndStatus ret = CNodeGeneral::NodeInit();
+
+	if (ret != ND_SUCCESS) return ret;
+
+
+	CNodeGateway nodeGateway;
+    ret = nodeGateway.RouteSetting();
+	if (ret != ND_SUCCESS)
+	{
+		AfxWriteDebugLog("SuperVPN run at [CNodeUser::NodeInit] RouteSetting error=[%d]", ret);
+	}	
+
+	return ret;
+}
+

@@ -7,6 +7,7 @@
 创建时间     :2017-03
 **********************************************************/
 #include "HttpFileDown.hpp"
+#include "NDFunc.hpp"
 
 /*********************************************************
 函数说明：构造函数
@@ -108,35 +109,6 @@ ndBool CHttpFileDown::SetDownFileRsp(ndUInt32 uiChunkOffset)
 返回值  ：true-设置成功
           false-设置失败
 *********************************************************/
-bool FileExist(const string filepath)
-{
-	if(filepath.length() <= 0)
-		return false;
-	if (access(filepath.c_str(), F_OK) == 0)
-		return true;
-	return false;
-}
-
-ndDouble FileSize(const string filepath)
-{
-    FILE *fp;
-    ndDouble size = -1;
-
-    if(!FileExist(filepath)) return -1;
-
-    if ((fp = fopen(filepath.c_str(), "r")) == NULL) {
-        printf("SuperVPN run at [%s] Read File size open Error\n", __FUNCTION__);
-        return -1;
-    }
-
-    fseek(fp, 0, SEEK_END);
-    size = ftell(fp);
-    fclose(fp);
-
-    return size;
-}
-
-
 bool CHttpFileDown::SetDownFileReq(SDownloadFileReqSt req)
 {
     mDownReq = req;
@@ -149,7 +121,7 @@ bool CHttpFileDown::SetDownFileReq(SDownloadFileReqSt req)
     if(!mDownReq.sLocalFile.empty())
     {
         //如果文件存在并且下载的偏移量等于文件大小，表示断点续传
-        if(FileSize(mDownReq.sLocalFile.c_str()) == mDownReq.iOffset){
+        if(AfxFileSize(mDownReq.sLocalFile.c_str()) == mDownReq.iOffset){
             TRACE("SuperVPN run at [CHttpFileDown::GetFile] Create File a+\n");
             mFile = fopen(mDownReq.sLocalFile.c_str(), "a+");
         }else{

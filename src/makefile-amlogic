@@ -1,5 +1,5 @@
 #create by lewis
-CROSS=
+CROSS=arm-linux-gnueabihf-
 CXX=$(CROSS)g++
 CC=$(CROSS)gcc
 STRIP=$(CROSS)strip
@@ -10,8 +10,8 @@ CP= cp -f -r
 BIN=SuperVPN
 AR=ar
 
-DFLAGS  = -w -Wall -DDEBUG  -D_RAW -g -DGENERAL_NODE_USER_APP
-RFLAGS  = -w -o2 -Wall -D_RAW -DGENERAL_NODE_USER_APP
+DFLAGS  = -w -Wall -DDEBUG  -D_RAW -g -DGENERAL_NODE_USER_APP_S
+RFLAGS  = -w -o2 -Wall -D_RAW -DGENERAL_NODE_USER_APP_S
 
 INCLUDE = -I../include -I../include/cJson -I/usr/include/curl
 
@@ -23,7 +23,7 @@ OBJS=BaseApp.o BThread.o cJSON.o HttpClient.o HttpGeneral.o HttpGateway.o HttpUs
 ALL:$(BIN)
 
 $(BIN): $(OBJS)
-	$(CXX) $(OBJS) -o $(BIN) -lpthread -lcurl
+	$(CXX) $(OBJS) -o $(BIN) -L/home/zhangzx/amlogic/curl/lib -static -lpthread -lcurl
 	$(STRIP) $(BIN)
 
 .c.o:

@@ -12,24 +12,31 @@
 
 
 /**
- * CHttpUpdateCK Class
+ * CHttpRunEvnCK Class
  */
-class CHttpUpdateCK : public CHttpGeneral
+class CHttpRunEvnCK : public CHttpGeneral
 {
 public:
-	CHttpUpdateCK();	
+	CHttpRunEvnCK(CNodeBase *node);	
 	//开始检测
-	ndStatus BeginUpdateCheck();	
+	ndStatus BeginCheck();	
 	
 private:
-	//升级检测数据
-	SUpdateCKSt mSUpdateCK;
+	//检测数据
+	SRunEnvCKSt mRunEnvCK;
 	//check请求
 	virtual ndStatus MakeCheckReq();
 	//Check应答
 	virtual ndStatus AnalysisCheckRsp();	
+	//edge检测
+	ndStatus EdgeCheck();
+	//iptable检测
+	ndStatus IPTableCheck();
+	//node检测
+	ndStatus NodeCheck();
+	
 	//下载文件
-	ndStatus DownloadNewVersion();
+	ndStatus Download(ndString filename, list<ndString> urls);
 	//覆盖文件并升级
 	ndStatus UpgradeAndReboot();
 };

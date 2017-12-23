@@ -10,7 +10,7 @@
 #include "NDFunc.hpp"
 #include "NodeUser.hpp"
 #include "NodeSrv.hpp"
-#include "HttpUpdateCK.hpp"
+#include "HttpRunEnvCK.hpp"
 
 CNodeBase *CSuperVPNApp::mPNode;
 
@@ -41,8 +41,9 @@ bool CSuperVPNApp::InitApplication(void)
 *********************************************************/
 bool CSuperVPNApp::InitSystem(void)
 {
-	//版本升级检测
-	UpdateCheck();
+	//系统运行环境检测(包括edge\iptable\node-version)
+	while(RunEnvCheck() != ND_SUCCESS)
+		sleep(8);
 
 	//节点初始化开始
 	mPNode->NodeInit();
@@ -58,16 +59,15 @@ bool CSuperVPNApp::InitSystem(void)
 }
 
 /*********************************************************
-函数说明：版本测试升级
+函数说明：系统运行环境检测(包括edge\iptable\node-version)
 入参说明：
 出参说明：
 返回值  ：
 *********************************************************/
-void CSuperVPNApp::UpdateCheck()
+ ndStatus CSuperVPNApp::RunEnvCheck()
 {
-	CHttpUpdateCK httpUpdateCK;
-	if (httpUpdateCK.BeginUpdateCheck() == ND_SUCCESS)
-		mStopRun = true;
+	CHttpRunEvnCK httpRunEnvCK(mPNode);
+	return httpRunEnvCK.BeginCheck();
 }
 
 
@@ -80,11 +80,11 @@ void CSuperVPNApp::UpdateCheck()
 CSuperVPNApp::CSuperVPNApp()
 {
 	mStopRun = false;
-	#ifdef GENERAL_NODE_USER_APP
-		mPNode = new CNodeUser();
-	#else
-		mPNode = new CNodeSrv();
-	#endif
+#ifdef GENERAL_NODE_USER_APP
+	mPNode = new CNodeUser();
+#else
+	mPNode = new CNodeSrv();
+#endif
 }
 
 /*********************************************************

@@ -17,7 +17,7 @@
 class CHttpUserNode : public CHttpGeneral
 {
 public:
-	CHttpUserNode(CNodeBase *node);	
+	CHttpUserNode(CNodeBase *node);
 	
 protected:
 	//Node初始化

@@ -36,7 +36,12 @@ ndStatus CHttpUserNode::MakeNodeHelloReq()
     //组装消息体
     root = cJSON_CreateObject();
     cJSON_AddItemToObject(root, "node", fmt=cJSON_CreateObject());
-    cJSON_AddStringToObject(fmt, "version",	SUPER_VPN_CLIENT_VER);
+#ifdef GENERAL_NODE_USER_APP
+		cJSON_AddStringToObject(fmt, "version",	SUPER_VPN_CLIENT_VER_NODE);
+#else
+		cJSON_AddStringToObject(fmt, "version",	SUPER_VPN_CLIENT_VER_SERVER);
+#endif	
+
     cJSON_AddStringToObject(fmt, "mac", mPNode->GetNodeInform().sNodeMac.c_str());
 
     AfxWriteDebugLog("SuperVPN run at [CHttpUserNode::MakeNodeHelloReq] Make Hello actions");
@@ -84,7 +89,12 @@ ndStatus CHttpUserNode::MakeNodeInitReq()
     //组装消息体
     root = cJSON_CreateObject();
     cJSON_AddItemToObject(root, "node", fmt=cJSON_CreateObject());
-    cJSON_AddStringToObject(fmt, "version",	SUPER_VPN_CLIENT_VER);
+#ifdef GENERAL_NODE_USER_APP
+	cJSON_AddStringToObject(fmt, "version",	SUPER_VPN_CLIENT_VER_NODE);
+#else
+	cJSON_AddStringToObject(fmt, "version",	SUPER_VPN_CLIENT_VER_SERVER);
+#endif	
+
     cJSON_AddStringToObject(fmt, "mac", mPNode->GetNodeInform().sNodeMac.c_str());
 
     AfxWriteDebugLog("SuperVPN run at [CHttpUserNode::MakeNodeInitReq] Make Init actions");

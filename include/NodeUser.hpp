@@ -16,6 +16,9 @@ class CNodeUser: public CNodeGeneral
 public:
     CNodeUser();
     virtual ~CNodeUser();
+
+	//结点初始化，向服务器申请配置信息
+	ndStatus NodeInit();	
 };
 
 #endif //VPN_NODE_USER_H

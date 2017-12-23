@@ -19,7 +19,6 @@
 CNodeSrv::CNodeSrv()
 {
 	mPHttpClient = new CHttpSrvNode(this);
-	AfxGetEthMac("eth0", mSNodeInform.sNodeMac);	
 }
 
 /*********************************************************
@@ -30,6 +29,5 @@ CNodeSrv::CNodeSrv()
 *********************************************************/
 CNodeSrv::~CNodeSrv()
 {
-	delete mPHttpClient;
 }
 

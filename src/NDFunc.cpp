@@ -184,6 +184,68 @@ static char *get_name(char *name, char *p)
 }
 
 /*********************************************************
+函数说明：文件是否存在检测
+入参说明：
+出参说明：
+返回值  ：返回false表示不存在
+*********************************************************/
+bool AfxFileExist(const string filepath)
+{
+	if(filepath.length() <= 0)
+		return false;
+	if (access(filepath.c_str(), F_OK) == 0)
+		return true;
+	return false;
+}
+
+/*********************************************************
+函数说明：获取文件大小检
+入参说明：
+出参说明：
+返回值  ：返回文件的实际大小
+*********************************************************/
+ndDouble AfxFileSize(const string filepath)
+{
+    FILE *fp;
+    ndDouble size = -1;
+
+    if(!AfxFileExist(filepath)) return -1;
+
+    if ((fp = fopen(filepath.c_str(), "r")) == NULL) {
+        printf("SuperVPN run at [%s] Read File size open Error\n", __FUNCTION__);
+        return -1;
+    }
+
+    fseek(fp, 0, SEEK_END);
+    size = ftell(fp);
+    fclose(fp);
+
+    return size;
+}
+
+/*********************************************************
+函数说明：检测命令是否存在
+入参说明：
+出参说明：
+返回值  ：返回true表示存在
+*********************************************************/
+bool AfxCheckCmdExist(const string cmd)
+{
+	FILE   *stream;
+	char buf[2048]={0};
+	
+	stream = popen( "which uname1", "r" );	
+	fread( buf, sizeof(char), sizeof(buf), stream);
+	pclose( stream );
+
+	if(!strcmp(buf, ""))
+		return true;
+
+	return false;
+}
+
+
+/*********************************************************
 函数说明：执行系统命令
 入参说明：
 出参说明：
