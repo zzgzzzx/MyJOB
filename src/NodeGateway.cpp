@@ -82,15 +82,15 @@ ndStatus CNodeGateway::SetPolicyRoute()
     	SRouteInform route = *iterRoute;
 		
  		sprintf(ExecCMD, "iptables -t mangle -A PREROUTING -s %s -j MARK --set-mark %d", route.sDeviceIP.c_str(), iTableIndex);
-		AfxWriteDebugLog("SuperVPN run at [CNodeGateway::SetPolicyRoute] ExecCmd=[%s]", ExecCMD);
+		//AfxWriteDebugLog("SuperVPN run at [CNodeGateway::SetPolicyRoute] ExecCmd=[%s]", ExecCMD);
 		AfxExecCmd(ExecCMD);
 
  		sprintf(ExecCMD, "ip rule add fwmark %d table %d", iTableIndex, iTableIndex);
-		AfxWriteDebugLog("SuperVPN run at [CNodeGateway::SetPolicyRoute] ExecCmd=[%s]", ExecCMD);
+		//AfxWriteDebugLog("SuperVPN run at [CNodeGateway::SetPolicyRoute] ExecCmd=[%s]", ExecCMD);
 		AfxExecCmd(ExecCMD);
 
  		sprintf(ExecCMD, "ip route add 0/0 via %s table %d", route.sServiceIP.c_str(), iTableIndex);
-		AfxWriteDebugLog("SuperVPN run at [CNodeGateway::SetPolicyRoute] ExecCmd=[%s]", ExecCMD);
+		//AfxWriteDebugLog("SuperVPN run at [CNodeGateway::SetPolicyRoute] ExecCmd=[%s]", ExecCMD);
 		AfxExecCmd(ExecCMD);
 
 		iTableIndex++;

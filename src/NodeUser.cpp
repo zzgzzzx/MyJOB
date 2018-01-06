@@ -44,7 +44,6 @@ ndStatus CNodeUser::NodeInit()
 
 	if (ret != ND_SUCCESS) return ret;
 
-
 	CNodeGateway nodeGateway;
     ret = nodeGateway.RouteSetting();
 	if (ret != ND_SUCCESS)

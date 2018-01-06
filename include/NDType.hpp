@@ -114,8 +114,8 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 /*---------------------------------------------------------------------------------------
 //VPN版本号
 -----------------------------------------------------------------------------------------*/
-#define SUPER_VPN_CLIENT_VER_SERVER "1009"
-#define SUPER_VPN_CLIENT_VER_NODE "1009"
+#define SUPER_VPN_CLIENT_VER_SERVER 1009
+#define SUPER_VPN_CLIENT_VER_NODE 1009
 
 
 /*---------------------------------------------------------------------------------------
@@ -283,9 +283,6 @@ typedef enum
 
 	//调用openssl库失败27
 	ND_ERROR_OPENSSL_LIB_CALL,
-
-	//不需要升级
-	ND_ERROR_NO_NEED_UPGRADE
 }ndErrorEn;
 
 

@@ -92,11 +92,11 @@ ndBool CHttpFileDown::SetDownFileRsp(ndUInt32 uiChunkOffset)
 
     if (mDownReq.iSize <=  mDownRsp.uiChunkOffset){
         mDownRsp.bIsDownloadComplete = ND_TRUE;
-        //TRACE("SuperVPN run at [CHttpFileDown::SetDownFileRsp] Complete...\n");
+        //AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::SetDownFileRsp] Complete...\n");
     }
     else{
         mDownRsp.bIsDownloadComplete = ND_FALSE;
-        //TRACE("SuperVPN run at [CHttpFileDown::SetDownFileRsp] Not Complete...\n");
+        //AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::SetDownFileRsp] Not Complete...\n");
     }
 
     return mDownRsp.bIsDownloadComplete;
@@ -114,30 +114,30 @@ bool CHttpFileDown::SetDownFileReq(SDownloadFileReqSt req)
     mDownReq = req;
     mFile = req.fFile;
 
-    TRACE("SuperVPN run at [CHttpFileDown::GetFile] FilePath=[%s]\n", mDownReq.sLocalFile.c_str());
-    TRACE("SuperVPN run at [CHttpFileDown::GetFile] offset=[%lu]\n", mDownReq.iOffset);
+    AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] FilePath=[%s]\n", mDownReq.sLocalFile.c_str());
+    AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] offset=[%lu]\n", mDownReq.iOffset);
 
     //以传文件路径的优先级高
     if(!mDownReq.sLocalFile.empty())
     {
         //如果文件存在并且下载的偏移量等于文件大小，表示断点续传
         if(AfxFileSize(mDownReq.sLocalFile.c_str()) == mDownReq.iOffset){
-            TRACE("SuperVPN run at [CHttpFileDown::GetFile] Create File a+\n");
+            AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] Create File a+\n");
             mFile = fopen(mDownReq.sLocalFile.c_str(), "a+");
         }else{
-            TRACE("SuperVPN run at [CHttpFileDown::GetFile] Create File wb\n");
+            AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] Create File wb\n");
             mFile = fopen(mDownReq.sLocalFile.c_str(), "wb");
         }
     }
 
     if(NULL == mFile)
     {
-        TRACE("SuperVPN run at [CHttpFileDown::GetFile] File Is NULL ERROR\n");
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] File Is NULL ERROR\n");
         return false;
     }
 
     if(mDownReq.iOffset < 0){
-        TRACE("SuperVPN run at [CHttpFileDown::GetFile] Offset =[%lu] Err\n", mDownReq.iOffset);
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] Offset =[%lu] Err\n", mDownReq.iOffset);
         return false;
     }
     mDownRsp.uiChunkOffset = mDownReq.iOffset;
@@ -160,18 +160,18 @@ size_t OnWriteData_GetFile(void *ptr, size_t size, size_t nmemb, void *stream) {
     //如果中断下载，则退出
     if(FileDown->IFAbortDownload())
     {
-        TRACE("SuperVPN run at [CHttpFileDown::OnWriteData_GetFile] Write File Abort...\n");
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::OnWriteData_GetFile] Write File Abort...\n");
         return 0;
     }
 
     size_t written = fwrite(ptr, size, nmemb, FileDown->GetDownLoadFile());
     if(written <= 0){
-        TRACE("SuperVPN run at [CHttpFileDown::OnWriteData_GetFile] Write File Error\n");
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::OnWriteData_GetFile] Write File Error\n");
         return 0;
     }
 
-    //TRACE("SuperVPN run at [CHttpFileDown::OnWriteData_GetFile] Write File Written Len=[%d]\n", written);
-    //TRACE("SuperVPN run at [CHttpFileDown::OnWriteData_GetFile] Write File iOffset=[%d]\n", FileDown->GetDownFileReq().iOffset);
+    //AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::OnWriteData_GetFile] Write File Written Len=[%d]\n", written);
+    //AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::OnWriteData_GetFile] Write File iOffset=[%d]\n", FileDown->GetDownFileReq().iOffset);
 
     //增加判断是不是已下载完成，如果下载完成了就关闭文件
     if (FileDown->SetDownFileRsp(written) == ND_TRUE){
@@ -179,7 +179,7 @@ size_t OnWriteData_GetFile(void *ptr, size_t size, size_t nmemb, void *stream) {
             FileDown->FileClose();
     }
 
-    //TRACE("SuperVPN run at [CHttpFileDown::OnWriteData_GetFile] Write File...\n");
+    //AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::OnWriteData_GetFile] Write File...\n");
     return written;
 }
 
@@ -199,9 +199,9 @@ size_t get_size_struct(void* ptr, size_t size, size_t nmemb, void* data){
 
 double CHttpFileDown::GetDownloadFileSize()
 {
-    TRACE("SuperVPN run at [CHttpFileDown::GetDownloadFileSize] Begin Get FileSize Url=[%s]\n", mDownReq.sUrl.c_str());
+    AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetDownloadFileSize] Begin Get FileSize Url=[%s]\n", mDownReq.sUrl.c_str());
     if(mDownReq.sUrl.empty()){
-        TRACE("SuperVPN run at [CHttpFileDown::GetDownloadFileSize] Url Empty\n");
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetDownloadFileSize] Url Empty\n");
         return ND_ERROR_INVALID_REQUEST;
     }
 
@@ -230,9 +230,9 @@ RePerform:
         if ( (code == CURLE_OK) && (retcode == 200) )
         {
             curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD , &downloadFileLenth);
-            TRACE("SuperVPN run at [CHttpFileDown::GetDownloadFileSize] Begin Get downloadFileLenth=[%f]\n", downloadFileLenth);
+            AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetDownloadFileSize] Begin Get downloadFileLenth=[%f]\n", downloadFileLenth);
         }else{
-            TRACE("SuperVPN run at [CHttpFileDown::GetDownloadFileSize] CURLCode=[%d] retcode=[%d]\n", code, retcode);
+            AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetDownloadFileSize] CURLCode=[%d] retcode=[%d]\n", code, retcode);
         }
     }
     else
@@ -250,13 +250,13 @@ RePerform:
                 ret == CURLE_COULDNT_CONNECT ||
                 ret == CURLE_COULDNT_RESOLVE_HOST) && (iReperform > 0)){
 
-            TRACE("dpclient run at [CHttpFileDown::GetDownloadFileSize] perform return =[%d], reperform=[%d]\n", ret, iReperform);
+            AfxWriteDebugLog("dpclient run at [CHttpFileDown::GetDownloadFileSize] perform return =[%d], reperform=[%d]\n", ret, iReperform);
             iReperform--;
             goto RePerform;
         }
 
         downloadFileLenth = -1;
-        TRACE("SuperVPN run at [CHttpFileDown::GetDownloadFileSize] Begin Get downloadFileLenth ERROR Curl=[%d]\n", ret);
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetDownloadFileSize] Begin Get downloadFileLenth ERROR Curl=[%d]\n", ret);
     }
     curl_easy_cleanup(curl);
     //if(fErr != NULL) fclose(fErr);
@@ -274,18 +274,18 @@ RePerform:
 ndStatus CHttpFileDown::BeginDownload()
 {
     if(mDownReq.sUrl.empty()){
-        TRACE("SuperVPN run at [CHttpFileDown::DealActionWithModel] Download Url Empty\n");
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::DealActionWithModel] Download Url Empty\n");
         return ND_ERROR_INVALID_REQUEST;
     }
 
     if(mDownReq.sLocalFile.empty() && mDownReq.fFile == NULL){
-        TRACE("SuperVPN run at [CHttpFileDown::DealActionWithModel] Local Or File handler Empty\n");
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::DealActionWithModel] Local Or File handler Empty\n");
         return ND_ERROR_INVALID_REQUEST;
     }
 
     if(mDownReq.iSize <= 0){
         mDownReq.iSize = GetDownloadFileSize();
-        TRACE("SuperVPN run at [CHttpFileDown::DealActionWithModel] FileSize=[%f]\n", mDownReq.iSize);
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::DealActionWithModel] FileSize=[%f]\n", mDownReq.iSize);
         if(mDownReq.iSize <= 0){
             return ND_ERROR_DOWNLOAD_ABORTED;
         }
@@ -293,7 +293,7 @@ ndStatus CHttpFileDown::BeginDownload()
 
     CURLcode ret = GetFile();
     if (ret != CURLE_OK){
-        TRACE("SuperVPN run at [CHttpFileDown::DealActionWithModel] Curl Retcode=[%d]\n", ret);
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::DealActionWithModel] Curl Retcode=[%d]\n", ret);
         return ND_ERROR_DOWNLOAD_ABORTED;
     }
 
@@ -344,17 +344,17 @@ CURLcode CHttpFileDown::GetFile(const char *pCookie,
     int iReperform = VALUE_CURLOPT_DOWNLOAD_RETRY_TIMES;
     int iCouldNotConnect = 1;
 
-    TRACE("SuperVPN run at [CHttpFileDown::GetFile] Begin Download FIle\n");
-    TRACE("SuperVPN run at [CHttpFileDown::GetFile] Url=[%s]\n", mDownReq.sUrl.c_str());
+    AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] Begin Download FIle\n");
+    AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] Url=[%s]\n", mDownReq.sUrl.c_str());
 
     if(mDownReq.sUrl.empty()){
-        TRACE("SuperVPN run at [CHttpFileDown::GetFile] Url Empty\n");
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] Url Empty\n");
         return CURLE_FAILED_INIT;
     }
 
     curl = curl_easy_init();
     if (curl == NULL) {
-        TRACE("SuperVPN run at [CHttpFileDown::GetFile] Curl init Err\n");
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] Curl init Err\n");
         return CURLE_FAILED_INIT;
     }
 
@@ -362,35 +362,35 @@ CURLcode CHttpFileDown::GetFile(const char *pCookie,
     headers = curl_slist_append(headers, "Accept: *.*");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
-    //TRACE("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_ERRORBUFFER\n");
+    //AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_ERRORBUFFER\n");
     code = curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, bufError);
     if (code != CURLE_OK) {
-        TRACE("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_ERRORBUFFER Err\n");
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_ERRORBUFFER Err\n");
         goto _END;
     }
 
-    TRACE("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_RESUME_FROM_LARGE Offset=[%d]\n", mDownReq.iOffset);
+    AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_RESUME_FROM_LARGE Offset=[%d]\n", mDownReq.iOffset);
     code =curl_easy_setopt(curl, CURLOPT_RESUME_FROM, mDownReq.iOffset);
     if (code != CURLE_OK) {
-        TRACE("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_RESUME_FROM_LARGE Err\n");
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_RESUME_FROM_LARGE Err\n");
         goto _END;
     }
 
     code = curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, VALUE_CURLOPT_CONNECTTIMEOUT);
     if (code != CURLE_OK) {
-        TRACE("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_TIMEOUT Err\n");
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_TIMEOUT Err\n");
         goto _END;
     }
 
     //code = curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
     //if (code != CURLE_OK) {
-    //    TRACE("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_TIMEOUT Err\n");
+    //    AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_TIMEOUT Err\n");
     //    goto _END;
     //}
 
     code =curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
     if (code != CURLE_OK) {
-        TRACE("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_NOSIGNAL Err\n");
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_NOSIGNAL Err\n");
         goto _END;
     }
 
@@ -400,39 +400,39 @@ CURLcode CHttpFileDown::GetFile(const char *pCookie,
     curl_easy_setopt(curl, CURLOPT_LOW_SPEED_LIMIT, 1);
     curl_easy_setopt(curl, CURLOPT_LOW_SPEED_TIME, VALUE_CURLOPT_LOW_SPEED_TIME);
 
-    TRACE("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_URL\n");
+    AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_URL\n");
     code = curl_easy_setopt(curl, CURLOPT_URL, mDownReq.sUrl.c_str());
     if (code != CURLE_OK) {
-        TRACE("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_URL Err\n");
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_URL Err\n");
         goto _END;
     }
 
     code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
     if (code != CURLE_OK) {
-        TRACE("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_FOLLOWLOCATION Err\n");
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_FOLLOWLOCATION Err\n");
         goto _END;
     }
 
     code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, OnWriteData_GetFile);
     if (code != CURLE_OK) {
-        TRACE("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_WRITEFUNCTION Err\n");
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_WRITEFUNCTION Err\n");
         goto _END;
     }
 
     code = curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
     if (code != CURLE_OK) {
-        TRACE("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_WRITEDATA Err\n");
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] CURLOPT_WRITEDATA Err\n");
         goto _END;
     }
 
-    //TRACE("SuperVPN run at [CHttpFileDown::GetFile] Cookie\n");
+    //AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] Cookie\n");
     if (pCookie != 0) {
         curl_easy_setopt(curl, CURLOPT_COOKIEFILE, (void *) pCookie);
         curl_easy_setopt(curl, CURLOPT_COOKIEJAR, (void *) pCookie);
     }
 
     //单向认证用
-    //TRACE("SuperVPN run at [CHttpFileDown::GetFile] CaPath\n");
+    //AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] CaPath\n");
     if (pCaPath != 0) {
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, true);
         curl_easy_setopt(curl, CURLOPT_CAINFO, pCaPath);
@@ -448,14 +448,14 @@ CURLcode CHttpFileDown::GetFile(const char *pCookie,
         curl_easy_setopt(curl, CURLOPT_SSLKEYTYPE, "PEM");
     }
 
-    TRACE("SuperVPN run at [CHttpFileDown::GetFile] curl_easy_perform\n");
+    AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] curl_easy_perform\n");
 
 RePerform:
     code = curl_easy_perform(curl);
     if (code != CURLE_OK) {
         if(code == CURLE_RANGE_ERROR && bFirstPerform)
         {
-            TRACE("SuperVPN run at [%s] Error End CURL Code=[%d] RePerform^_^\n", __FUNCTION__, code);
+            AfxWriteDebugLog("SuperVPN run at [%s] Error End CURL Code=[%d] RePerform^_^\n", __FUNCTION__, code);
             curl_easy_setopt(curl, CURLOPT_RESUME_FROM_LARGE, mDownReq.iOffset);
             bFirstPerform = false;
             iReperform = VALUE_CURLOPT_DOWNLOAD_RETRY_TIMES;
@@ -479,12 +479,12 @@ RePerform:
             mDownReq.iOffset = mDownRsp.uiChunkOffset;
             curl_easy_setopt(curl, CURLOPT_RESUME_FROM, mDownReq.iOffset);
 
-            TRACE("SuperVPN run at [CHttpFileDown::GetFile] perform return =[%d], reperform=[%d] Offset=[%u]\n", code, iReperform, mDownReq.iOffset);
+            AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] perform return =[%d], reperform=[%d] Offset=[%u]\n", code, iReperform, mDownReq.iOffset);
             iReperform--;
             goto RePerform;
         }
 
-        TRACE("SuperVPN run at [CHttpFileDown::GetFile] curl_easy_perform Return Err code=[%d]\n", code);
+        AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] curl_easy_perform Return Err code=[%d]\n", code);
         goto _END;
     }
 
@@ -493,15 +493,15 @@ RePerform:
     if (code == CURLE_OK){
         if  (retcode =! 200){
             if( !mDownReq.sLocalFile.empty() && remove(mDownReq.sLocalFile.c_str()) != 0 )
-                TRACE("SuperVPN run at [CHttpFileDown::GetFile] Remove File Err=[%s]\n", mDownReq.sLocalFile.c_str());
+                AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] Remove File Err=[%s]\n", mDownReq.sLocalFile.c_str());
             else
-                TRACE("SuperVPN run at [CHttpFileDown::GetFile] Remove File Success=[%s]\n", mDownReq.sLocalFile.c_str());
+                AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] Remove File Success=[%s]\n", mDownReq.sLocalFile.c_str());
         }
     }else{
         if( !mDownReq.sLocalFile.empty() && remove(mDownReq.sLocalFile.c_str()) != 0 )
-            TRACE("SuperVPN run at [CHttpFileDown::GetFile] Remove File Err=[%s]\n", mDownReq.sLocalFile.c_str());
+            AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] Remove File Err=[%s]\n", mDownReq.sLocalFile.c_str());
         else
-            TRACE("SuperVPN run at [CHttpFileDown::GetFile] Remove File Success=[%s]\n", mDownReq.sLocalFile.c_str());
+            AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] Remove File Success=[%s]\n", mDownReq.sLocalFile.c_str());
     }
 
     _END:
@@ -510,7 +510,7 @@ RePerform:
     if(!mDownReq.sLocalFile.empty())
         FileClose();
 
-    TRACE("SuperVPN run at [CHttpFileDown::GetFile] End>>>\n");
+    AfxWriteDebugLog("SuperVPN run at [CHttpFileDown::GetFile] End>>>\n");
 
     return code;
 }

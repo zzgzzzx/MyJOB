@@ -21,7 +21,7 @@ CNodeGeneral::CNodeGeneral()
 {
 	mPHttpClient = NULL;
 	AfxGetEthMac("eth0", mSNodeInform.sNodeMac);	
-	mSNodeInform.sNodeMac = "aa:bb:cc:dd:ee:ff";
+	//mSNodeInform.sNodeMac = "aa:bb:cc:dd:ee:ff";
 }
 
 /*********************************************************

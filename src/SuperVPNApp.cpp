@@ -10,7 +10,8 @@
 #include "NDFunc.hpp"
 #include "NodeUser.hpp"
 #include "NodeSrv.hpp"
-#include "HttpRunEnvCK.hpp"
+#include "HttpRunEnvCKUser.hpp"
+#include "HttpRunEnvCKSrv.hpp"
 
 CNodeBase *CSuperVPNApp::mPNode;
 
@@ -66,7 +67,11 @@ bool CSuperVPNApp::InitSystem(void)
 *********************************************************/
  ndStatus CSuperVPNApp::RunEnvCheck()
 {
-	CHttpRunEvnCK httpRunEnvCK(mPNode);
+#ifdef GENERAL_NODE_USER_APP
+	CHttpRunEvnCKUser httpRunEnvCK(mPNode);
+#else
+	CHttpRunEvnCKSrv httpRunEnvCK(mPNode);
+#endif
 	return httpRunEnvCK.BeginCheck();
 }
 

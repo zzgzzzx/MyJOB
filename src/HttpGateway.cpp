@@ -38,17 +38,9 @@ ndStatus CHttpGateway::MakeRouteSetting()
     //组装消息体
     root = cJSON_CreateObject();
     cJSON_AddItemToObject(root, "node", fmt=cJSON_CreateObject());
-	
-	#ifdef GENERAL_NODE_USER_APP
-		cJSON_AddStringToObject(fmt, "version",	SUPER_VPN_CLIENT_VER_NODE);
-	#else
-		cJSON_AddStringToObject(fmt, "version",	SUPER_VPN_CLIENT_VER_SERVER);
-	#endif	
-    
+	cJSON_AddNumberToObject(fmt, "version",	SUPER_VPN_CLIENT_VER_NODE);    
     cJSON_AddStringToObject(fmt, "mac", mPNode->GetNodeInform().sNodeMac.c_str());
-
     AfxWriteDebugLog("SuperVPN run at [CHttpGateway::MakeRouteSetting] Make RouteSetting actions");
-
     cJSON_AddItemToObject(root, "actions", actions = cJSON_CreateArray());
 
     //========================set===========================================

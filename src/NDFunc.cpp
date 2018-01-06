@@ -232,16 +232,17 @@ ndDouble AfxFileSize(const string filepath)
 bool AfxCheckCmdExist(const string cmd)
 {
 	FILE   *stream;
-	char buf[2048]={0};
-	
-	stream = popen( "which uname1", "r" );	
+	char buf[2048]={0}, strCMD[128]={0};
+
+	sprintf(strCMD, "which %s", cmd.c_str());	
+	stream = popen( strCMD, "r" );	
 	fread( buf, sizeof(char), sizeof(buf), stream);
 	pclose( stream );
 
 	if(!strcmp(buf, ""))
-		return true;
+		return false;
 
-	return false;
+	return true;
 }
 
 

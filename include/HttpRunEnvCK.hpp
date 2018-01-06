@@ -30,8 +30,6 @@ private:
 	virtual ndStatus AnalysisCheckRsp();	
 	//edge检测
 	ndStatus EdgeCheck();
-	//iptable检测
-	ndStatus IPTableCheck();
 	//node检测
 	ndStatus NodeCheck();
 	
@@ -39,6 +37,12 @@ private:
 	ndStatus Download(ndString filename, list<ndString> urls);
 	//覆盖文件并升级
 	ndStatus UpgradeAndReboot();
+
+protected:
+	//当前版本号
+	int mLocalVersion;	
+	//iptable检测
+	virtual ndStatus IPTableCheck();
 };
 
 #endif //VPN_SRV_NODE_HTTPCLIENT_H
