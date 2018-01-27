@@ -114,22 +114,43 @@ ndStatus CNodeGeneral::SetN2NVPNNetwork()
 	return ND_SUCCESS;
 }
 
-
 /*********************************************************
-函数说明：结点初始化
+函数说明：节点初始化
 入参说明：无
 出参说明：无
 返回值  ：DP_SUCCESS-成功
           Others-失败
 *********************************************************/
+
 ndStatus CNodeGeneral::NodeInit()
 {
-    //初始化操作
- ReInit:
-    ndStatus ret = mPHttpClient->NodeInit();
+//初始化操作
+ReInit:
+	ndStatus ret = mPHttpClient->NodeInit();
 	if (ret != ND_SUCCESS)
 	{
-		AfxWriteDebugLog("SuperVPN run at [CNodeGeneral::NodeInit] Node init error=[%d]", ret);
+		AfxWriteDebugLog("SuperVPN run at [CNodeGeneral::NodeEnvSet] Node init error=[%d]", ret);
+		goto ReInit;
+	}
+	return ret;
+}
+
+
+/*********************************************************
+函数说明：节点环境配置
+入参说明：无
+出参说明：无
+返回值  ：DP_SUCCESS-成功
+          Others-失败
+*********************************************************/
+ndStatus CNodeGeneral::NodeEnvSet()
+{
+    //配置操作
+ ReInit:
+    ndStatus ret = mPHttpClient->NodeEnvSet();
+	if (ret != ND_SUCCESS)
+	{
+		AfxWriteDebugLog("SuperVPN run at [CNodeGeneral::NodeEnvSet] Node init error=[%d]", ret);
 		goto ReInit;
 	}
 
@@ -146,6 +167,6 @@ ndStatus CNodeGeneral::NodeInit()
 ndStatus CNodeGeneral::NodeHello()
 {
     //Hello
-    mPHttpClient->NodeHello();
+    return mPHttpClient->NodeHello();
 }
 

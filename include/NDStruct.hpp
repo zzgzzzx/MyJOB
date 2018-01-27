@@ -75,6 +75,8 @@ typedef struct
 	ndString 	sNodeMac;
 	//HelloTime
 	ndInt32		lHelloTime;
+	//RestartTime
+	ndInt32		lRestartTime;	
 	//所属域的相关信息
 	vector<SSupperNode> mSupperNode;
 	//所属域的相关信息

@@ -38,9 +38,9 @@ CNodeUser::~CNodeUser()
 出参说明：无
 返回值  ：无
 *********************************************************/
-ndStatus CNodeUser::NodeInit()
+ndStatus CNodeUser::NodeEnvSet()
 {
-	ndStatus ret = CNodeGeneral::NodeInit();
+	ndStatus ret = CNodeGeneral::NodeEnvSet();
 
 	if (ret != ND_SUCCESS) return ret;
 
@@ -48,7 +48,7 @@ ndStatus CNodeUser::NodeInit()
     ret = nodeGateway.RouteSetting();
 	if (ret != ND_SUCCESS)
 	{
-		AfxWriteDebugLog("SuperVPN run at [CNodeUser::NodeInit] RouteSetting error=[%d]", ret);
+		AfxWriteDebugLog("SuperVPN run at [CNodeUser::NodeEnvSet] RouteSetting error=[%d]", ret);
 	}	
 
 	return ret;

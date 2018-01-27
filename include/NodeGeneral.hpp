@@ -28,10 +28,12 @@ public:
 
     //数据处理前的初始化操作
     virtual ndStatus InitData();
-
-	//结点初始化，向服务器申请配置信息
+	//节点初始化
 	virtual ndStatus NodeInit();
-	//结点Hello
+
+	//节点向服务器申请配置信息
+	virtual ndStatus NodeEnvSet();
+	//节点Hello
 	virtual ndStatus NodeHello();
 };
 

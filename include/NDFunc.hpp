@@ -33,6 +33,10 @@ bool AfxDeleteSingleTimer(unsigned long callid);
 //写调试日志
 void AfxWriteDebugLog(char *Format,...);
 
+void AfxWriteNodeID(const char *nodeid);
+char *AfxGetNodeID();
+
+
 //获取mac地址
 void AfxGetEthMac(const char *ethname, ndString &mac);
 	

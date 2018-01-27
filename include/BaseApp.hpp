@@ -60,6 +60,8 @@ private:
 	bool InitSystem(void);
  	//系统运行环境检测
  	ndStatus RunEnvCheck();
+	//节点初始化编号检测
+	ndStatus NodeInitCheck();
 protected:
 	//应用程序初始化工作
 	bool InitApplication(void);
@@ -71,6 +73,8 @@ public:
 	~CSuperVPNApp();	
 	//节点hello
 	static void NodeHelloFunc(ndULong param);	
+	//节点重启
+	static void NodeRestartFunc(ndULong param);		
 };
 
 #endif

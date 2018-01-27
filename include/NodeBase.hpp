@@ -28,10 +28,12 @@ public:
     CNodeBase();
     virtual ~CNodeBase();
 
-	//结点初始化，向服务器申请配置信息
-	virtual ndStatus NodeInit()=0;
-	//结点Hello
+	//节点初服务器申请配置信息
+	virtual ndStatus NodeEnvSet()=0;
+	//节点Hello
 	virtual ndStatus NodeHello()=0;
+	//节点初始化
+	virtual ndStatus NodeInit()=0;
 	
 
 	//异步回调处理函数
@@ -43,6 +45,8 @@ public:
     ndCallbackFunction GetCallBackFunction();
 
 	void SetNodeInform(SNodeInform &inform);
+
+	void SetNodeID(ndString nodeid);
 
 	SNodeInform GetNodeInform();
 

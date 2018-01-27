@@ -36,7 +36,7 @@ ndStatus CHttpSrvNode::MakeNodeHelloReq()
     root = cJSON_CreateObject();
     cJSON_AddItemToObject(root, "node", fmt=cJSON_CreateObject());
 	cJSON_AddNumberToObject(fmt, "version",	SUPER_VPN_CLIENT_VER_SERVER);
-    cJSON_AddStringToObject(fmt, "mac", mPNode->GetNodeInform().sNodeMac.c_str());
+    cJSON_AddStringToObject(fmt, "nodeid", mPNode->GetNodeInform().sNodeID.c_str());
 
     AfxWriteDebugLog("SuperVPN run at [CHttpSrvNode::MakeNodeHelloReq] Make Hello actions");
 
@@ -84,7 +84,40 @@ ndStatus CHttpSrvNode::MakeNodeInitReq()
     cJSON_AddItemToObject(root, "node", fmt=cJSON_CreateObject());
 	cJSON_AddNumberToObject(fmt, "version",	SUPER_VPN_CLIENT_VER_SERVER);
     cJSON_AddStringToObject(fmt, "mac", mPNode->GetNodeInform().sNodeMac.c_str());
-    AfxWriteDebugLog("SuperVPN run at [CHttpSrvNode::MakeNodeInitReq] Make Init actions");
+    AfxWriteDebugLog("SuperVPN run at [CHttpSrvNode::MakeNodeEnvSetReq] Make Init actions");
+    cJSON_AddItemToObject(root, "actions", actions = cJSON_CreateArray());
+
+    //========================set===========================================
+    cJSON_AddItemToArray(actions, fmt = cJSON_CreateObject());
+    cJSON_AddStringToObject(fmt, "action", SUPER_ACTION_SERVER_NODE_INIT);
+	cJSON_AddStringToObject(fmt, "arugments", "");
+
+    out = cJSON_Print(root);
+    mSendBuf = out;
+
+    cJSON_Delete(root);
+    free(out);
+
+    return ND_SUCCESS;
+}
+
+/*********************************************************
+函数说明：节点配置
+入参说明：无
+出参说明：无
+返回值  ：无
+*********************************************************/
+ndStatus CHttpSrvNode::MakeNodeEnvSetReq()
+{
+    char *out;
+    cJSON *root, *fmt, *actions;
+
+    //组装消息体
+    root = cJSON_CreateObject();
+    cJSON_AddItemToObject(root, "node", fmt=cJSON_CreateObject());
+	cJSON_AddNumberToObject(fmt, "version",	SUPER_VPN_CLIENT_VER_SERVER);
+    cJSON_AddStringToObject(fmt, "nodeid", mPNode->GetNodeInform().sNodeID.c_str());
+    AfxWriteDebugLog("SuperVPN run at [CHttpSrvNode::MakeNodeEnvSetReq] Make Init actions");
     cJSON_AddItemToObject(root, "actions", actions = cJSON_CreateArray());
 
     //========================set===========================================

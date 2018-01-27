@@ -39,7 +39,7 @@ ndStatus CHttpGateway::MakeRouteSetting()
     root = cJSON_CreateObject();
     cJSON_AddItemToObject(root, "node", fmt=cJSON_CreateObject());
 	cJSON_AddNumberToObject(fmt, "version",	SUPER_VPN_CLIENT_VER_NODE);    
-    cJSON_AddStringToObject(fmt, "mac", mPNode->GetNodeInform().sNodeMac.c_str());
+    cJSON_AddStringToObject(fmt, "nodeid", mPNode->GetNodeInform().sNodeID.c_str());
     AfxWriteDebugLog("SuperVPN run at [CHttpGateway::MakeRouteSetting] Make RouteSetting actions");
     cJSON_AddItemToObject(root, "actions", actions = cJSON_CreateArray());
 
@@ -108,12 +108,12 @@ ndStatus CHttpGateway::AnalysisRouteSetting()
                         if(cJSON_GetObjectItem(serviceslist, "devicesip") != NULL &&
                            cJSON_GetObjectItem(serviceslist, "devicesip")->valuestring != NULL)
                             item.sDeviceIP = cJSON_GetObjectItem(serviceslist, "devicesip")->valuestring;
-						AfxWriteDebugLog("SuperVPN run at [CHttpGeneral::AnalysisNodeInitRsp] deviceip=[%s]",item.sDeviceIP.c_str());
+						AfxWriteDebugLog("SuperVPN run at [CHttpGeneral::AnalysisRouteSetting] deviceip=[%s]",item.sDeviceIP.c_str());
 
                         if(cJSON_GetObjectItem(serviceslist, "serviceip") != NULL &&
                            cJSON_GetObjectItem(serviceslist, "serviceip")->valuestring != NULL)
                             item.sServiceIP = cJSON_GetObjectItem(serviceslist, "serviceip")->valuestring;
-						AfxWriteDebugLog("SuperVPN run at [CHttpGeneral::AnalysisNodeInitRsp] ServiceIP=[%s]",item.sServiceIP.c_str());
+						AfxWriteDebugLog("SuperVPN run at [CHttpGeneral::AnalysisRouteSetting] ServiceIP=[%s]",item.sServiceIP.c_str());
 
                         routeInfo.push_back(item);
                         serviceslist = serviceslist->next;
@@ -131,7 +131,7 @@ ndStatus CHttpGateway::AnalysisRouteSetting()
 }
 
 /*********************************************************
-函数说明：节点初始化
+函数说明：GetRouteSetting
 入参说明：无
 出参说明：无
 返回值  ：无

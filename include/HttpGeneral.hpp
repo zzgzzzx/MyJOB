@@ -37,6 +37,10 @@ protected:
 	virtual ndStatus MakeNodeInitReq();
 	virtual ndStatus AnalysisNodeInitRsp();
 
+	//节点配置
+	virtual ndStatus MakeNodeEnvSetReq();
+	virtual ndStatus AnalysisNodeEnvSetRsp();
+
 	//节点Hello
 	virtual ndStatus MakeNodeHelloReq();
 	virtual ndStatus AnalysisNodeHelloRsp();
@@ -48,8 +52,9 @@ public:
     CHttpGeneral();
 	CHttpGeneral(CNodeBase *node);
 
-	ndStatus NodeInit();
+	ndStatus NodeEnvSet();
 	ndStatus NodeHello();
+	ndStatus NodeInit();
 	
     virtual ~CHttpGeneral();
 

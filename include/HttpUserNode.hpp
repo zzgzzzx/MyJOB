@@ -22,6 +22,8 @@ public:
 protected:
 	//Node初始化
 	virtual ndStatus MakeNodeInitReq();
+	//节点配置
+	virtual ndStatus MakeNodeEnvSetReq();
 	//Node Hello
 	virtual ndStatus MakeNodeHelloReq();
 	//Node Hello Response

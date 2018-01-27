@@ -78,6 +78,12 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 -----------------------------------------------------------------------------------------*/
 #define LOG_FILE_NAME	"/var/log/supervpn.log"
 
+/*---------------------------------------------------------------------------------------
+//节点编号文件名
+-----------------------------------------------------------------------------------------*/
+#define NODEID_FILE_NAME	"node.id"
+
+
 /**
  ******************************************************************************
  * @brief   Definition of ND_FALSE
@@ -127,6 +133,8 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 //定时器ID设置
 -----------------------------------------------------------------------------------------*/
 #define TIMER_ID_NODE_HELLO_CHECK	0x0001			//hello检测检测
+#define TIMER_ID_NODE_RESTART_CHECK	0x0002			//restart检测检测
+
 
 /*---------------------------------------------------------------------------------------
 //定时器时间设置(秒数)
@@ -167,6 +175,9 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 /*---------------------------------------------------------------------------------------
 //数据包Action标签名称定义
 -----------------------------------------------------------------------------------------*/
+#define SUPER_ACTION_SERVER_NODE_INIT "server-node-init"
+#define SUPER_ACTION_USER_NODE_INIT "user-node-init"
+
 #define SUPER_ACTION_SERVER_NODE_HELLO "server-node-hello"
 #define SUPER_ACTION_USER_NODE_HELLO "user-node-hello"
 

@@ -105,13 +105,49 @@ void AfxTraceLocalLog(char *sLogContext)
 {
 	FILE *pFile;
 
-	if ((pFile = fopen(LOG_FILE_NAME,"a+")) == NULL) return;
+	if ((pFile = fopen(LOG_FILE_NAME, "a+")) == NULL) return;
 
 	fputs(sLogContext, pFile);
 	fputs("\n", pFile);
 	fclose(pFile);
 	Shringk(LOG_FILE_NAME);
 }
+
+/*********************************************************
+函数说明：写调试日志
+入参说明：
+出参说明：
+返回值  ：
+*********************************************************/
+void AfxWriteNodeID(const char *nodeid)
+{
+	FILE *pFile;
+
+	if ((pFile = fopen(NODEID_FILE_NAME, "w+")) == NULL) return;
+
+	fputs(nodeid, pFile);
+	fclose(pFile);
+}
+
+/*********************************************************
+函数说明：写调试日志
+入参说明：
+出参说明：
+返回值  ：
+*********************************************************/
+char *AfxGetNodeID()
+{
+	FILE *pFile;
+	static char nodeid[128]={0};
+
+	if ((pFile = fopen(NODEID_FILE_NAME, "r")) == NULL) return NULL;
+
+	fgets(nodeid, sizeof(nodeid), pFile);
+	fclose(pFile);
+
+	return nodeid;
+}
+
 
 /*********************************************************
 函数说明：写调试日志
@@ -307,7 +343,7 @@ void AfxFormatMac(const char src[],ndUChar des[])
 
 	if ((NULL == src)||(strlen(src)<17)) return;
 
-	sscanf(src,"%02X-%02X-%02X-%02X-%02X-%02X",\
+	sscanf(src,"%02X:%02X:%02X:%02X:%02X:%02X",\
 					&lMac[0],&lMac[1],&lMac[2],\
 					&lMac[3],&lMac[4],&lMac[5]);
 
@@ -344,7 +380,7 @@ char *AfxMacToStr(const ndUChar src[])
 	static char sDes[32]={0};
 
 	if (NULL == src) return sDes;
-	sprintf(sDes, "%02X-%02X-%02X-%02X-%02X-%02X",src[0],src[1],src[2],src[3],src[4],src[5]);
+	sprintf(sDes, "%02X:%02X:%02X:%02X:%02X:%02X",src[0],src[1],src[2],src[3],src[4],src[5]);
 	
 	return sDes;
 }
@@ -366,7 +402,7 @@ void AfxGetEthMac(const char *ethname, ndString &mac)
 	strcpy( if_data.ifr_name, ethname );
 	ioctl( sd, SIOCGIFHWADDR, &if_data);
 	memcpy(sMac, &if_data.ifr_hwaddr.sa_data, 6);
-	sprintf(sTemp,"%02X-%02X-%02X-%02X-%02X-%02X",sMac[0],sMac[1],sMac[2],sMac[3],sMac[4],sMac[5]);
+	sprintf(sTemp,"%02X:%02X:%02X:%02X:%02X:%02X",sMac[0],sMac[1],sMac[2],sMac[3],sMac[4],sMac[5]);
 	mac = sTemp;
 	
 	close( sd );

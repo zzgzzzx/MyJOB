@@ -18,7 +18,7 @@ public:
     virtual ~CNodeUser();
 
 	//结点初始化，向服务器申请配置信息
-	ndStatus NodeInit();	
+	ndStatus NodeEnvSet();	
 };
 
 #endif //VPN_NODE_USER_H
