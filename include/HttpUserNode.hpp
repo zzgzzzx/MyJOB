@@ -26,6 +26,8 @@ protected:
 	virtual ndStatus MakeNodeEnvSetReq();
 	//Node Hello
 	virtual ndStatus MakeNodeHelloReq();
+	//获取服务器列表
+	virtual ndStatus MakeServerListReq();	
 	//Node Hello Response
 	virtual ndStatus AnalysisNodeHelloRsp();	
 

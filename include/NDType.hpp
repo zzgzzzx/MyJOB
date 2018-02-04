@@ -81,8 +81,12 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 /*---------------------------------------------------------------------------------------
 //节点编号文件名
 -----------------------------------------------------------------------------------------*/
-#define NODEID_FILE_NAME	"node.id"
+#define NODEID_FILE_NAME	"/etc/network/node.id"
 
+/*---------------------------------------------------------------------------------------
+//服务器列表 IP:Port
+-----------------------------------------------------------------------------------------*/
+#define SERVER_LIST_FILE_NAME	"/etc/network/server.list"
 
 /**
  ******************************************************************************
@@ -186,6 +190,7 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 
 #define SUPER_ACTION_USER_NODE_ROUTE "user-node-get-services"
 #define SUPER_ACTION_NODE_ENV_CHECK "run-env-check"
+#define SUPER_ACTION_NODE_GET_SERVER_LIST "server-list-inform"
 
 
 

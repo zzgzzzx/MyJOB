@@ -114,7 +114,7 @@ void AfxTraceLocalLog(char *sLogContext)
 }
 
 /*********************************************************
-函数说明：写调试日志
+函数说明：写入节点编号
 入参说明：
 出参说明：
 返回值  ：
@@ -130,7 +130,7 @@ void AfxWriteNodeID(const char *nodeid)
 }
 
 /*********************************************************
-函数说明：写调试日志
+函数说明：获取节点编号
 入参说明：
 出参说明：
 返回值  ：
@@ -148,6 +148,96 @@ char *AfxGetNodeID()
 	return nodeid;
 }
 
+/*********************************************************
+函数说明：获取服务列表
+入参说明：
+出参说明：
+返回值  ：
+*********************************************************/
+ndString ServerListToString(list<SServerInfo> &mServers)
+{
+}
+
+void StringToServerList(json, mServers)
+{
+}
+
+ndBool AfxGetServerList(list<SServerInfo> &mServers)
+{
+	FILE *pFile;
+	ndString json;
+
+	//初始化列表信息
+	SServerInfo server;
+	server.sServerIP = "45.33.58.27";
+	server.sServerPort = "8080";
+	mServers.push_back(server);
+	server.sServerIP = "45.33.58.27";
+	server.sServerPort = "8080";
+	mServers.push_back(server);
+
+	//文件不存在
+	if ((pFile = fopen(SERVER_LIST_FILE_NAME, "r")) == NULL)
+	{
+		if (pFile = fopen(SERVER_LIST_FILE_NAME, "w+")) == NULL)
+		{
+			AfxWriteDebugLog("SuperVPN run at [AfxGetServerList] Create [%s] File Fail", SERVER_LIST_FILE_NAME);
+			return false;
+		}
+
+		json = ServerListToString(mServers);
+		if (fwrite(json.c_str(), json.length(), 1, pFile) <= 0)
+		{
+			AfxWriteDebugLog("SuperVPN run at [AfxGetServerList] Write [%s] File Fail", SERVER_LIST_FILE_NAME);
+			fclose(pFile);
+			return false;
+		}
+		
+		fclose(pFile);
+		return true;
+	}
+
+	//文件存在
+	char buff[1024];
+	while(fread(buff, sizeof(buff), 1, pFile) >0 )
+	{
+		json.append(buff);
+	}
+	StringToServerList(json, mServers);
+	
+	fclose(pFile);
+
+	return true;
+}
+
+/*********************************************************
+函数说明：更新服务列表
+入参说明：
+出参说明：
+返回值  ：
+*********************************************************/
+ndBool AfxUpdateServerList(list<SServerInfo> &mServers)
+{
+	FILE *pFile;
+	ndString json;
+	
+	if (pFile = fopen(SERVER_LIST_FILE_NAME, "w+")) == NULL)
+	{
+		AfxWriteDebugLog("SuperVPN run at [AfxGetServerList] Create [%s] File Fail", SERVER_LIST_FILE_NAME);
+		return false;
+	}
+
+	json = ServerListToString(mServers);
+	if (fwrite(json.c_str(), json.length(), 1, pFile) <= 0)
+	{
+		AfxWriteDebugLog("SuperVPN run at [AfxGetServerList] Write [%s] File Fail", SERVER_LIST_FILE_NAME);
+		fclose(pFile);
+		return false;
+	}
+	
+	fclose(pFile);
+	return true;
+}
 
 /*********************************************************
 函数说明：写调试日志

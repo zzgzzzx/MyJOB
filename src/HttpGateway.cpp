@@ -105,10 +105,10 @@ ndStatus CHttpGateway::AnalysisRouteSetting()
                     SRouteInform item;
                     while(serviceslist != NULL)
                     {
-                        if(cJSON_GetObjectItem(serviceslist, "devicesip") != NULL &&
-                           cJSON_GetObjectItem(serviceslist, "devicesip")->valuestring != NULL)
-                            item.sDeviceIP = cJSON_GetObjectItem(serviceslist, "devicesip")->valuestring;
-						AfxWriteDebugLog("SuperVPN run at [CHttpGeneral::AnalysisRouteSetting] deviceip=[%s]",item.sDeviceIP.c_str());
+                        if(cJSON_GetObjectItem(serviceslist, "deviceflag") != NULL &&
+                           cJSON_GetObjectItem(serviceslist, "deviceflag")->valuestring != NULL)
+                            item.sDeviceFlag = cJSON_GetObjectItem(serviceslist, "devicesflag")->valuestring;
+						AfxWriteDebugLog("SuperVPN run at [CHttpGeneral::AnalysisRouteSetting] deviceflag=[%s]",item.sDeviceFlag.c_str());
 
                         if(cJSON_GetObjectItem(serviceslist, "serviceip") != NULL &&
                            cJSON_GetObjectItem(serviceslist, "serviceip")->valuestring != NULL)

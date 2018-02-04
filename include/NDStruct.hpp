@@ -32,12 +32,20 @@ typedef struct
  /* 策略路由的信息 */
  typedef struct
 {
-	 //vpn超级节点的IP地址
+	 //vpn服务节点的IP地址
 	 ndString	 sServiceIP;
-	 //下游设备的ip地址
-	 ndString	 sDeviceIP;
+	 //下游设备的特征码
+	 ndString	 sDeviceFlag;
 }SRouteInform;
- 
+
+ /* 下端设备策略路由的信息 */
+ typedef struct
+{
+	 //下游设备的IP地址
+	 ndString	 sDeviceIP;
+	 //下游设备的特征码
+	 ndString	 sDeviceFlag;
+}SDeviceFlag; 
 
 /**
  ******************************************************************************
@@ -82,6 +90,21 @@ typedef struct
 	//所属域的相关信息
 	list<SDomain> mDomainInforms;	
 }SNodeInform, *pSNodeInform;
+
+
+ /**
+  ******************************************************************************
+  * @brief	 server list inform structure
+  * @note	 This is the structure for server inform
+  ******************************************************************************
+  */
+ typedef struct
+{
+	 //中心服务器的IP地址
+	 ndString	 sServerIP;
+	 //中心服务器端口号
+	 ndString	 sServerPort;
+}SServerInfo;
 
 /*
  ******************************************************************************

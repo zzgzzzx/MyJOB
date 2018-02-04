@@ -32,10 +32,12 @@ bool AfxDeleteSingleTimer(unsigned long callid);
 -----------------------------------------------------------------------------------------*/
 //写调试日志
 void AfxWriteDebugLog(char *Format,...);
-
+//节点编号文件读写
 void AfxWriteNodeID(const char *nodeid);
 char *AfxGetNodeID();
-
+//服务列表文件读写
+ndBool AfxGetServerList(list<SServerInfo> &mServers);
+ndBool AfxUpdateServerList(list<SServerInfo> &mServers);
 
 //获取mac地址
 void AfxGetEthMac(const char *ethname, ndString &mac);

@@ -170,3 +170,16 @@ ndStatus CNodeGeneral::NodeHello()
     return mPHttpClient->NodeHello();
 }
 
+/*********************************************************
+函数说明：GetServerList
+入参说明：无
+出参说明：无
+返回值  ：DP_SUCCESS-成功
+          Others-失败
+*********************************************************/
+ndBool CNodeGeneral::GetServerList(list<SServerInfo> &mServers)
+{
+	return mPHttpClient->GetServerList(mServers);
+}
+
+

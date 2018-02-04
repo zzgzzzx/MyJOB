@@ -54,14 +54,20 @@ class CSuperVPNApp: public CBaseApp
 private:
 	//节点
 	static CNodeBase *mPNode;
+	//服务器列表
+	static list<SServerInfo> mServers;		
 	//是否需要退出标识
 	ndBool mStopRun;	
 	//系统数据初始化
 	bool InitSystem(void);
+	//服务器列表检测
+	ndStatus ServerListCheck();
  	//系统运行环境检测
  	ndStatus RunEnvCheck();
 	//节点初始化编号检测
 	ndStatus NodeInitCheck();
+	//启动http服务器
+	ndStatus StartHttpd();
 protected:
 	//应用程序初始化工作
 	bool InitApplication(void);

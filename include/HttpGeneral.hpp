@@ -45,6 +45,10 @@ protected:
 	virtual ndStatus MakeNodeHelloReq();
 	virtual ndStatus AnalysisNodeHelloRsp();
 
+	//获取服务器列表
+	virtual ndStatus MakeServerListReq();
+	ndStatus AnalysisServerListRsp(list<SServerInfo> &mServers);	
+
 	//数据包发送并接收处理
 	ndStatus PkgSendAndRecv(ndString url);	
 
@@ -55,6 +59,7 @@ public:
 	ndStatus NodeEnvSet();
 	ndStatus NodeHello();
 	ndStatus NodeInit();
+	ndBool GetServerList(list<SServerInfo> &mServers);
 	
     virtual ~CHttpGeneral();
 

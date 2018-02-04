@@ -4,7 +4,7 @@ CXX=$(CROSS)g++
 CC=$(CROSS)gcc
 STRIP=$(CROSS)strip
 
-DIR_INC =  -I../include -I../include/cJson -I/usr/include/curl
+DIR_INC =  -I../include -I../include/cJson -I/usr/include/curl -I/home/zhangzx/N2N/httpd
 DIR_SRC = .
 DIR_OBJ = ./obj
 DIR_BIN = ./bin
@@ -22,7 +22,7 @@ DFLAGS  = -w -Wall -DDEBUG  -D_RAW -g -DGENERAL_NODE_USER_APP_S
 RFLAGS  = -w -o2 -Wall -D_RAW -DGENERAL_NODE_USER_APP_S
 
 CFLAGS = ${DIR_INC} ${DFLAGS} -fPIC
-LDFLAGS = -L/home/zhangzx/amlogic/curl/lib -static -lpthread -lcurl -fPIC
+LDFLAGS = -L/home/zhangzx/amlogic/curl/lib -L/home/zhangzx/N2N/httpd/lib -static -lpthread -lcurl -fPIC -lmicrohttpd -pthread
 
 ${BIN_TARGET}:${CPP_OBJ} ${C_OBJ}
 	$(CXX) -o $@ $(CPP_OBJ) ${C_OBJ} $(LDFLAGS)

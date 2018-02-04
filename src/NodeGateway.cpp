@@ -112,4 +112,26 @@ void CNodeGateway::SetRouteInf(list<SRouteInform> &routeInf)
 	mRouteInf = routeInf;
 }
 
+/*********************************************************
+函数说明：通过设备标识查询服务出口
+入参说明：无
+出参说明：无
+返回值  ：无
+*********************************************************/
+ndBool CNodeGateway::GetRouteInf(ndString deviceFlag, SRouteInform &sRI)
+{
+	list<SRouteInform>::iterator iterRoute;
+	SRouteInform route;
+	
+    for(iterRoute=mRouteInf.begin(); iterRoute!=mRouteInf.end(); iterRoute++)
+    {
+    	route = *iterRoute;		
+ 		if(route.sDeviceFlag == deviceFlag)
+		{
+			sRI = route;
+			return true;
+ 		}
+    }
+	return false;
+}
 
