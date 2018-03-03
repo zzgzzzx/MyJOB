@@ -22,7 +22,7 @@ DFLAGS  = -w -Wall -DDEBUG  -D_RAW -g -DGENERAL_NODE_USER_APP_S
 RFLAGS  = -w -o2 -Wall -D_RAW -DGENERAL_NODE_USER_APP_S
 
 CFLAGS = ${DIR_INC} ${DFLAGS} -fPIC
-LDFLAGS = -L/home/zhangzx/amlogic/curl/lib -L/home/zhangzx/N2N/httpd/lib -static -lpthread -lcurl -fPIC -lmicrohttpd -pthread
+LDFLAGS = -L/home/zhangzx/amlogic/curl/lib -L/home/zhangzx/N2N/httpd/lib -static -lcurl -lmicrohttpd -pthread
 
 ${BIN_TARGET}:${CPP_OBJ} ${C_OBJ}
 	$(CXX) -o $@ $(CPP_OBJ) ${C_OBJ} $(LDFLAGS)

@@ -79,6 +79,16 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 #define LOG_FILE_NAME	"/var/log/supervpn.log"
 
 /*---------------------------------------------------------------------------------------
+//目录路径
+-----------------------------------------------------------------------------------------*/
+#define VPN_DIR_PATH_NAME	"/etc/network/"
+
+/*---------------------------------------------------------------------------------------
+//升级文件名
+-----------------------------------------------------------------------------------------*/
+#define UPGRADE_SH_FILE_NAME	"upgrade.sh"
+
+/*---------------------------------------------------------------------------------------
 //节点编号文件名
 -----------------------------------------------------------------------------------------*/
 #define NODEID_FILE_NAME	"/etc/network/node.id"
@@ -124,9 +134,8 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 /*---------------------------------------------------------------------------------------
 //VPN版本号
 -----------------------------------------------------------------------------------------*/
-#define SUPER_VPN_CLIENT_VER_SERVER 1009
-#define SUPER_VPN_CLIENT_VER_NODE 1009
-
+#define SUPER_VPN_CLIENT_VER_SERVER 1000
+#define SUPER_VPN_CLIENT_VER_NODE 1000
 
 /*---------------------------------------------------------------------------------------
 //系统支持的最大消息队列数
@@ -139,12 +148,10 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 #define TIMER_ID_NODE_HELLO_CHECK	0x0001			//hello检测检测
 #define TIMER_ID_NODE_RESTART_CHECK	0x0002			//restart检测检测
 
-
 /*---------------------------------------------------------------------------------------
 //定时器时间设置(秒数)
 -----------------------------------------------------------------------------------------*/
 #define TIMER_VALUE_NODE_HELLO_CHECK	60			//节点Hello检测
-
 
 /*---------------------------------------------------------------------------------------
 //curl连接服务器超时时间（秒）
@@ -162,13 +169,11 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 #define BUILTIN_KEY  "ZEASN2016"
 
 /*---------------------------------------------------------------------------------------
-//中心服务器地址
+//中心服务器地址 http://45.33.58.27:8080
 -----------------------------------------------------------------------------------------*/
-#define VPN_CENTER_USER_URL  "http://45.33.58.27:8080/anywhere/node/unode"
-
-#define VPN_CENTER_GW_URL  "http://45.33.58.27:8080/anywhere/node/unode"
-
-#define VPN_CENTER_SRV_URL  "http://45.33.58.27:8080/anywhere/node/pnode"
+#define VPN_CENTER_USER_URL  "/anywhere/node/unode"
+#define VPN_CENTER_GW_URL  "/anywhere/node/unode"
+#define VPN_CENTER_SRV_URL  "/anywhere/node/pnode"
 
 /*---------------------------------------------------------------------------------------
 //升级文件的临时文件名
@@ -191,8 +196,6 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 #define SUPER_ACTION_USER_NODE_ROUTE "user-node-get-services"
 #define SUPER_ACTION_NODE_ENV_CHECK "run-env-check"
 #define SUPER_ACTION_NODE_GET_SERVER_LIST "server-list-inform"
-
-
 
 #define VALUE_CURLOPT_DOWNLOAD_RETRY_TIMES 5
 #define VALUE_CURLOPT_POST_RETRY_TIMES 3

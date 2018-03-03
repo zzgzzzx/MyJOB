@@ -6,10 +6,13 @@
 作者         :zhangzx 
 版本         :1.0 
 **********************************************************/
+#include "cJSON.h"
 #include "NDFunc.hpp"
 #include "NDGlobal.hpp"
 
 extern CSuperVPNApp TSuperVPNApp;
+extern list<SServerInfo> gServers;
+extern list<SServerInfo>::iterator gITCurServer, gITBakServer;
 
 /*********************************************************
 函数说明：插入单回定时器
@@ -114,6 +117,45 @@ void AfxTraceLocalLog(char *sLogContext)
 }
 
 /*********************************************************
+函数说明：获取下一个可用的服务器地址
+入参说明：无
+出参说明：无
+返回值  ：true-成功获得下一个地址
+          false-无可用地址
+          list<SServerInfo> CSuperVPNApp::gServers;
+		 list<SServerInfo>::iterator gITServer;
+*********************************************************/
+bool AfxGetNextSrvUrl(SServerInfo &serverInfo)
+{
+    if(gITCurServer == gServers.end() || ++gITCurServer == gServers.end())
+    {
+        gITCurServer = gServers.begin();
+		AfxWriteDebugLog("SuperVPN run at [AfxGetNextSrvUrl] it set to begin");
+    }
+
+    if (gITCurServer != gServers.end())
+    {
+    		SServerInfo curInfo,bakInfo;
+			bakInfo = *gITBakServer;
+			curInfo = *gITCurServer;
+
+			AfxWriteDebugLog("SuperVPN run at [AfxGetNextSrvUrl] cur IP=[%s]", curInfo.sServerIP.c_str());
+			AfxWriteDebugLog("SuperVPN run at [AfxGetNextSrvUrl] bak IP=[%s]", bakInfo.sServerIP.c_str());
+
+			if(curInfo.sServerIP != bakInfo.sServerIP)
+			{	
+		        serverInfo = *gITCurServer;
+				AfxWriteDebugLog("SuperVPN run at [AfxGetNextSrvUrl] Get new server ip=[%s]", serverInfo.sServerIP.c_str());
+		        return true;
+			}
+    }
+	AfxWriteDebugLog("SuperVPN run at [AfxGetNextSrvUrl] Not more new server");
+
+    return false;
+}
+
+
+/*********************************************************
 函数说明：写入节点编号
 入参说明：
 出参说明：
@@ -153,13 +195,79 @@ char *AfxGetNodeID()
 入参说明：
 出参说明：
 返回值  ：
+ {
+	"servers":[
+	         {
+	             "ip":"192.168.0.1"
+	             "port":"6666"
+	         }
+	         {
+	             "ip":"192.168.0.2"
+	             "port":"7777"
+	         }
+	]
+}
 *********************************************************/
 ndString ServerListToString(list<SServerInfo> &mServers)
 {
+	ndString result;
+    char *out;
+    cJSON *root, *fmt, *actions;
+
+	list<SServerInfo>::iterator iter;
+    root = cJSON_CreateObject();
+    cJSON_AddItemToObject(root, "servers", actions = cJSON_CreateArray());
+
+	SServerInfo sInfo;
+	for (iter = mServers.begin(); iter != mServers.end(); ++iter)
+	{
+		sInfo = *iter;
+    	cJSON_AddItemToArray(actions, fmt = cJSON_CreateObject());
+    	cJSON_AddStringToObject(fmt, "ip", sInfo.sServerIP.c_str());
+		cJSON_AddStringToObject(fmt, "port", sInfo.sServerPort.c_str());		
+	}
+	
+    out = cJSON_Print(root);
+	result = out;
+	
+    cJSON_Delete(root);
+    free(out);
+	
+	return result;
 }
 
-void StringToServerList(json, mServers)
+void StringToServerList(ndString json, list<SServerInfo> &mServers)
 {
+    cJSON *root;
+	SServerInfo sInfo;
+	
+    root = cJSON_Parse(json.c_str());
+    if (!root)
+    {
+        AfxWriteDebugLog("SuperVPN run at [StringToServerList] Error before: [%s]", cJSON_GetErrorPtr());
+        return;
+    }
+
+    cJSON *serverArray = cJSON_GetObjectItem(root, "servers");
+    if(serverArray != NULL)
+    {
+        cJSON *serverlist = serverArray->child;
+		while(serverlist != NULL)
+		{
+		    if(cJSON_GetObjectItem(serverlist, "ip") != NULL &&
+		       cJSON_GetObjectItem(serverlist, "ip")->valuestring != NULL)
+		        sInfo.sServerIP = cJSON_GetObjectItem(serverlist, "ip")->valuestring;
+			AfxWriteDebugLog("SuperVPN run at [StringToServerList] ip=[%s]", sInfo.sServerIP.c_str());
+
+		    if(cJSON_GetObjectItem(serverlist, "port") != NULL &&
+		       cJSON_GetObjectItem(serverlist, "port")->valuestring != NULL)
+		        sInfo.sServerPort = cJSON_GetObjectItem(serverlist, "port")->valuestring;
+			AfxWriteDebugLog("SuperVPN run at [StringToServerList] port=[%s]", sInfo.sServerPort.c_str());
+
+		    mServers.push_back(sInfo);
+		    serverlist = serverlist->next;
+		}
+     }
 }
 
 ndBool AfxGetServerList(list<SServerInfo> &mServers)
@@ -172,14 +280,27 @@ ndBool AfxGetServerList(list<SServerInfo> &mServers)
 	server.sServerIP = "45.33.58.27";
 	server.sServerPort = "8080";
 	mServers.push_back(server);
-	server.sServerIP = "45.33.58.27";
+	
+	server.sServerIP = "45.33.58.28";
 	server.sServerPort = "8080";
 	mServers.push_back(server);
 
+	//检测/etc/network目录是否存在
+	AfxWriteDebugLog("SuperVPN run at [AfxGetServerList] Check /etc/network Dir");
+	if(access(VPN_DIR_PATH_NAME, NULL) != 0)  
+	{  
+		if(mkdir(VPN_DIR_PATH_NAME, 0755) == -1)  
+		{   
+			AfxWriteDebugLog("SuperVPN run at [AfxGetServerList] create [%s] File Fail", SERVER_LIST_FILE_NAME);
+			return false; 
+		}  
+	}  
+
 	//文件不存在
-	if ((pFile = fopen(SERVER_LIST_FILE_NAME, "r")) == NULL)
+	AfxWriteDebugLog("SuperVPN run at [AfxGetServerList] Check /etc/network/server.list");
+	if (access(SERVER_LIST_FILE_NAME, NULL) != 0)
 	{
-		if (pFile = fopen(SERVER_LIST_FILE_NAME, "w+")) == NULL)
+		if ((pFile = fopen(SERVER_LIST_FILE_NAME, "w+")) == NULL)
 		{
 			AfxWriteDebugLog("SuperVPN run at [AfxGetServerList] Create [%s] File Fail", SERVER_LIST_FILE_NAME);
 			return false;
@@ -198,11 +319,22 @@ ndBool AfxGetServerList(list<SServerInfo> &mServers)
 	}
 
 	//文件存在
-	char buff[1024];
-	while(fread(buff, sizeof(buff), 1, pFile) >0 )
+	if ((pFile = fopen(SERVER_LIST_FILE_NAME, "r")) == NULL)
+	{
+		AfxWriteDebugLog("SuperVPN run at [AfxGetServerList] read [%s] File Fail", SERVER_LIST_FILE_NAME);
+		return false;
+	}	
+
+	mServers.clear();
+	
+	AfxWriteDebugLog("SuperVPN run at [AfxGetServerList] read /etc/network/server.list");
+	char buff[1025]={0};
+	while(fread(buff, sizeof(char), 1024, pFile) >0 )
 	{
 		json.append(buff);
+		memset(buff, 0, sizeof(buff));
 	}
+	AfxWriteDebugLog("SuperVPN run at [AfxGetServerList] Local Inform=[%s]", json.c_str());
 	StringToServerList(json, mServers);
 	
 	fclose(pFile);
@@ -221,7 +353,7 @@ ndBool AfxUpdateServerList(list<SServerInfo> &mServers)
 	FILE *pFile;
 	ndString json;
 	
-	if (pFile = fopen(SERVER_LIST_FILE_NAME, "w+")) == NULL)
+	if ((pFile = fopen(SERVER_LIST_FILE_NAME, "w+")) == NULL)
 	{
 		AfxWriteDebugLog("SuperVPN run at [AfxGetServerList] Create [%s] File Fail", SERVER_LIST_FILE_NAME);
 		return false;
@@ -403,6 +535,17 @@ bool AfxExecCmd(const char *cmd)
 		return true;
 	} 
 }
+
+bool AfxExecCmdNotWait(const char *cmd)
+{
+	AfxWriteDebugLog("SuperVPN run at [AfxExecCmdNotWait] Exec Cmd=[%s]",cmd);
+	int status = system(cmd);
+	if (status == 0)
+		return true;
+
+	return false;
+}
+
 
 /*********************************************************
 函数说明：十六进制的串转成整数

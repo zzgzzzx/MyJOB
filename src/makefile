@@ -4,33 +4,35 @@ CXX=$(CROSS)g++
 CC=$(CROSS)gcc
 STRIP=$(CROSS)strip
 
-RM= rm -f -r
-CP= cp -f -r
+DIR_INC =  -I../include -I../include/cJson -I/usr/include/curl -I/home/zhangzx/N2N/httpd
+DIR_SRC = .
+DIR_OBJ = ./obj
+DIR_BIN = ./bin
 
-BIN=SuperVPN
-AR=ar
+CPP_SRC = $(wildcard ${DIR_SRC}/*.cpp)
+CPP_OBJ = $(patsubst %.cpp,${DIR_OBJ}/%.o,$(notdir ${CPP_SRC}))
 
-DFLAGS  = -w -Wall -DDEBUG  -D_RAW -g -DGENERAL_NODE_USER_APP
-RFLAGS  = -w -o2 -Wall -D_RAW -DGENERAL_NODE_USER_APP
+C_SRC = $(wildcard ${DIR_SRC}/*.c)
+C_OBJ = $(patsubst %.c,${DIR_OBJ}/%.o,$(notdir ${C_SRC}))
 
-INCLUDE = -I../include -I../include/cJson -I/usr/include/curl
+BIN = SuperVPN
+BIN_TARGET = ${DIR_BIN}/${BIN}
 
-CFLAGS  = $(DFLAGS)
-CFLAGS += $(INCLUDE)
+DFLAGS  = -w -Wall -DDEBUG  -D_RAW -g -DGENERAL_NODE_USER_APP_S
+RFLAGS  = -w -o2 -Wall -D_RAW -DGENERAL_NODE_USER_APP_S
 
-OBJS=BaseApp.o BThread.o cJSON.o HttpClient.o HttpGeneral.o HttpGateway.o HttpUserNode.o HttpSrvNode.o MainServer.o NDFunc.o NodeBase.o NodeGateway.o NodeGeneral.o SuperVPNApp.o TimerManager.o NodeUser.o NodeSrv.o HttpFileDown.o Md5.o HttpRunEnvCK.o HttpRunEnvCKUser.o HttpRunEnvCKSrv.o
+CFLAGS = ${DIR_INC} ${DFLAGS} -fPIC
+LDFLAGS = -lpthread -lcurl -fPIC
 
-ALL:$(BIN)
+${BIN_TARGET}:${CPP_OBJ} ${C_OBJ}
+	$(CXX) -o $@ $(CPP_OBJ) ${C_OBJ} $(LDFLAGS)
 
-$(BIN): $(OBJS)
-	$(CXX) $(OBJS) -o $(BIN) -lpthread -lcurl
-	$(STRIP) $(BIN)
-
-.c.o:
-	$(CC) -c $(CFLAGS) $^ -o $@
-.cpp.o:
-	$(CXX) -c $(CFLAGS) $^ -o $@
-
+${DIR_OBJ}/%.o:${DIR_SRC}/%.cpp
+	$(CXX) $(CFLAGS) -c  $< -o $@
+	
+${DIR_OBJ}/%.o:${DIR_SRC}/%.c
+	$(CC) $(CFLAGS) -c  $< -o $@
 
 clean:
-	$(RM) *.o *.log core* $(BIN)
+	rm -f -r  $(DIR_OBJ)/*.* $(DIR_BIN)/*.*	
+

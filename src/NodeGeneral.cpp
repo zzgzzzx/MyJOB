@@ -124,14 +124,8 @@ ndStatus CNodeGeneral::SetN2NVPNNetwork()
 
 ndStatus CNodeGeneral::NodeInit()
 {
-//初始化操作
-ReInit:
 	ndStatus ret = mPHttpClient->NodeInit();
-	if (ret != ND_SUCCESS)
-	{
-		AfxWriteDebugLog("SuperVPN run at [CNodeGeneral::NodeEnvSet] Node init error=[%d]", ret);
-		goto ReInit;
-	}
+	AfxWriteDebugLog("SuperVPN run at [CNodeGeneral::NodeEnvSet] Node init return=[%d]", ret);
 	return ret;
 }
 
@@ -146,12 +140,11 @@ ReInit:
 ndStatus CNodeGeneral::NodeEnvSet()
 {
     //配置操作
- ReInit:
     ndStatus ret = mPHttpClient->NodeEnvSet();
 	if (ret != ND_SUCCESS)
 	{
-		AfxWriteDebugLog("SuperVPN run at [CNodeGeneral::NodeEnvSet] Node init error=[%d]", ret);
-		goto ReInit;
+		AfxWriteDebugLog("SuperVPN run at [CNodeGeneral::NodeEnvSet] Node Evn set error=[%d]", ret);
+		return ret;
 	}
 
 	return SetN2NVPNNetwork();

@@ -32,6 +32,9 @@ bool AfxDeleteSingleTimer(unsigned long callid);
 -----------------------------------------------------------------------------------------*/
 //写调试日志
 void AfxWriteDebugLog(char *Format,...);
+//获取下一个可用的服务器信息
+bool AfxGetNextSrvUrl(SServerInfo &serverInfo);
+
 //节点编号文件读写
 void AfxWriteNodeID(const char *nodeid);
 char *AfxGetNodeID();
@@ -89,6 +92,8 @@ bool AfxCheckCmdExist(const string cmd);
 
 //执行系统命令
 bool AfxExecCmd(const char *cmd);
+bool AfxExecCmdNotWait(const char *cmd);
+
 
 /*---------------------------------------------------------------------------------------
 //Socket读写函数

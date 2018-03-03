@@ -10,6 +10,9 @@
 #include "cJSON.h"
 #include "NDFunc.hpp"
 
+extern list<SServerInfo> gServers;
+extern list<SServerInfo>::iterator gITCurServer,gITBakServer;
+
 /*********************************************************
 函数说明：构造函数
 入参说明：无
@@ -465,8 +468,12 @@ ndStatus CHttpGeneral::NodeHello()
 *********************************************************/
 ndStatus CHttpGeneral::PkgSendAndRecv(ndString url)
 {
+	ndString sSrvUrl;
     //判断服务器地址
-    if(url.empty()){
+    SServerInfo serverInfo = *gITCurServer;
+	sSrvUrl =  "http://"+serverInfo.sServerIP+":"+serverInfo.sServerPort+url;
+	
+    if(sSrvUrl.empty()){
         AfxWriteDebugLog("SuperVPN run at[CHttpGeneral::PkgSendAndRecv] Http Server Empty Err");
         return ND_ERROR_INVALID_PARAM;
     }	
@@ -477,10 +484,19 @@ ndStatus CHttpGeneral::PkgSendAndRecv(ndString url)
         return ND_ERROR_INVALID_PARAM;
     }
 
-    AfxWriteDebugLog("SuperVPN run at[CHttpGeneral::PkgSendAndRecv] Begin post data\n ServerURL=[%s]\n [%s]", url.c_str(),mSendBuf.c_str());
-    rePost:
+    AfxWriteDebugLog("SuperVPN run at[CHttpGeneral::PkgSendAndRecv] Begin post data\n ServerURL=[%s]\n [%s]", sSrvUrl.c_str(), mSendBuf.c_str());
+rePost:
     //发送服务端并接收返回
-    CURLcode rtn = Post(url.c_str(), mSendBuf.c_str(), mRcvBuf);
+    CURLcode rtn = Post(sSrvUrl.c_str(), mSendBuf.c_str(), mRcvBuf);
+    if(rtn != CURLE_OK){
+        while(AfxGetNextSrvUrl(serverInfo)){
+			sSrvUrl =  "http://"+serverInfo.sServerIP+":"+serverInfo.sServerPort+url;
+            rtn = Post(sSrvUrl.c_str(), mSendBuf.c_str(), mRcvBuf);
+            if (rtn == CURLE_OK) {
+                break;
+            }
+        }
+    }	
 
     if(rtn != CURLE_OK){
         AfxWriteDebugLog("SuperVPN run at[CNodeSrvBase::DealActionWithModel] Http Post Err");
@@ -499,6 +515,8 @@ ndStatus CHttpGeneral::PkgSendAndRecv(ndString url)
                 return ND_ERROR_INVALID_PARAM;
         }
     }
+
+	gITBakServer = gITCurServer;
 
     //http服务器返回码判断
     if (GetHttpReturnCode() != 200){

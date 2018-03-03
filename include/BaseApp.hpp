@@ -52,10 +52,6 @@ public:
 class CSuperVPNApp: public CBaseApp
 {
 private:
-	//节点
-	static CNodeBase *mPNode;
-	//服务器列表
-	static list<SServerInfo> mServers;		
 	//是否需要退出标识
 	ndBool mStopRun;	
 	//系统数据初始化
@@ -73,6 +69,8 @@ protected:
 	bool InitApplication(void);
 
 public:
+	//节点
+	static CNodeBase *gPNode;
 	//构造函数
 	CSuperVPNApp();
 	//析构函数

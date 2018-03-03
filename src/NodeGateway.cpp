@@ -81,7 +81,7 @@ ndStatus CNodeGateway::SetPolicyRoute()
     {
     	SRouteInform route = *iterRoute;
 		
- 		sprintf(ExecCMD, "iptables -t mangle -A PREROUTING -s %s -j MARK --set-mark %d", route.sDeviceIP.c_str(), iTableIndex);
+ 		sprintf(ExecCMD, "iptables -t mangle -A PREROUTING -s %s -j MARK --set-mark %d", route.sDeviceFlag.c_str(), iTableIndex);
 		//AfxWriteDebugLog("SuperVPN run at [CNodeGateway::SetPolicyRoute] ExecCmd=[%s]", ExecCMD);
 		AfxExecCmd(ExecCMD);
 

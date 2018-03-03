@@ -86,8 +86,8 @@ ndStatus CHttpRunEvnCK::AnalysisCheckRsp()
 	if(objType != NULL)
 	{
 	    if(cJSON_GetObjectItem(objType, "version") != NULL &&
-			cJSON_GetObjectItem(objType, "version")->valuestring != NULL)
-	        mRunEnvCK.node.iVerCode = cJSON_GetObjectItem(objType, "nodeip")->valueuint;
+			cJSON_GetObjectItem(objType, "version")->valueuint != NULL)
+	        mRunEnvCK.node.iVerCode = cJSON_GetObjectItem(objType, "version")->valueuint;
 
 	    if(cJSON_GetObjectItem(objType, "md5") != NULL &&
 			cJSON_GetObjectItem(objType, "md5")->valuestring != NULL)
@@ -232,6 +232,7 @@ ndStatus CHttpRunEvnCK::IPTableCheck()
 *********************************************************/
 ndStatus CHttpRunEvnCK::NodeCheck()
 {
+	AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::NodeCheck] Local VER=[%d] New VER=[%d]", mLocalVersion, mRunEnvCK.node.iVerCode);
 	//判断版本号是否需要升级
 	if (mRunEnvCK.node.iVerCode <= mLocalVersion){
 		AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::NodeCheck] Node Not Need Upgrade");
@@ -356,15 +357,58 @@ ndBool getFileMD5(const ndString& filename, ndString& md5)
     {
         return false;
     }
-            */
+*/
     return true;
 }
 
+/*********************************************************
+函数说明：
+入参说明：无
+出参说明：无
+返回值  ：true为成功,false为失败
+*********************************************************/
+ndBool CHttpRunEvnCK::GenerateUpgradeFile()
+{
+	FILE *pFile;
+	char cmd[512]={0};
+	
+	if ((pFile = fopen(UPGRADE_SH_FILE_NAME, "w+")) == NULL) return false;
+
+	fputs("PROCESS=`ps |grep $1|grep -v grep|grep -v PPID|awk '{ print $1}'`", pFile);
+	fputs("for i in $PROCESS", pFile);
+	fputs("do", pFile);
+	fputs("\techo \"Kill the $1 process [ $i ]\"", pFile);
+	fputs("\tkill -9 $i", pFile);
+	fputs("done", pFile);
+	
+	sprintf(cmd, "sh mv %s %s", VPN_UPGRADE_TEMP_FILE_NAME, VPN_EXE_FILE_NAME);
+	fputs(cmd, pFile);
+	sprintf(cmd, "sh chmod 777 %s", VPN_EXE_FILE_NAME);
+	fputs(cmd, pFile);
+	sprintf(cmd, "./%s&", VPN_EXE_FILE_NAME);
+	fputs(cmd, pFile);	
+	fclose(pFile);
+
+	AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::GenerateUpgradeFile] Exec sh chmod 777 upgradefile");	
+	sprintf(cmd, "sh chmod 777 %s", UPGRADE_SH_FILE_NAME);
+	if (AfxExecCmdNotWait(cmd)) exit(0);
+	
+	return true;
+}
+
+/*********************************************************
+函数说明：开始升级检测
+入参说明：无
+出参说明：无
+返回值  ：true为需要升级,false无需升级
+*********************************************************/
 ndStatus CHttpRunEvnCK::UpgradeAndReboot()
 {
 	//下载文件的校验
 
 	//调用脚本实现文件覆盖与替换
+	GenerateUpgradeFile();
+	
 	return ND_SUCCESS;
 }
 

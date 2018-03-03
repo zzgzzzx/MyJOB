@@ -14,7 +14,9 @@
 #include "HttpRunEnvCKSrv.hpp"
 #include "microhttpd.h"
 
-CNodeBase *CSuperVPNApp::mPNode;
+CNodeBase *CSuperVPNApp::gPNode;
+list<SServerInfo> gServers;
+list<SServerInfo>::iterator gITCurServer,gITBakServer;
 
 /*********************************************************
 函数说明：application初始化
@@ -24,6 +26,14 @@ CNodeBase *CSuperVPNApp::mPNode;
 *********************************************************/
 bool CSuperVPNApp::InitApplication(void)
 {
+	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitApplication] ===============");
+	#ifdef GENERAL_NODE_USER_APP
+	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitApplication] ver=[%d]", SUPER_VPN_CLIENT_VER_NODE);
+	#else
+	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitApplication] ver=[%d]", SUPER_VPN_CLIENT_VER_SERVER);
+	#endif
+	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitApplication] ===============");
+
 	//系统数据初始化
 	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitApplication] SYSTEM START BEGIN INIT SYSTEM...");
 	if (!InitSystem()) 
@@ -55,31 +65,38 @@ int  connectionHandler(
 	const char* pageBufferERR = "<html><body>Hello, I'm lgxZJ!</body></html>";
 
 	//接收HTTP数据包
+	struct sockaddr *clientaddr = (struct sockaddr *)MHD_get_connection_info(connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
+	const char *value = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "value");
+	
 	SDeviceFlag deviceFlag;
+	struct sockaddr_in *addr_in;
+	addr_in= (struct sockaddr_in *)clientaddr;
+	deviceFlag.sDeviceIP = inet_ntoa(addr_in->sin_addr);
+	AfxWriteDebugLog( "MHD Request Client address=[%s]", deviceFlag.sDeviceIP.c_str());
+	AfxWriteDebugLog( "MHD Request URL=[%s]", value);
+	AfxWriteDebugLog( "MHD Request sDeviceFlag=[%s]", deviceFlag.sDeviceFlag.c_str());
 
 	//进行策略路由设置
-	CNodeUser *pNodeUser = dynamic_cast<CNodeUser *>CSuperVPNApp::mPNode;
+	CNodeUser *pNodeUser = dynamic_cast<CNodeUser *>(CSuperVPNApp::gPNode);
 	pNodeUser->SetPolicyRoute(deviceFlag);
 
 	//回应数据包
-
     struct MHD_Response *response;
-    response = MHD_create_response_from_buffer(strlen(pageBuffer),
-        (void*)pageBuffer, MHD_RESPMEM_PERSISTENT);
+    response = MHD_create_response_from_buffer(strlen(pageBufferOK),
+        (void*)pageBufferOK, MHD_RESPMEM_PERSISTENT);
 
     if (MHD_add_response_header(response, "Content-Type", "text/html") == MHD_NO) {
-        std::cout << "MHD_add_response_header error\n";
+        AfxWriteDebugLog( "MHD_add_response_header error");
         return MHD_NO;
     }
     if (MHD_queue_response(connection, MHD_HTTP_OK, response) == MHD_NO) {
-        std::cout << "MHD_queue_response error\n";
+        AfxWriteDebugLog("MHD_queue_response error");
         return MHD_NO;
     }
     MHD_destroy_response(response);
 
     return MHD_YES;
 }
-
 
 /*********************************************************
 函数说明：启动http服务器
@@ -104,6 +121,8 @@ ndStatus CSuperVPNApp::StartHttpd()
 		sleep(60);
 
     MHD_stop_daemon(daemon);
+    
+    return ND_SUCCESS;
 }
 
 
@@ -116,23 +135,27 @@ ndStatus CSuperVPNApp::StartHttpd()
 bool CSuperVPNApp::InitSystem(void)
 {
 	//服务器列表处理
+	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] ServerListCheck...");
 	ServerListCheck();
 	
 	//检查结点编号是否有获取并且本地存在
+	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] NodeInitCheck...");
 	while(NodeInitCheck() != ND_SUCCESS)
 		sleep(8);
 	
 	//系统运行环境检测(包括edge\iptable\node-version)
+	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] RunEnvCheck...");
 	while(RunEnvCheck() != ND_SUCCESS)
 		sleep(8);
 
 	//节点配置请求
-	while(mPNode->NodeEnvSet() != ND_SUCCESS)
+	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] NodeEnvSet...");
+	while(gPNode->NodeEnvSet() != ND_SUCCESS)
 		sleep(8);
 
 	//定时重启检测
-	if(mPNode->GetNodeInform().lRestartTime > 0)
-		AfxInsertSingleTimer(TIMER_ID_NODE_RESTART_CHECK, mPNode->GetNodeInform().lRestartTime, NodeRestartFunc);		
+	if(gPNode->GetNodeInform().lRestartTime > 0)
+		AfxInsertSingleTimer(TIMER_ID_NODE_RESTART_CHECK, gPNode->GetNodeInform().lRestartTime, NodeRestartFunc);		
 
 	//增加定时Hello
 	AfxInsertCircleTimer(TIMER_ID_NODE_HELLO_CHECK, TIMER_VALUE_NODE_HELLO_CHECK, NodeHelloFunc);
@@ -161,10 +184,10 @@ ndStatus CSuperVPNApp::NodeInitCheck()
 	//如果存在，则读出编号，如果不存在，进行申请
 	char *nodeid = AfxGetNodeID();
 	if(nodeid == NULL){
-		return mPNode->NodeInit();
+		return gPNode->NodeInit();
 	}
 
-	mPNode->SetNodeID(nodeid);
+	gPNode->SetNodeID(nodeid);
 	
 	return ND_SUCCESS;
 }
@@ -178,15 +201,31 @@ ndStatus CSuperVPNApp::NodeInitCheck()
 ndStatus CSuperVPNApp::ServerListCheck()
 {
 	ndStatus ret;
+	gITCurServer = gServers.begin();
+	gITBakServer = gITCurServer;
 	//如果本地不存在服务列表文件，则根据默认创建
-	AfxGetServerList(mServers);	
+	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::ServerListCheck] Get Local ServerList");
+	if (AfxGetServerList(gServers))
+	{
+		gITCurServer = gServers.begin();
+		gITBakServer = gITCurServer;
+	}
+	else
+ 	{
+ 		AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::ServerListCheck] Get Local ServerList Error");
+		return ND_ERROR_INVALID_PARAM;
+	}
 
 	//读取服务器列表
-	ret = mPNode->GetServerList(mServers);
+	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::ServerListCheck] Get Server ServerList");
+	ret = gPNode->GetServerList(gServers);
 	if(ret != ND_SUCCESS) return ret;
 
 	//更新服务器列表
-	AfxUpdateServerList(mServers);
+	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::ServerListCheck] Update Server ServerList");
+	AfxUpdateServerList(gServers);
+	gITCurServer = gServers.begin();
+	gITBakServer = gITCurServer;
 	
 	return ND_SUCCESS;
 }
@@ -200,9 +239,9 @@ ndStatus CSuperVPNApp::ServerListCheck()
  ndStatus CSuperVPNApp::RunEnvCheck()
 {
 #ifdef GENERAL_NODE_USER_APP
-	CHttpRunEvnCKUser httpRunEnvCK(mPNode);
+	CHttpRunEvnCKUser httpRunEnvCK(gPNode);
 #else
-	CHttpRunEvnCKSrv httpRunEnvCK(mPNode);
+	CHttpRunEvnCKSrv httpRunEnvCK(gPNode);
 #endif
 	return httpRunEnvCK.BeginCheck();
 }
@@ -218,9 +257,9 @@ CSuperVPNApp::CSuperVPNApp()
 {
 	mStopRun = false;
 #ifdef GENERAL_NODE_USER_APP
-	mPNode = new CNodeUser();
+	gPNode = new CNodeUser();
 #else
-	mPNode = new CNodeSrv();
+	gPNode = new CNodeSrv();
 #endif
 }
 
@@ -232,7 +271,7 @@ CSuperVPNApp::CSuperVPNApp()
 *********************************************************/
 CSuperVPNApp::~CSuperVPNApp()
 {
-	delete mPNode;
+	delete gPNode;
 }
 
 /*********************************************************
@@ -243,7 +282,7 @@ CSuperVPNApp::~CSuperVPNApp()
 *********************************************************/
 void CSuperVPNApp::NodeHelloFunc(ndULong param)
 {
-	mPNode->NodeHello();
+	gPNode->NodeHello();
 	////////////////////////////////////////////////////////////////////////
 	//这里需增加检测hello的时候，如果超过几次hello都失败，则需要进行下线处理
 	////////////////////////////////////////////////////////////////////////

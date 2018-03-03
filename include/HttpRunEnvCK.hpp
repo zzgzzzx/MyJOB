@@ -35,6 +35,8 @@ private:
 	
 	//下载文件
 	ndStatus Download(ndString filename, list<ndString> urls);
+	//生成自升级文件
+	ndBool GenerateUpgradeFile();
 	//覆盖文件并升级
 	ndStatus UpgradeAndReboot();
 

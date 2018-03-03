@@ -6,7 +6,7 @@
 #ifndef VPN_NODE_USER_H
 #define VPN_NODE_USER_H
 
-#include "NodeGeneral.hpp"
+#include "NodeGateway.hpp"
 
 /**
  * NodeUser Class
