@@ -34,6 +34,14 @@ namespace network {
         static ndString mZToken;
 
 
+		//服务端URL
+		ndString mSrvURL;
+	    //发送的数据buff
+	    ndString mSendBuf;
+	    //接收的数据buff
+	    ndString mRcvBuf;			
+
+
         //页面的返回码
         long mHttpRetcode;
 

@@ -20,13 +20,7 @@ class CHttpGeneral : public CHttpClient
 {
 protected:
 	//结点信息
-	CNodeBase *mPNode;	
-	//服务端URL
-	ndString mSrvURL;
-    //发送的数据buff
-    ndString mSendBuf;
-    //接收的数据buff
-    ndString mRcvBuf;	
+	CNodeBase *mPNode;
 	
     //生成认证头
     virtual ndString GenerateAuthHeader();

@@ -374,23 +374,31 @@ ndBool CHttpRunEvnCK::GenerateUpgradeFile()
 	
 	if ((pFile = fopen(UPGRADE_SH_FILE_NAME, "w+")) == NULL) return false;
 
-	fputs("PROCESS=`ps |grep $1|grep -v grep|grep -v PPID|awk '{ print $1}'`", pFile);
-	fputs("for i in $PROCESS", pFile);
-	fputs("do", pFile);
-	fputs("\techo \"Kill the $1 process [ $i ]\"", pFile);
-	fputs("\tkill -9 $i", pFile);
-	fputs("done", pFile);
+	sprintf(cmd, "PROCESS=`ps |grep %s|grep -v grep|grep -v PPID|awk '{ print $1}'`\n", VPN_EXE_FILE_NAME);
+	fputs(cmd, pFile);
+	sprintf(cmd, "for i in $PROCESS\n");
+	fputs(cmd, pFile);
+	sprintf(cmd, "do\n");
+	fputs(cmd, pFile);
+	sprintf(cmd, "\techo \"Kill the $1 process [ $i ]\"\n");
+	fputs(cmd, pFile);
+	sprintf(cmd, "\tkill -9 $i\n");
+	fputs(cmd, pFile);
+	sprintf(cmd, "done\n");
+	fputs(cmd, pFile);
 	
-	sprintf(cmd, "sh mv %s %s", VPN_UPGRADE_TEMP_FILE_NAME, VPN_EXE_FILE_NAME);
+	sprintf(cmd, "mv %s %s\n", VPN_UPGRADE_TEMP_FILE_NAME, VPN_EXE_FILE_NAME);
 	fputs(cmd, pFile);
-	sprintf(cmd, "sh chmod 777 %s", VPN_EXE_FILE_NAME);
+	sprintf(cmd, "chmod 777 %s\n", VPN_EXE_FILE_NAME);
 	fputs(cmd, pFile);
-	sprintf(cmd, "./%s&", VPN_EXE_FILE_NAME);
+	sprintf(cmd, "./%s&\n", VPN_EXE_FILE_NAME);
 	fputs(cmd, pFile);	
 	fclose(pFile);
 
-	AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::GenerateUpgradeFile] Exec sh chmod 777 upgradefile");	
-	sprintf(cmd, "sh chmod 777 %s", UPGRADE_SH_FILE_NAME);
+	AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::GenerateUpgradeFile] Exec chmod 777 upgradefile");	
+	sprintf(cmd, "chmod 777 %s", UPGRADE_SH_FILE_NAME);
+	AfxExecCmd(cmd);
+	sprintf(cmd, "./%s", UPGRADE_SH_FILE_NAME);
 	if (AfxExecCmdNotWait(cmd)) exit(0);
 	
 	return true;

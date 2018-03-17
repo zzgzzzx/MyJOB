@@ -100,6 +100,76 @@ ndStatus CHttpSrvNode::MakeNodeHelloReq()
 ndStatus CHttpSrvNode::AnalysisNodeHelloRsp()
 {
 	AfxWriteDebugLog("SuperVPN run at [CHttpSrvNode::AnalysisNodeHelloRsp] Recv Hello actions");
+
+    cJSON *root;
+	int iErrCode;
+	list<SDomain> listDomains;	
+
+    root = cJSON_Parse(mRcvBuf.c_str());
+    if (!root)
+    {
+        AfxWriteDebugLog("SuperVPN run at [CHttpSrvNode::AnalysisNodeHelloRsp] Error before: [%s]", cJSON_GetErrorPtr());
+        return ND_ERROR_INVALID_RESPONSE;
+    }
+
+    cJSON *actionsArray = cJSON_GetObjectItem(root, "actions");
+    if(actionsArray != NULL)
+    {
+
+        cJSON *actionslist = actionsArray->child;
+
+        iErrCode = cJSON_GetObjectItem(actionslist, "error")->valueint;
+        if(iErrCode != 0)
+		{
+			cJSON_Delete(root);
+			return ND_ERROR_INVALID_RESPONSE;
+        }		
+        
+        cJSON *replices = cJSON_GetObjectItem(root, "replies");
+        if(replices != NULL)
+        {
+            cJSON *repliceslist = replices->child;
+
+            cJSON *domains = cJSON_GetObjectItem(repliceslist, "domains");
+            if(domains != NULL)
+            {
+                    cJSON *domainslist = domains->child;
+
+                    AfxWriteDebugLog("SuperVPN run at [CHttpGeneral::AnalysisNodeHelloRsp] Get Domains");
+                    SDomain item;
+                    while(domainslist != NULL)
+                    {
+                        if(cJSON_GetObjectItem(domainslist, "domainid") != NULL &&
+                           cJSON_GetObjectItem(domainslist, "domainid")->valuestring != NULL)
+                            item.sDomain = cJSON_GetObjectItem(domainslist, "domainid")->valuestring;
+						AfxWriteDebugLog("SuperVPN run at [CHttpGeneral::AnalysisNodeHelloRsp] domain id=[%s]",item.sDomain.c_str());
+
+                        if(cJSON_GetObjectItem(domainslist, "ip") != NULL &&
+                           cJSON_GetObjectItem(domainslist, "ip")->valuestring != NULL)
+                            item.lNodeIP = cJSON_GetObjectItem(domainslist, "ip")->valuestring;
+						AfxWriteDebugLog("SuperVPN run at [CHttpGeneral::AnalysisNodeHelloRsp] domain ip=[%s]",item.lNodeIP.c_str());
+
+                        if(cJSON_GetObjectItem(domainslist, "mask") != NULL &&
+                           cJSON_GetObjectItem(domainslist, "mask")->valuestring != NULL)
+                            item.lMask = cJSON_GetObjectItem(domainslist, "mask")->valuestring;
+						AfxWriteDebugLog("SuperVPN run at [CHttpGeneral::AnalysisNodeHelloRsp] domain mask=[%s]",item.lMask.c_str());
+
+                        if(cJSON_GetObjectItem(domainslist, "key") != NULL &&
+                           cJSON_GetObjectItem(domainslist, "key")->valuestring != NULL)
+                            item.sDomainKey = cJSON_GetObjectItem(domainslist, "key")->valuestring;
+						AfxWriteDebugLog("SuperVPN run at [CHttpGeneral::AnalysisNodeHelloRsp] domain key=[%s]",item.sDomainKey.c_str());
+
+                        listDomains.push_back(item);
+
+                        domainslist = domainslist->next;
+                    }
+			
+            }
+        }
+
+        cJSON_Delete(root);
+    }		
+	mPNode->DealHelloAddNewDomain(listDomains);
 	return ND_SUCCESS;
 }
 

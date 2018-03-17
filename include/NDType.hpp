@@ -87,6 +87,14 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 //升级文件名
 -----------------------------------------------------------------------------------------*/
 #define UPGRADE_SH_FILE_NAME	"upgrade.sh"
+/*---------------------------------------------------------------------------------------
+//重启脚本文件名
+-----------------------------------------------------------------------------------------*/
+#define RESTART_SH_FILE_NAME	"restart.sh"
+/*---------------------------------------------------------------------------------------
+//edge结束脚本文件名
+-----------------------------------------------------------------------------------------*/
+#define CLEAN_EDGE_SH_FILE_NAME	"stopedge.sh"
 
 /*---------------------------------------------------------------------------------------
 //节点编号文件名
@@ -134,13 +142,19 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 /*---------------------------------------------------------------------------------------
 //VPN版本号
 -----------------------------------------------------------------------------------------*/
-#define SUPER_VPN_CLIENT_VER_SERVER 1000
-#define SUPER_VPN_CLIENT_VER_NODE 1000
+#define SUPER_VPN_CLIENT_VER_SERVER 1010
+#define SUPER_VPN_CLIENT_VER_NODE 1010
 
 /*---------------------------------------------------------------------------------------
 //系统支持的最大消息队列数
 -----------------------------------------------------------------------------------------*/
 #define MAX_FIFO_MSG_NUM 5000
+
+/*---------------------------------------------------------------------------------------
+//hello 服务的本地端口号
+-----------------------------------------------------------------------------------------*/
+#define HELLO_SRV_LOCAL_PORT 9988
+
 
 /*---------------------------------------------------------------------------------------
 //定时器ID设置
@@ -152,6 +166,7 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 //定时器时间设置(秒数)
 -----------------------------------------------------------------------------------------*/
 #define TIMER_VALUE_NODE_HELLO_CHECK	60			//节点Hello检测
+#define MAX_VALUE_HELLO_CHECK_TIMES 3				//hello检测的次数
 
 /*---------------------------------------------------------------------------------------
 //curl连接服务器超时时间（秒）
@@ -189,6 +204,8 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 
 #define SUPER_ACTION_SERVER_NODE_HELLO "server-node-hello"
 #define SUPER_ACTION_USER_NODE_HELLO "user-node-hello"
+#define SUPER_ACTION_SERVICES_CHECK_HELLO "services-check-hello"
+
 
 #define SUPER_ACTION_SERVER_NODE_SET "server-node-set"
 #define SUPER_ACTION_USER_NODE_SET "user-node-set"
@@ -300,8 +317,8 @@ typedef enum
 	//解密失败26
 	ND_ERROR_DECRYPTION_FAILED,
 
-	//调用openssl库失败27
-	ND_ERROR_OPENSSL_LIB_CALL,
+	//hello接收超过规定的次数失败
+	ND_ERROR_NOT_RECVIVE_HELLO
 }ndErrorEn;
 
 

@@ -47,7 +47,26 @@ void CNodeBase::SetNodeInform(SNodeInform &inform)
 {
 	inform.sNodeMac = mSNodeInform.sNodeMac;
 	mSNodeInform = inform;
+	SDomain domain;
+
+	list<SDomain>::iterator iterDomain;
+    for(iterDomain=mSNodeInform.mDomainInforms.begin(); iterDomain!=mSNodeInform.mDomainInforms.end(); iterDomain++)
+    {
+    	domain = *iterDomain;
+		mSNodeInform.mDomainMap.insert(domain.sDomain, domain);
+    }
 }
+
+/*********************************************************
+函数说明：设置接收hello时需要增加的新的域(用于服务节点)
+入参说明：无
+出参说明：无
+返回值  ：无
+*********************************************************/
+void CNodeBase::DealHelloAddNewDomain(list<SDomain> &domain)
+{
+}
+
 
 /*********************************************************
 函数说明：设置节点编号信息

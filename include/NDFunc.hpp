@@ -26,6 +26,10 @@ bool AfxInsertCircleTimer(unsigned long callid,unsigned long timeout,void (*Call
 bool AfxDeleteCircleTimer(unsigned long callid);
 //删除单个定时器
 bool AfxDeleteSingleTimer(unsigned long callid);
+//获取Hello服务
+CHelloSrv *AfxGetHelloSrv(void);
+//获取服务节点集合
+CServiceSet *AfxGetServiceSet(void);
 
 /*---------------------------------------------------------------------------------------
 //日志

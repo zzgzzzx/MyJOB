@@ -42,89 +42,12 @@ bool CSuperVPNApp::InitApplication(void)
 		cout<<"Init System Error......";
 		return false;
 	}
+
+	//数据包队列循环处理
+	TranslatePkt();
+	
 	return true;
 }
-
-/*********************************************************
-函数说明：http服务接收数据处理
-入参说明：
-出参说明：
-返回值  ：
-*********************************************************/
-int  connectionHandler(
-    void *cls,
-    struct MHD_Connection *connection,
-    const char *url,
-    const char *method,
-    const char *version,
-    const char *upload_data,
-    size_t *upload_data_size,
-    void **con_cls)
-{
-    const char* pageBufferOK = "<html><body>Hello, I'm lgxZJ!</body></html>";
-	const char* pageBufferERR = "<html><body>Hello, I'm lgxZJ!</body></html>";
-
-	//接收HTTP数据包
-	struct sockaddr *clientaddr = (struct sockaddr *)MHD_get_connection_info(connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
-	const char *value = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "value");
-	
-	SDeviceFlag deviceFlag;
-	struct sockaddr_in *addr_in;
-	addr_in= (struct sockaddr_in *)clientaddr;
-	deviceFlag.sDeviceIP = inet_ntoa(addr_in->sin_addr);
-	AfxWriteDebugLog( "MHD Request Client address=[%s]", deviceFlag.sDeviceIP.c_str());
-	AfxWriteDebugLog( "MHD Request URL=[%s]", value);
-	AfxWriteDebugLog( "MHD Request sDeviceFlag=[%s]", deviceFlag.sDeviceFlag.c_str());
-
-	//进行策略路由设置
-	CNodeUser *pNodeUser = dynamic_cast<CNodeUser *>(CSuperVPNApp::gPNode);
-	pNodeUser->SetPolicyRoute(deviceFlag);
-
-	//回应数据包
-    struct MHD_Response *response;
-    response = MHD_create_response_from_buffer(strlen(pageBufferOK),
-        (void*)pageBufferOK, MHD_RESPMEM_PERSISTENT);
-
-    if (MHD_add_response_header(response, "Content-Type", "text/html") == MHD_NO) {
-        AfxWriteDebugLog( "MHD_add_response_header error");
-        return MHD_NO;
-    }
-    if (MHD_queue_response(connection, MHD_HTTP_OK, response) == MHD_NO) {
-        AfxWriteDebugLog("MHD_queue_response error");
-        return MHD_NO;
-    }
-    MHD_destroy_response(response);
-
-    return MHD_YES;
-}
-
-/*********************************************************
-函数说明：启动http服务器
-入参说明：
-出参说明：
-返回值  ：
-*********************************************************/
-ndStatus CSuperVPNApp::StartHttpd()
-{
-    const int port = 8888;
-
-    struct MHD_Daemon* daemon = 
-        MHD_start_daemon(MHD_USE_SELECT_INTERNALLY, port
-        , NULL, NULL, connectionHandler, NULL, MHD_OPTION_END);
-    if (daemon == NULL) {
-        AfxWriteDebugLog("Cannot start httpd server!");
-        return -1;
-    }
-
-	//循环等待保证不退出应用
-	while(!mStopRun)
-		sleep(60);
-
-    MHD_stop_daemon(daemon);
-    
-    return ND_SUCCESS;
-}
-
 
 /*********************************************************
 函数说明：系统数据初始化
@@ -155,19 +78,26 @@ bool CSuperVPNApp::InitSystem(void)
 
 	//定时重启检测
 	if(gPNode->GetNodeInform().lRestartTime > 0)
-		AfxInsertSingleTimer(TIMER_ID_NODE_RESTART_CHECK, gPNode->GetNodeInform().lRestartTime, NodeRestartFunc);		
+		AfxInsertSingleTimer(TIMER_ID_NODE_RESTART_CHECK, gPNode->GetNodeInform().lRestartTime, NodeRestartFunc);	
 
-	//增加定时Hello
-	AfxInsertCircleTimer(TIMER_ID_NODE_HELLO_CHECK, TIMER_VALUE_NODE_HELLO_CHECK, NodeHelloFunc);
+	//启用Hello服务
+	if (mHelloSrv.Start()) 
+		AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] HELLO SERVER START ERROR...");
+	else
+		AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] HELLO SERVER START WORKING...");	
 
 #ifdef GENERAL_NODE_USER_APP
-	//启动http服务器
-	StartHttpd();
-#else
-	//循环等待保证不退出应用
-	while(!mStopRun)
-		sleep(60);
-#endif	
+	//启动http服务	
+	if (mHttpSrv.Start()) 
+		AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] HTTP SERVER START ERROR...");
+	else
+		AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] HTTP SERVER START WORKING...");		
+#endif		
+
+	//增加定时Hello
+	if(gPNode->GetNodeInform().lHelloTime <= 0)
+		gPNode->GetNodeInform().lHelloTime = TIMER_VALUE_NODE_HELLO_CHECK;	
+	AfxInsertCircleTimer(TIMER_ID_NODE_HELLO_CHECK, gPNode->GetNodeInform().lHelloTime, NodeHelloFunc);
 
 	return true;
 }
@@ -255,7 +185,6 @@ ndStatus CSuperVPNApp::ServerListCheck()
 *********************************************************/
 CSuperVPNApp::CSuperVPNApp()
 {
-	mStopRun = false;
 #ifdef GENERAL_NODE_USER_APP
 	gPNode = new CNodeUser();
 #else
@@ -282,10 +211,36 @@ CSuperVPNApp::~CSuperVPNApp()
 *********************************************************/
 void CSuperVPNApp::NodeHelloFunc(ndULong param)
 {
-	gPNode->NodeHello();
-	////////////////////////////////////////////////////////////////////////
-	//这里需增加检测hello的时候，如果超过几次hello都失败，则需要进行下线处理
-	////////////////////////////////////////////////////////////////////////
+	if (gPNode->NodeHello() == ND_ERROR_NOT_RECVIVE_HELLO)
+	{
+		////////////////////////////////////////////////////////////////////////
+		//这里需增加检测hello的时候，如果超过几次hello都失败，则需要进行下线处理
+		////////////////////////////////////////////////////////////////////////
+		FILE *pFile;
+		char cmd[512]={0};
+		
+		if ((pFile = fopen(CLEAN_EDGE_SH_FILE_NAME, "w+")) == NULL) return;
+		//结束錯edge进行
+		sprintf(cmd, "PROCESS=`ps |grep edge|grep -v grep|grep -v PPID|awk '{ print $1}'`\n");
+		fputs(cmd, pFile);
+		sprintf(cmd, "for i in $PROCESS\n");
+		fputs(cmd, pFile);
+		sprintf(cmd, "do\n");
+		fputs(cmd, pFile);
+		sprintf(cmd, "\techo \"Kill the $1 process [ $i ]\"\n");
+		fputs(cmd, pFile);
+		sprintf(cmd, "\tkill -9 $i\n");
+		fputs(cmd, pFile);
+		sprintf(cmd, "done\n");
+		fputs(cmd, pFile);
+		fclose(pFile);
+
+		AfxWriteDebugLog("SuperVPN run at[CSuperVPNApp::NodeHelloFunc] Exec chmod 777 restart_SH_FILE");	
+		sprintf(cmd, "chmod 777 %s", CLEAN_EDGE_SH_FILE_NAME);
+		AfxExecCmd(cmd);
+		sprintf(cmd, "./%s", CLEAN_EDGE_SH_FILE_NAME);
+		AfxExecCmdNotWait(cmd);	
+	}
 }
 
 /*********************************************************
@@ -299,6 +254,81 @@ void CSuperVPNApp::NodeRestartFunc(ndULong param)
 	//////////////////////////////////////////////////////////////////////
 	//重启的操作处理
 	//////////////////////////////////////////////////////////////////////
+	FILE *pFile;
+	char cmd[512]={0};
+	
+	if ((pFile = fopen(RESTART_SH_FILE_NAME, "w+")) == NULL) return;
+	//结束錯edge进行
+	sprintf(cmd, "PROCESS=`ps |grep edge|grep -v grep|grep -v PPID|awk '{ print $1}'`\n");
+	fputs(cmd, pFile);
+	sprintf(cmd, "for i in $PROCESS\n");
+	fputs(cmd, pFile);
+	sprintf(cmd, "do\n");
+	fputs(cmd, pFile);
+	sprintf(cmd, "\techo \"Kill the $1 process [ $i ]\"\n");
+	fputs(cmd, pFile);
+	sprintf(cmd, "\tkill -9 $i\n");
+	fputs(cmd, pFile);
+	sprintf(cmd, "done\n");
+	fputs(cmd, pFile);	
+	//结束SuperVPN
+	sprintf(cmd, "PROCESS=`ps |grep %s|grep -v grep|grep -v PPID|awk '{ print $1}'`\n", VPN_EXE_FILE_NAME);
+	fputs(cmd, pFile);
+	sprintf(cmd, "for i in $PROCESS\n");
+	fputs(cmd, pFile);
+	sprintf(cmd, "do\n");
+	fputs(cmd, pFile);
+	sprintf(cmd, "\techo \"Kill the $1 process [ $i ]\"\n");
+	fputs(cmd, pFile);
+	sprintf(cmd, "\tkill -9 $i\n");
+	fputs(cmd, pFile);
+	sprintf(cmd, "done\n");
+	fputs(cmd, pFile);
+	
+	sprintf(cmd, "./%s&\n", VPN_EXE_FILE_NAME);
+	fputs(cmd, pFile);	
+	fclose(pFile);
+
+	AfxWriteDebugLog("SuperVPN run at[CSuperVPNApp::NodeRestartFunc] Exec chmod 777 restart_SH_FILE");	
+	sprintf(cmd, "chmod 777 %s", RESTART_SH_FILE_NAME);
+	AfxExecCmd(cmd);
+	sprintf(cmd, "./%s", RESTART_SH_FILE_NAME);
+	if (AfxExecCmdNotWait(cmd)) exit(0);
+}
+
+/*********************************************************
+函数说明：消息数据包入队
+入参说明：
+出参说明：
+返回值  ：
+*********************************************************/
+void CSuperVPNApp::InsertPktToQueue(CPacket *pkt)
+{
+	//AfxWriteDebugLog("===>INSERT PKT TO SYSTEM MSG QUEUE...");
+	mPktQueue.PutMsg(pkt);
+}
+
+/*********************************************************
+函数说明：数据包队列循环处理
+入参说明：
+出参说明：
+返回值  ：
+*********************************************************/
+void CSuperVPNApp::TranslatePkt(void)
+{
+	CPacket *pkt;
+
+	while(true)
+	{
+		//数据包读取
+		pkt = mPktQueue.GetMsg();		
+		if (NULL == pkt) continue;
+		//数据包处理
+		AfxWriteDebugLog("===>CSuperVPNApp Recv Pkt Begin Dispose...");
+		pkt->DisposePkt();		
+		//数据包释放
+		delete pkt;
+	}
 }
 
 

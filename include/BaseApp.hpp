@@ -52,8 +52,16 @@ public:
 class CSuperVPNApp: public CBaseApp
 {
 private:
-	//是否需要退出标识
-	ndBool mStopRun;	
+	//消息包队列
+	CMsgFIFO<CPacket*> mPktQueue;	
+	
+	//hello服务
+	CHelloSrvThread mHelloSrv;
+	//http服务
+	CHttpSrvThread mHttpSrv;
+	//服务节点集合类
+	CServiceSet mServiceSet;
+		
 	//系统数据初始化
 	bool InitSystem(void);
 	//服务器列表检测
@@ -64,6 +72,9 @@ private:
 	ndStatus NodeInitCheck();
 	//启动http服务器
 	ndStatus StartHttpd();
+	//数据包队列循环处理
+	void TranslatePkt(void);
+	
 protected:
 	//应用程序初始化工作
 	bool InitApplication(void);
@@ -78,7 +89,10 @@ public:
 	//节点hello
 	static void NodeHelloFunc(ndULong param);	
 	//节点重启
-	static void NodeRestartFunc(ndULong param);		
+	static void NodeRestartFunc(ndULong param);	
+
+	//消息数据包入队
+	void InsertPktToQueue(CPacket *pkt);	
 };
 
 #endif

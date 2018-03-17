@@ -154,7 +154,7 @@ ndStatus CHttpUserNode::MakeNodeEnvSetReq()
     cJSON_AddItemToObject(root, "node", fmt=cJSON_CreateObject());
 	cJSON_AddNumberToObject(fmt, "version",	SUPER_VPN_CLIENT_VER_NODE);
     cJSON_AddStringToObject(fmt, "nodeid", mPNode->GetNodeInform().sNodeID.c_str());
-    AfxWriteDebugLog("SuperVPN run at [CHttpUserNode::MakeNodeEnvSetReq] Make Init actions");
+    AfxWriteDebugLog("SuperVPN run at [CHttpUserNode::MakeNodeEnvSetReq] Make EnvSet actions");
     cJSON_AddItemToObject(root, "actions", actions = cJSON_CreateArray());
 
     //========================set===========================================

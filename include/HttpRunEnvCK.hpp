@@ -10,11 +10,12 @@
 #include "HttpGeneral.hpp"
 #include "NodeBase.hpp"
 
+using namespace network;
 
 /**
  * CHttpRunEvnCK Class
  */
-class CHttpRunEvnCK : public CHttpGeneral
+class CHttpRunEvnCK : public CHttpClient
 {
 public:
 	CHttpRunEvnCK(CNodeBase *node);	

@@ -12,6 +12,7 @@
 #include <list>
 #include <map>
 #include <vector>
+#include "Map.hpp"
 
 using namespace std;
 
@@ -85,10 +86,11 @@ typedef struct
 	ndInt32		lHelloTime;
 	//RestartTime
 	ndInt32		lRestartTime;	
-	//所属域的相关信息
+	//超级结点的相关信息
 	vector<SSupperNode> mSupperNode;
 	//所属域的相关信息
 	list<SDomain> mDomainInforms;	
+	CMap<ndString, SDomain> mDomainMap;
 }SNodeInform, *pSNodeInform;
 
 
@@ -177,6 +179,17 @@ typedef struct
 	SEdgeCKSt edge;
 	SIPTableCKSt iptable;
 }SRunEnvCKSt;
+
+//数据包网络参数结构
+struct NetParam
+{
+	ndString	sSrvURL;			//服务端访问的URL
+	ndUInt32	lDesIP;				//目的IP地址
+	ndUInt32	lSrcIP;				//源IP地址
+	ndUInt16	uDesPort;			//目的端口
+	ndUInt16	uSrcPort;			//源端口
+};
+typedef struct NetParam SNetParam,*pSNetParam;
 
 
 //字符串动态数组定义

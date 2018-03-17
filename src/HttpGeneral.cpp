@@ -120,7 +120,7 @@ ndStatus CHttpGeneral::MakeNodeEnvSetReq()
 *********************************************************/
 ndStatus CHttpGeneral::AnalysisNodeEnvSetRsp()
 {
-	SNodeInform sNode;
+	SNodeInform sNode = mPNode->GetNodeInform();
 	//解析返回的数据到NdoeInform
 
     cJSON *root;

@@ -48,6 +48,8 @@ public:
 
 	void SetNodeInform(SNodeInform &inform);
 
+	virtual void DealHelloAddNewDomain(list<SDomain> &domain);
+
 	void SetNodeID(ndString nodeid);
 
 	SNodeInform GetNodeInform();
