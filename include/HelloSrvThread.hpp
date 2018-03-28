@@ -11,6 +11,7 @@
 
 #include "BThread.hpp"
 #include "Udp.hpp"
+#include "NDStruct.hpp"
 
 class CHelloSrvThread: public CBaseThread
 {
@@ -21,6 +22,8 @@ private:
 	bool StartService();
 	//接收并处理数据
 	void RcvAndDealMsg();
+	//节点hello
+	static void NodeHelloFunc(ndULong param);		
 protected:
 	//线程处理函数
 	virtual void ProcessVirtual(void);
@@ -30,7 +33,7 @@ public:
 	//析构函数
 	~CHelloSrvThread();
 	//发送数据包
-	int SendTo(ndInt32 IP, ndInt16 iPort,char *pBuf,int iBufLen);
+	int SendTo(ndUInt32 IP, ndInt16 iPort, const char *pBuf, int iBufLen);
 };
 
 #endif

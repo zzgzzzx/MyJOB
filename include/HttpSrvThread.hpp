@@ -27,6 +27,8 @@ public:
 	CHttpSrvThread();
 	//析构函数
 	~CHttpSrvThread();
+	//发送数据包
+	int SendTo(ndUInt32 IP,ndInt16 iPort,char *pBuf,int iBufLen);
 };
 
 #endif

@@ -30,15 +30,6 @@ typedef struct
 	ndInt16 LogDayNum;		//本地日志的存储的天数(天);
 }SLogConf, *pSLogConf;
 
- /* 策略路由的信息 */
- typedef struct
-{
-	 //vpn服务节点的IP地址
-	 ndString	 sServiceIP;
-	 //下游设备的特征码
-	 ndString	 sDeviceFlag;
-}SRouteInform;
-
  /* 下端设备策略路由的信息 */
  typedef struct
 {
@@ -47,6 +38,20 @@ typedef struct
 	 //下游设备的特征码
 	 ndString	 sDeviceFlag;
 }SDeviceFlag; 
+
+ /**
+ ******************************************************************************
+ * @brief   ip pool structure
+ * @note    This is the structure for ip pool
+ ******************************************************************************
+ */
+ typedef struct
+{
+	//网关可分配的ip起始地址
+	ndUInt32 uBeginIP;
+	//网关可份配的ip结束地址
+	ndUInt32 uEndIP;
+}SIPPool;
 
 /**
  ******************************************************************************
@@ -91,6 +96,8 @@ typedef struct
 	//所属域的相关信息
 	list<SDomain> mDomainInforms;	
 	CMap<ndString, SDomain> mDomainMap;
+	//用户节点/网关的IP地址池
+	SIPPool mIPPool;
 }SNodeInform, *pSNodeInform;
 
 

@@ -75,10 +75,23 @@ void AfxInsertPktToSysQue(CPacket *pkt)
 出参说明：
 返回值  ：
 *********************************************************/
-CHelloSrv *AfxGetHelloSrv(void)
+CHelloSrvThread *AfxGetHelloSrv()
 {
 	return &TSuperVPNApp.mHelloSrv;
 }
+
+/*********************************************************
+函数说明：获取网关名称
+入参说明：
+出参说明：
+返回值  ：
+*********************************************************/
+ndString AfxGetGatewayName()
+{
+	//lewis
+	return "";
+}
+
 
 /*********************************************************
 函数说明：获取服务节点集合
@@ -86,11 +99,32 @@ CHelloSrv *AfxGetHelloSrv(void)
 出参说明：
 返回值  ：
 *********************************************************/
-CServiceSet *AfxGetServiceSet(void)
+CServiceSet *AfxGetServiceSet()
 {
 	return &TSuperVPNApp.mServiceSet;
 }
 
+/*********************************************************
+函数说明：获取身份识别集合
+入参说明：
+出参说明：
+返回值  ：
+*********************************************************/
+CIdentifySet *AfxGetIdentifySet()
+{
+	return &TSuperVPNApp.mIdentifySet;
+}
+
+/*********************************************************
+函数说明：获取节点
+入参说明：
+出参说明：
+返回值  ：
+*********************************************************/
+CNodeBase *AfxGetVPNNode()
+{
+	return TSuperVPNApp.mPNode;
+}
 
 /*********************************************************
 函数说明：写调试日志

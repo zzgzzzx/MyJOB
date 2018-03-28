@@ -41,6 +41,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include<arpa/inet.h>
+
 
 
 /*******************************************************************************
@@ -65,6 +67,12 @@ typedef bool			 ndBool;
 
 typedef signed long     ndStatus;
 typedef unsigned char	 ndByte;
+
+//网络序与主机序的转换
+#define NTOHS ntohs
+#define NTOHL ntohl
+#define HTONS htons
+#define HTONL htonl
 
 
 //调试日志结果输出
@@ -213,6 +221,9 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 #define SUPER_ACTION_USER_NODE_ROUTE "user-node-get-services"
 #define SUPER_ACTION_NODE_ENV_CHECK "run-env-check"
 #define SUPER_ACTION_NODE_GET_SERVER_LIST "server-list-inform"
+
+#define SUPER_ACTION_NODE_GET_SERVICES "user-node-get-services"
+
 
 #define VALUE_CURLOPT_DOWNLOAD_RETRY_TIMES 5
 #define VALUE_CURLOPT_POST_RETRY_TIMES 3

@@ -7,6 +7,9 @@
 版本         :1.0 
 **********************************************************/
 #include "HttpSrvThread.hpp"
+#include "NDFunc.hpp"
+#include "microhttpd.h"
+
 
 /*********************************************************
 函数说明：构造函数
@@ -98,7 +101,7 @@ int  connectionHandler(
 
 	
 	//进行策略路由设置
-	//CNodeUser *pNodeUser = dynamic_cast<CNodeUser *>(CSuperVPNApp::gPNode);
+	//CNodeUser *pNodeUser = dynamic_cast<CNodeUser *>(AfxVPNNode());
 	//pNodeUser->SetPolicyRoute(deviceFlag);
 
 	//回应数据包

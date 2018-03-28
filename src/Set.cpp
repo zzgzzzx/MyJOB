@@ -36,7 +36,7 @@ CBaseSet::~CBaseSet()
 出参说明：
 返回值  ：
 *********************************************************/
-bool CBaseSet::AddItem(ULONG Key,CBaseInform *pBI)
+bool CBaseSet::AddItem(ndUInt32 Key,CBaseInform *pBI)
 {
 	return insert(Key,pBI);
 }
@@ -47,7 +47,7 @@ bool CBaseSet::AddItem(ULONG Key,CBaseInform *pBI)
 出参说明：
 返回值  ：
 *********************************************************/
-bool CBaseSet::DelItem(ULONG Key)
+bool CBaseSet::DelItem(ndUInt32 Key)
 {
 	return nlerase(Key);
 }
@@ -58,7 +58,7 @@ bool CBaseSet::DelItem(ULONG Key)
 出参说明：
 返回值  ：
 *********************************************************/
-CBaseInform *CBaseSet::FindItemNL(ULONG Key)
+CBaseInform *CBaseSet::FindItemNL(ndUInt32 Key)
 {
 	CBaseInform *pBI;
 
@@ -73,7 +73,7 @@ CBaseInform *CBaseSet::FindItemNL(ULONG Key)
 出参说明：
 返回值  ：
 *********************************************************/
-CBaseInform *CBaseSet::FindItem(ULONG Key)
+CBaseInform *CBaseSet::FindItem(ndUInt32 Key)
 {
 	CBaseInform *pBI;
 

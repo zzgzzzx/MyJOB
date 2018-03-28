@@ -12,7 +12,10 @@
 #include "MsgQueue.hpp"
 #include "TimerManager.hpp"
 #include "NodeBase.hpp"
-
+#include "Packet.hpp"
+#include "HelloSrvThread.hpp"
+#include "HttpSrvThread.hpp"
+#include "ServiceSet.hpp"
 
 //**********************************
 //应用工程基类                       
@@ -55,13 +58,6 @@ private:
 	//消息包队列
 	CMsgFIFO<CPacket*> mPktQueue;	
 	
-	//hello服务
-	CHelloSrvThread mHelloSrv;
-	//http服务
-	CHttpSrvThread mHttpSrv;
-	//服务节点集合类
-	CServiceSet mServiceSet;
-		
 	//系统数据初始化
 	bool InitSystem(void);
 	//服务器列表检测
@@ -81,13 +77,21 @@ protected:
 
 public:
 	//节点
-	static CNodeBase *gPNode;
+	CNodeBase *mPNode;
+	//hello服务
+	CHelloSrvThread mHelloSrv;
+	//http服务
+	CHttpSrvThread mHttpSrv;
+	//服务节点集合类
+	CServiceSet mServiceSet;
+	//身份识别管理类
+	CIdentifySet mIdentifySet;
+	
 	//构造函数
 	CSuperVPNApp();
 	//析构函数
 	~CSuperVPNApp();	
-	//节点hello
-	static void NodeHelloFunc(ndULong param);	
+
 	//节点重启
 	static void NodeRestartFunc(ndULong param);	
 

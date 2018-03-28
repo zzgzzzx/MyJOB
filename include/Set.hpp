@@ -9,7 +9,7 @@
 #ifndef __SET_HPP__
 #define __SET_HPP__
 
-#include "Struct.hpp"
+#include "NDStruct.hpp"
 #include "Inform.hpp"
 #include "Packet.hpp"
 

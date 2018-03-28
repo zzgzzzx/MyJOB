@@ -52,7 +52,7 @@ public:
 
 	void SetNodeID(ndString nodeid);
 
-	SNodeInform GetNodeInform();
+	SNodeInform &GetNodeInform();
 
     //ªÒ»°¥ÌŒÛ¬Î
     ndULong GetLastErrCode();

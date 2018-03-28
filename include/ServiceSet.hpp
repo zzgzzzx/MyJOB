@@ -10,6 +10,7 @@
 #define __SERVICE_SET_HPP__
 
 #include "Set.hpp"
+#include "HelloPkt.hpp"
 
 class CServiceSet: public CBaseSet
 {
@@ -20,7 +21,7 @@ public:
 	//构造函数
 	CServiceSet();
 	//析构函数
-	CServiceSet();
+	~CServiceSet();
 
 	//接收处理数据包
 	bool DealRcvPkt(CHelloPkt *pkt);

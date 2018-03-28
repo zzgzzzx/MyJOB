@@ -21,16 +21,16 @@ public:
 	
 protected:
 	//Node初始化
-	virtual ndStatus MakeNodeInitReq();
+	ndStatus MakeNodeInitReq();
 	//节点配置
-	virtual ndStatus MakeNodeEnvSetReq();
+	ndStatus MakeNodeEnvSetReq();
+	ndStatus AnalysisNodeEnvSetRsp();	
 	//Node Hello
-	virtual ndStatus MakeNodeHelloReq();
+	ndStatus MakeNodeHelloReq();
 	//获取服务器列表
-	virtual ndStatus MakeServerListReq();	
+	ndStatus MakeServerListReq();	
 	//Node Hello Response
-	virtual ndStatus AnalysisNodeHelloRsp();	
-
+	ndStatus AnalysisNodeHelloRsp();	
 };
 
 #endif //VPN_USER_NODE_HTTPCLIENT_H

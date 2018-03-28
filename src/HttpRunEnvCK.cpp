@@ -185,7 +185,6 @@ ndStatus CHttpRunEvnCK::EdgeCheck()
 		return ND_SUCCESS;
 
 	ndStatus ret = Download("/usr/bin/edge", mRunEnvCK.edge.mDownLodURL);
-	//ndStatus ret = Download("/tmp/edge", mRunEnvCK.edge.mDownLodURL);
     if(ret != ND_SUCCESS){
         AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::EdgeCheck] Download edge command Err ret=[%d]", ret);
         return ret;
@@ -209,7 +208,6 @@ ndStatus CHttpRunEvnCK::IPTableCheck()
 		return ND_SUCCESS;
 
 	ndStatus ret = Download("/usr/bin/iptables", mRunEnvCK.iptable.mDownLodURL);
-	//ndStatus ret = Download("/tmp/iptables", mRunEnvCK.iptable.mDownLodURL);
     if(ret != ND_SUCCESS){
         AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::IPTableCheck] Download iptable command Err ret=[%d]", ret);
         return ret;

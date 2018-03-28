@@ -7,7 +7,7 @@
 版本         :1.0 
 **********************************************************/
 #include "Packet.hpp"
-#include "Func.hpp"
+#include "NDFunc.hpp"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 //数据包基类                 
@@ -20,7 +20,6 @@
 *********************************************************/
 CPacket::CPacket()
 {
-	memset(mBuff,0,sizeof(m_Buff));
 	memset(&mRcvNP,0,sizeof(SNetParam));
 	memset(&mSndNP,0,sizeof(SNetParam));
 }

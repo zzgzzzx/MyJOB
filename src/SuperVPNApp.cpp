@@ -12,9 +12,7 @@
 #include "NodeSrv.hpp"
 #include "HttpRunEnvCKUser.hpp"
 #include "HttpRunEnvCKSrv.hpp"
-#include "microhttpd.h"
 
-CNodeBase *CSuperVPNApp::gPNode;
 list<SServerInfo> gServers;
 list<SServerInfo>::iterator gITCurServer,gITBakServer;
 
@@ -73,12 +71,12 @@ bool CSuperVPNApp::InitSystem(void)
 
 	//节点配置请求
 	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] NodeEnvSet...");
-	while(gPNode->NodeEnvSet() != ND_SUCCESS)
+	while(mPNode->NodeEnvSet() != ND_SUCCESS)
 		sleep(8);
 
 	//定时重启检测
-	if(gPNode->GetNodeInform().lRestartTime > 0)
-		AfxInsertSingleTimer(TIMER_ID_NODE_RESTART_CHECK, gPNode->GetNodeInform().lRestartTime, NodeRestartFunc);	
+	if(mPNode->GetNodeInform().lRestartTime > 0)
+		AfxInsertSingleTimer(TIMER_ID_NODE_RESTART_CHECK, mPNode->GetNodeInform().lRestartTime, NodeRestartFunc);	
 
 	//启用Hello服务
 	if (mHelloSrv.Start()) 
@@ -93,11 +91,6 @@ bool CSuperVPNApp::InitSystem(void)
 	else
 		AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] HTTP SERVER START WORKING...");		
 #endif		
-
-	//增加定时Hello
-	if(gPNode->GetNodeInform().lHelloTime <= 0)
-		gPNode->GetNodeInform().lHelloTime = TIMER_VALUE_NODE_HELLO_CHECK;	
-	AfxInsertCircleTimer(TIMER_ID_NODE_HELLO_CHECK, gPNode->GetNodeInform().lHelloTime, NodeHelloFunc);
 
 	return true;
 }
@@ -114,10 +107,10 @@ ndStatus CSuperVPNApp::NodeInitCheck()
 	//如果存在，则读出编号，如果不存在，进行申请
 	char *nodeid = AfxGetNodeID();
 	if(nodeid == NULL){
-		return gPNode->NodeInit();
+		return mPNode->NodeInit();
 	}
 
-	gPNode->SetNodeID(nodeid);
+	mPNode->SetNodeID(nodeid);
 	
 	return ND_SUCCESS;
 }
@@ -148,7 +141,7 @@ ndStatus CSuperVPNApp::ServerListCheck()
 
 	//读取服务器列表
 	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::ServerListCheck] Get Server ServerList");
-	ret = gPNode->GetServerList(gServers);
+	ret = mPNode->GetServerList(gServers);
 	if(ret != ND_SUCCESS) return ret;
 
 	//更新服务器列表
@@ -169,9 +162,9 @@ ndStatus CSuperVPNApp::ServerListCheck()
  ndStatus CSuperVPNApp::RunEnvCheck()
 {
 #ifdef GENERAL_NODE_USER_APP
-	CHttpRunEvnCKUser httpRunEnvCK(gPNode);
+	CHttpRunEvnCKUser httpRunEnvCK(mPNode);
 #else
-	CHttpRunEvnCKSrv httpRunEnvCK(gPNode);
+	CHttpRunEvnCKSrv httpRunEnvCK(mPNode);
 #endif
 	return httpRunEnvCK.BeginCheck();
 }
@@ -186,9 +179,9 @@ ndStatus CSuperVPNApp::ServerListCheck()
 CSuperVPNApp::CSuperVPNApp()
 {
 #ifdef GENERAL_NODE_USER_APP
-	gPNode = new CNodeUser();
+	mPNode = new CNodeUser();
 #else
-	gPNode = new CNodeSrv();
+	mPNode = new CNodeSrv();
 #endif
 }
 
@@ -200,47 +193,7 @@ CSuperVPNApp::CSuperVPNApp()
 *********************************************************/
 CSuperVPNApp::~CSuperVPNApp()
 {
-	delete gPNode;
-}
-
-/*********************************************************
-函数说明：Hello的定时器函数
-入参说明：
-出参说明：
-返回值  ：
-*********************************************************/
-void CSuperVPNApp::NodeHelloFunc(ndULong param)
-{
-	if (gPNode->NodeHello() == ND_ERROR_NOT_RECVIVE_HELLO)
-	{
-		////////////////////////////////////////////////////////////////////////
-		//这里需增加检测hello的时候，如果超过几次hello都失败，则需要进行下线处理
-		////////////////////////////////////////////////////////////////////////
-		FILE *pFile;
-		char cmd[512]={0};
-		
-		if ((pFile = fopen(CLEAN_EDGE_SH_FILE_NAME, "w+")) == NULL) return;
-		//结束錯edge进行
-		sprintf(cmd, "PROCESS=`ps |grep edge|grep -v grep|grep -v PPID|awk '{ print $1}'`\n");
-		fputs(cmd, pFile);
-		sprintf(cmd, "for i in $PROCESS\n");
-		fputs(cmd, pFile);
-		sprintf(cmd, "do\n");
-		fputs(cmd, pFile);
-		sprintf(cmd, "\techo \"Kill the $1 process [ $i ]\"\n");
-		fputs(cmd, pFile);
-		sprintf(cmd, "\tkill -9 $i\n");
-		fputs(cmd, pFile);
-		sprintf(cmd, "done\n");
-		fputs(cmd, pFile);
-		fclose(pFile);
-
-		AfxWriteDebugLog("SuperVPN run at[CSuperVPNApp::NodeHelloFunc] Exec chmod 777 restart_SH_FILE");	
-		sprintf(cmd, "chmod 777 %s", CLEAN_EDGE_SH_FILE_NAME);
-		AfxExecCmd(cmd);
-		sprintf(cmd, "./%s", CLEAN_EDGE_SH_FILE_NAME);
-		AfxExecCmdNotWait(cmd);	
-	}
+	delete mPNode;
 }
 
 /*********************************************************

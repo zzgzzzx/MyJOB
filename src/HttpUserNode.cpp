@@ -170,3 +170,104 @@ ndStatus CHttpUserNode::MakeNodeEnvSetReq()
 
     return ND_SUCCESS;
 }
+
+/*********************************************************
+函数说明：节点配置请求返回处理
+入参说明：无
+出参说明：无
+返回值  ：无
+*********************************************************/
+ndStatus CHttpUserNode::AnalysisNodeEnvSetRsp()
+{
+	SNodeInform &sNode = mPNode->GetNodeInform();
+	//解析返回的数据到NdoeInform
+
+    cJSON *root;
+	int iErrCode;
+
+    root = cJSON_Parse(mRcvBuf.c_str());
+    if (!root)
+    {
+        AfxWriteDebugLog("SuperVPN run at [CHttpUserNode::AnalysisNodeEnvSetRsp] Error before: [%s]", cJSON_GetErrorPtr());
+        return ND_ERROR_INVALID_RESPONSE;
+    }
+
+    cJSON *actionsArray = cJSON_GetObjectItem(root, "actions");
+    if(actionsArray != NULL)
+    {
+
+        cJSON *actionslist = actionsArray->child;
+
+        iErrCode = cJSON_GetObjectItem(actionslist, "error")->valueint;
+        if(iErrCode != 0)
+		{
+			cJSON_Delete(root);
+			return ND_ERROR_INVALID_RESPONSE;
+        }		
+        
+        cJSON *replices = cJSON_GetObjectItem(root, "replies");
+        if(replices != NULL)
+        {
+            cJSON *repliceslist = replices->child;
+
+			sNode.lHelloTime = cJSON_GetObjectItem(repliceslist, "hellotime")->valueint;
+			sNode.lRestartTime = cJSON_GetObjectItem(repliceslist, "restarttime")->valueint;
+				
+            cJSON *supernode = cJSON_GetObjectItem(repliceslist, "supernode");
+            if(supernode != NULL)
+            {
+                    cJSON *supernodelist = supernode->child;
+
+                    AfxWriteDebugLog("SuperVPN run at [CHttpUserNode::AnalysisNodeEnvSetRsp] Get SuperNode Informs");
+                    SSupperNode item;
+                    while(supernodelist != NULL)
+                    {
+                        if(cJSON_GetObjectItem(supernodelist, "nodeip") != NULL &&
+                           cJSON_GetObjectItem(supernodelist, "nodeip")->valuestring != NULL)
+                            item.sSuperNodeIP = cJSON_GetObjectItem(supernodelist, "nodeip")->valuestring;
+						AfxWriteDebugLog("SuperVPN run at [CHttpUserNode::AnalysisNodeEnvSetRsp] supernode ip=[%s]",item.sSuperNodeIP.c_str());
+
+                        if(cJSON_GetObjectItem(supernodelist, "nodeport") != NULL &&
+                           cJSON_GetObjectItem(supernodelist, "nodeport")->valuestring != NULL)
+                            item.sSuperNodePort = cJSON_GetObjectItem(supernodelist, "nodeport")->valuestring;
+						AfxWriteDebugLog("SuperVPN run at [CHttpUserNode::AnalysisNodeEnvSetRsp] supernode port=[%s]",item.sSuperNodePort.c_str());
+
+                        sNode.mSupperNode.push_back(item);
+
+                        supernodelist = supernodelist->next;
+                    }
+                }
+
+            cJSON *ippools = cJSON_GetObjectItem(repliceslist, "ippool");
+            if(ippools != NULL)
+            {
+                    cJSON *ippoolslist = ippools->child;
+
+                    AfxWriteDebugLog("SuperVPN run at [CHttpUserNode::AnalysisNodeEnvSetRsp] Get IPPools");
+                    while(ippoolslist != NULL)
+                    {
+                        if(cJSON_GetObjectItem(ippoolslist, "begin") != NULL &&
+                           cJSON_GetObjectItem(ippoolslist, "begin")->valuestring != NULL)
+                            sNode.mIPPool.uBeginIP = inet_addr(cJSON_GetObjectItem(ippoolslist, "domainid")->valuestring);
+						AfxWriteDebugLog("SuperVPN run at [CHttpGeneral::AnalysisNodeEnvSetRsp] beginip=[%s]", AfxHostIPToStr(sNode.mIPPool.uBeginIP));
+
+                        if(cJSON_GetObjectItem(ippoolslist, "end") != NULL &&
+                           cJSON_GetObjectItem(ippoolslist, "end")->valuestring != NULL)
+                            sNode.mIPPool.uEndIP = inet_addr(cJSON_GetObjectItem(ippoolslist, "domainid")->valuestring);
+						AfxWriteDebugLog("SuperVPN run at [CHttpGeneral::AnalysisNodeEnvSetRsp] endip=[%s]", AfxHostIPToStr(sNode.mIPPool.uEndIP));
+
+                        break;
+                    }
+			
+            }
+        }
+
+        cJSON_Delete(root);
+    }	
+
+	mPNode->SetNodeInform(sNode);
+	
+	return ND_SUCCESS;	
+
+}
+

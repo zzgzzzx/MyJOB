@@ -66,7 +66,7 @@ int CUdpSvr::Open(ndUInt32 ip, int iPort)
 出参说明：
 返回值  ：
 *********************************************************/
-int CUdpSvr::RecvFrom(uchar *pcMsgBuf, int iBufLen, ndUInt32 &ip, ndUInt16 &port)
+int CUdpSvr::RecvFrom(ndUChar *pcMsgBuf, int iBufLen, ndUInt32 &ip, ndUInt16 &port)
 {
 	int iRevcNum;
 	int iCliLen;
@@ -120,7 +120,7 @@ int CUdpSvr::RecvFrom(char *pcMsgBuf,int iBufLen, int iSeconds)
 出参说明：
 返回值  ：
 *********************************************************/
-int CUdpSvr::SendTo(ndUInt32 IP,unsigned short iPort,char *pcMsgBuf,int iBufLen)
+int CUdpSvr::SendTo(ndUInt32 IP,unsigned short iPort,const char *pcMsgBuf,int iBufLen)
 {
 	struct sockaddr_in sSO;
 	int iSendNum;

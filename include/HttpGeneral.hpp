@@ -41,7 +41,11 @@ protected:
 
 	//获取服务器列表
 	virtual ndStatus MakeServerListReq();
-	ndStatus AnalysisServerListRsp(list<SServerInfo> &mServers);	
+	ndStatus AnalysisServerListRsp(list<SServerInfo> &mServers);
+
+	//获取服务出口
+	ndStatus MakeBindServerReq(ndString devidentify);
+	ndStatus AnalysisBindServerRsp(list<SBindInform> &mServers);	
 
 	//数据包发送并接收处理
 	ndStatus PkgSendAndRecv(ndString url);	
@@ -53,7 +57,10 @@ public:
 	ndStatus NodeEnvSet();
 	ndStatus NodeHello();
 	ndStatus NodeInit();
+	virtual ndStatus NodeGetIPPool();
+	
 	ndBool GetServerList(list<SServerInfo> &mServers);
+	ndStatus GetIdentifyService(list<SBindInform> &ltBSer);
 	
     virtual ~CHttpGeneral();
 

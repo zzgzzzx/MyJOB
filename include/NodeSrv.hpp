@@ -15,6 +15,8 @@ class CNodeSrv: public CNodeGeneral
 {
 private:
 	ndInt8 mNoRecvHelloTime;
+	//根据返回的网络参数配置vpn网络
+	ndStatus SetN2NVPNNetwork();	
 public:
     CNodeSrv();
     virtual ~CNodeSrv();
@@ -22,6 +24,8 @@ public:
 	//节点Hello
 	ndStatus NodeHello();	
 	void DealHelloAddNewDomain(list<SDomain> &domains);
+	//节点向服务器申请配置信息
+	ndStatus NodeEnvSet();
 };
 
 #endif //VPN_NODE_SRV_H

@@ -13,6 +13,7 @@
 #include "BaseApp.hpp"
 #include "NDType.hpp"
 #include "NDStruct.hpp"
+#include "HelloSrvThread.hpp"
 
 /*---------------------------------------------------------------------------------------
 //定时器
@@ -26,10 +27,20 @@ bool AfxInsertCircleTimer(unsigned long callid,unsigned long timeout,void (*Call
 bool AfxDeleteCircleTimer(unsigned long callid);
 //删除单个定时器
 bool AfxDeleteSingleTimer(unsigned long callid);
+//数据包写入队列
+void AfxInsertPktToSysQue(CPacket *pkt);
+
 //获取Hello服务
-CHelloSrv *AfxGetHelloSrv(void);
+CHelloSrvThread *AfxGetHelloSrv();
 //获取服务节点集合
-CServiceSet *AfxGetServiceSet(void);
+CServiceSet *AfxGetServiceSet();
+//获取身份识别集合
+CIdentifySet *AfxGetIdentifySet();
+//获取vpn节点
+CNodeBase *AfxGetVPNNode();
+
+//获取网关名称
+ndString AfxGetGatewayName();
 
 /*---------------------------------------------------------------------------------------
 //日志
@@ -48,7 +59,9 @@ ndBool AfxUpdateServerList(list<SServerInfo> &mServers);
 
 //获取mac地址
 void AfxGetEthMac(const char *ethname, ndString &mac);
-	
+
+
+//unsigned long int inet_addr(const char *cp);
 
 //网络序IP地址转成字符串
 inline char *AfxNetIPToStr(const ndULong &IP)

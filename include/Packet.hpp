@@ -9,7 +9,7 @@
 #ifndef __PACKET_HPP__
 #define __PACKET_HPP__
 
-#include "Struct.hpp"
+#include "NDStruct.hpp"
 
 //数据包长度定义(以太网的MTU)
 #define PACKET_BUFF_LEN 1472
@@ -46,7 +46,7 @@ public:
 	//设备网络参数信息
 	void SetRcvNetParam(const SNetParam &sNP);	
 	//设置数据包
-	void SeRcvtPktBuf(char *buf,int len);	
+	void SetRcvPktBuf(char *buf,int len);	
 
 	//设置网络参数信息
 	void SetSndNetParam(const SNetParam &sNP);		

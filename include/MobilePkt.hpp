@@ -22,9 +22,9 @@ protected:
 	virtual bool DealWithPkt();
 public:
 	//构造函数
-	CHelloPkt();
+	CMobilePkt();
 	//析构函数
-	~CHelloPkt();
+	~CMobilePkt();
 
 	//发送数据包
 	virtual bool SendPktToClient();

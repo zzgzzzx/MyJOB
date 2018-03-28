@@ -86,7 +86,7 @@ void CNodeBase::SetNodeID(ndString nodeid)
 出参说明：无
 返回值  ：无
 *********************************************************/
-SNodeInform CNodeBase::GetNodeInform()
+SNodeInform &CNodeBase::GetNodeInform()
 {
 	return mSNodeInform;
 }

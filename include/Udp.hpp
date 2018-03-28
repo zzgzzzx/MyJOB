@@ -23,11 +23,11 @@ class CUdpSvr
 public:
    int Open(int iPort);
    int Open(ndUInt32 ip, int iPort);
-   int RecvFrom(uchar *pcMsgBuf,int iBufLen,ndUInt32 &ip,ndUInt16 &port);
+   int RecvFrom(ndUChar *pcMsgBuf, int iBufLen, ndUInt32 &ip, ndUInt16 &port);
    int RecvFrom(char *pcMsgBuf,int iBufLen, int iSeconds);
    int Close();
    void SetRecvBuffer(unsigned long ulBufferSize);
-   int SendTo(ndUInt32 IP,unsigned short iPort,char *pcMsgBuf,int iBufLen);
+   int SendTo(ndUInt32 IP,unsigned short iPort,const char *pcMsgBuf,int iBufLen);
 };
 
 //**********************************

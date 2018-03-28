@@ -14,9 +14,6 @@
  */
 class CNodeGeneral: public CNodeBase
 {
-private :
-	//根据返回的网络参数配置vpn网络
-	ndStatus SetN2NVPNNetwork();
 protected:
 	//通讯的客户端
 	CHttpGeneral *mPHttpClient;

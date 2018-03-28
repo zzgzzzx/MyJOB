@@ -15,7 +15,7 @@ using namespace network;
 /**
  * CHttpRunEvnCK Class
  */
-class CHttpRunEvnCK : public CHttpClient
+class CHttpRunEvnCK : public CHttpGeneral
 {
 public:
 	CHttpRunEvnCK(CNodeBase *node);	
