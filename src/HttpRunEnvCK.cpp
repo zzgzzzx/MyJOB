@@ -11,6 +11,7 @@
 #include "NDFunc.hpp"
 #include "HttpFileDown.hpp"
 #include "md5.h"
+#include <strings.h>
 
 /*********************************************************
 函数说明：构造函数
@@ -22,6 +23,7 @@ CHttpRunEvnCK::CHttpRunEvnCK(CNodeBase *node):CHttpGeneral(node)
 {
 	mRunEnvCK.node.iVerCode = 0;
 	mRunEnvCK.node.mDownLodURL.clear();
+	mRunEnvCK.deamon.mDownLodURL.clear();
 	mRunEnvCK.edge.mDownLodURL.clear();
 	mRunEnvCK.iptable.mDownLodURL.clear();
 }
@@ -81,92 +83,140 @@ ndStatus CHttpRunEvnCK::AnalysisCheckRsp()
         return ND_ERROR_INVALID_RESPONSE;
     }
 
-	//取node信息
-	cJSON *objType = cJSON_GetObjectItem(root, "node") ;
-	if(objType != NULL)
-	{
-	    if(cJSON_GetObjectItem(objType, "version") != NULL &&
-			cJSON_GetObjectItem(objType, "version")->valueuint != NULL)
-	        mRunEnvCK.node.iVerCode = cJSON_GetObjectItem(objType, "version")->valueuint;
+    cJSON *actionsArray = cJSON_GetObjectItem(root, "actions");
+    if(actionsArray != NULL)
+    {
 
-	    if(cJSON_GetObjectItem(objType, "md5") != NULL &&
-			cJSON_GetObjectItem(objType, "md5")->valuestring != NULL)
-	        mRunEnvCK.node.sMD5 = cJSON_GetObjectItem(objType, "md5")->valuestring;	
+        cJSON *actionslist = actionsArray->child;
 
-	       
-	    cJSON *URLS = cJSON_GetObjectItem(objType, "download");
-	    if(URLS != NULL)
-	    {
-			cJSON *url = URLS->child;
-
-			AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::AnalysisCheckRspAndDeal] Get URL");
-			while(url != NULL)
+        iErrCode = cJSON_GetObjectItem(actionslist, "error")->valueint;
+        if(iErrCode != 0)
+		{
+			cJSON_Delete(root);
+			return ND_ERROR_INVALID_RESPONSE;
+        }		
+        
+        cJSON *replices = cJSON_GetObjectItem(root, "replies");
+        if(replices != NULL)
+        {
+            cJSON *repliceslist = replices->child;
+			
+			//取node信息
+			cJSON *objType = cJSON_GetObjectItem(repliceslist, "node") ;
+			if(objType != NULL)
 			{
-			    if(cJSON_GetObjectItem(url, "url") != NULL &&
-			       cJSON_GetObjectItem(url, "url")->valuestring != NULL)
+			    if(cJSON_GetObjectItem(objType, "version") != NULL &&
+					cJSON_GetObjectItem(objType, "version")->valueuint != NULL)
+			        mRunEnvCK.node.iVerCode = cJSON_GetObjectItem(objType, "version")->valueuint;
+
+			    if(cJSON_GetObjectItem(objType, "md5") != NULL &&
+					cJSON_GetObjectItem(objType, "md5")->valuestring != NULL)
+			        mRunEnvCK.node.sMD5 = cJSON_GetObjectItem(objType, "md5")->valuestring;	
+
+			       
+			    cJSON *URLS = cJSON_GetObjectItem(objType, "download");
+			    if(URLS != NULL)
 			    {
-			        mRunEnvCK.node.mDownLodURL.push_back(cJSON_GetObjectItem(url, "url")->valuestring);
-					AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::AnalysisCheckRspAndDeal] url=[%s]",cJSON_GetObjectItem(url, "url")->valuestring);
-			    }
-			    url = url->next;
-			}	       
-	    }		
-	}
-	//取edge
-	objType = cJSON_GetObjectItem(root, "edge") ;
-	if(objType != NULL)
-	{
-	    if(cJSON_GetObjectItem(objType, "md5") != NULL &&
-			cJSON_GetObjectItem(objType, "md5")->valuestring != NULL)
-	        mRunEnvCK.edge.sMD5 = cJSON_GetObjectItem(objType, "md5")->valuestring;	
+					cJSON *url = URLS->child;
 
-	       
-	    cJSON *URLS = cJSON_GetObjectItem(objType, "download");
-	    if(URLS != NULL)
-	    {
-			cJSON *url = URLS->child;
+					AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::AnalysisCheckRspAndDeal] Get URL");
+					while(url != NULL)
+					{
+					    if(cJSON_GetObjectItem(url, "url") != NULL &&
+					       cJSON_GetObjectItem(url, "url")->valuestring != NULL)
+					    {
+					        mRunEnvCK.node.mDownLodURL.push_back(cJSON_GetObjectItem(url, "url")->valuestring);
+							AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::AnalysisCheckRspAndDeal] url=[%s]",cJSON_GetObjectItem(url, "url")->valuestring);
+					    }
+					    url = url->next;
+					}	       
+			    }		
+			}
 
-			AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::AnalysisCheckRspAndDeal] Get URL");
-			while(url != NULL)
+			//取checknode
+			objType = cJSON_GetObjectItem(repliceslist, "checknode") ;
+			if(objType != NULL)
 			{
-			    if(cJSON_GetObjectItem(url, "url") != NULL &&
-			       cJSON_GetObjectItem(url, "url")->valuestring != NULL)
+			    if(cJSON_GetObjectItem(objType, "md5") != NULL &&
+					cJSON_GetObjectItem(objType, "md5")->valuestring != NULL)
+			        mRunEnvCK.deamon.sMD5 = cJSON_GetObjectItem(objType, "md5")->valuestring;	
+
+			       
+			    cJSON *URLS = cJSON_GetObjectItem(objType, "download");
+			    if(URLS != NULL)
 			    {
-			        mRunEnvCK.edge.mDownLodURL.push_back(cJSON_GetObjectItem(url, "url")->valuestring);
-					AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::AnalysisCheckRspAndDeal] url=[%s]",cJSON_GetObjectItem(url, "url")->valuestring);
-			    }
-			    url = url->next;
-			}	       
-	    }		
-	}	
-	//取iptable
-	objType = cJSON_GetObjectItem(root, "iptable") ;
-	if(objType != NULL)
-	{
-	    if(cJSON_GetObjectItem(objType, "md5") != NULL &&
-			cJSON_GetObjectItem(objType, "md5")->valuestring != NULL)
-	        mRunEnvCK.iptable.sMD5 = cJSON_GetObjectItem(objType, "md5")->valuestring;	
+					cJSON *url = URLS->child;
 
-	       
-	    cJSON *URLS = cJSON_GetObjectItem(objType, "download");
-	    if(URLS != NULL)
-	    {
-			cJSON *url = URLS->child;
+					AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::AnalysisCheckRspAndDeal] Get URL");
+					while(url != NULL)
+					{
+					    if(cJSON_GetObjectItem(url, "url") != NULL &&
+					       cJSON_GetObjectItem(url, "url")->valuestring != NULL)
+					    {
+					        mRunEnvCK.deamon.mDownLodURL.push_back(cJSON_GetObjectItem(url, "url")->valuestring);
+							AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::AnalysisCheckRspAndDeal] url=[%s]",cJSON_GetObjectItem(url, "url")->valuestring);
+					    }
+					    url = url->next;
+					}	       
+			    }		
+			}	
 
-			AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::AnalysisCheckRspAndDeal] Get URL");
-			while(url != NULL)
+			//取edge
+			objType = cJSON_GetObjectItem(repliceslist, "edge") ;
+			if(objType != NULL)
 			{
-			    if(cJSON_GetObjectItem(url, "url") != NULL &&
-			       cJSON_GetObjectItem(url, "url")->valuestring != NULL)
-			    {
-			        mRunEnvCK.iptable.mDownLodURL.push_back(cJSON_GetObjectItem(url, "url")->valuestring);
-					AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::AnalysisCheckRspAndDeal] url=[%s]",cJSON_GetObjectItem(url, "url")->valuestring);
-			    }
-			    url = url->next;
-			}	       
-	    }		
-	}		
+			    if(cJSON_GetObjectItem(objType, "md5") != NULL &&
+					cJSON_GetObjectItem(objType, "md5")->valuestring != NULL)
+			        mRunEnvCK.edge.sMD5 = cJSON_GetObjectItem(objType, "md5")->valuestring;	
 
+			       
+			    cJSON *URLS = cJSON_GetObjectItem(objType, "download");
+			    if(URLS != NULL)
+			    {
+					cJSON *url = URLS->child;
+
+					AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::AnalysisCheckRspAndDeal] Get URL");
+					while(url != NULL)
+					{
+					    if(cJSON_GetObjectItem(url, "url") != NULL &&
+					       cJSON_GetObjectItem(url, "url")->valuestring != NULL)
+					    {
+					        mRunEnvCK.edge.mDownLodURL.push_back(cJSON_GetObjectItem(url, "url")->valuestring);
+							AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::AnalysisCheckRspAndDeal] url=[%s]",cJSON_GetObjectItem(url, "url")->valuestring);
+					    }
+					    url = url->next;
+					}	       
+			    }		
+			}	
+			//取iptable
+			objType = cJSON_GetObjectItem(repliceslist, "iptable") ;
+			if(objType != NULL)
+			{
+			    if(cJSON_GetObjectItem(objType, "md5") != NULL &&
+					cJSON_GetObjectItem(objType, "md5")->valuestring != NULL)
+			        mRunEnvCK.iptable.sMD5 = cJSON_GetObjectItem(objType, "md5")->valuestring;	
+
+			       
+			    cJSON *URLS = cJSON_GetObjectItem(objType, "download");
+			    if(URLS != NULL)
+			    {
+					cJSON *url = URLS->child;
+
+					AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::AnalysisCheckRspAndDeal] Get URL");
+					while(url != NULL)
+					{
+					    if(cJSON_GetObjectItem(url, "url") != NULL &&
+					       cJSON_GetObjectItem(url, "url")->valuestring != NULL)
+					    {
+					        mRunEnvCK.iptable.mDownLodURL.push_back(cJSON_GetObjectItem(url, "url")->valuestring);
+							AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::AnalysisCheckRspAndDeal] url=[%s]",cJSON_GetObjectItem(url, "url")->valuestring);
+					    }
+					    url = url->next;
+					}	       
+			    }		
+			}		
+        }
+    }
  	cJSON_Delete(root);
 
 	return ND_SUCCESS;
@@ -184,13 +234,36 @@ ndStatus CHttpRunEvnCK::EdgeCheck()
 	if(AfxCheckCmdExist("edge"))
 		return ND_SUCCESS;
 
-	ndStatus ret = Download("/usr/bin/edge", mRunEnvCK.edge.mDownLodURL);
+	ndStatus ret = Download("/usr/bin/edge", mRunEnvCK.edge.mDownLodURL, mRunEnvCK.edge.sMD5);
     if(ret != ND_SUCCESS){
         AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::EdgeCheck] Download edge command Err ret=[%d]", ret);
         return ret;
     }
 
-	chmod("/usr/bin/edge", S_IRUSR|S_IXUSR|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
+	chmod("/usr/bin/edge", S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
+
+	return ND_SUCCESS;
+}
+
+/*********************************************************
+函数说明：deamon检测
+入参说明：无
+出参说明：无
+返回值  ：无
+*********************************************************/	
+ndStatus CHttpRunEvnCK::CheckSuperVPNCheck()
+{
+	//判断checksupervpn命令是否存在
+	if(AfxFileExist(CHECK_VPN_EXE_FILE_NAME))
+		return ND_SUCCESS;
+
+	ndStatus ret = Download(CHECK_VPN_EXE_FILE_NAME, mRunEnvCK.deamon.mDownLodURL, mRunEnvCK.deamon.sMD5);
+    if(ret != ND_SUCCESS){
+        AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::DeamonCheck] Download CheckSuperVPN command Err ret=[%d]", ret);
+        return ret;
+    }
+
+	chmod(CHECK_VPN_EXE_FILE_NAME, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
 
 	return ND_SUCCESS;
 }
@@ -200,6 +273,20 @@ ndStatus CHttpRunEvnCK::EdgeCheck()
 入参说明：无
 出参说明：无
 返回值  ：无
+  32#define S_IRWXU 00700
+  33#define S_IRUSR 00400
+  34#define S_IWUSR 00200
+  35#define S_IXUSR 00100
+  36
+  37#define S_IRWXG 00070
+  38#define S_IRGRP 00040
+  39#define S_IWGRP 00020
+  40#define S_IXGRP 00010
+  41
+  42#define S_IRWXO 00007
+  43#define S_IROTH 00004
+  44#define S_IWOTH 00002
+  45#define S_IXOTH 00001
 *********************************************************/
 ndStatus CHttpRunEvnCK::IPTableCheck()
 {
@@ -207,13 +294,13 @@ ndStatus CHttpRunEvnCK::IPTableCheck()
 	if(AfxCheckCmdExist("iptables"))
 		return ND_SUCCESS;
 
-	ndStatus ret = Download("/usr/bin/iptables", mRunEnvCK.iptable.mDownLodURL);
+	ndStatus ret = Download("/usr/bin/iptables", mRunEnvCK.iptable.mDownLodURL, mRunEnvCK.iptable.sMD5);
     if(ret != ND_SUCCESS){
         AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::IPTableCheck] Download iptable command Err ret=[%d]", ret);
         return ret;
     }
 	
-	chmod("/usr/bin/iptables", S_IRUSR|S_IXUSR|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
+	chmod("/usr/bin/iptables", S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
 
 	AfxExecCmd("ln -s /usr/bin/iptables /usr/bin/iptables-restore");
 	AfxExecCmd("ln -s /usr/bin/iptables /usr/bin/iptables-save");
@@ -238,20 +325,88 @@ ndStatus CHttpRunEvnCK::NodeCheck()
 	}
 	
 	//下载新版本
-    ndStatus ret = Download(VPN_UPGRADE_TEMP_FILE_NAME, mRunEnvCK.node.mDownLodURL);
+    ndStatus ret = Download(VPN_UPGRADE_TEMP_FILE_NAME, mRunEnvCK.node.mDownLodURL, mRunEnvCK.node.sMD5);
     if(ret != ND_SUCCESS){
         AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::NodeCheck] DownloadNewVersion Err ret=[%d]", ret);
         return ret;
     }
 
-	//校验并升级
-    ret = UpgradeAndReboot();
-    if(ret != ND_SUCCESS){
-        AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::NodeCheck] UpgradeAndReboot Err ret=[%d]", ret);
-        return ret;
-    }
-	return ret;
+	//下载完成，替换文件名
+	char cmd[256]={0};
+	sprintf(cmd, "mv %s %s", VPN_UPGRADE_TEMP_FILE_NAME, VPN_UPGRADE_FILE_NAME);
+	AfxExecCmd(cmd);	
+
+	//chmod(VPN_UPGRADE_FILE_NAME, S_IRUSR|S_IXUSR|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
+	chmod(VPN_UPGRADE_FILE_NAME, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);	
+	
+	return ND_SUCCESS;
 }
+
+/*********************************************************
+函数说明：覆盖文件并升级
+入参说明：无
+出参说明：无
+返回值  ：无
+*********************************************************/
+#define READ_DATA_SIZE  1024  
+#define MD5_SIZE        16  
+#define MD5_STR_LEN     (MD5_SIZE * 2) 
+ndBool getFileMD5(const ndString& filename, ndString& fileMd5)
+{
+    int i;  
+    int fd;  
+    int ret;  
+    unsigned char data[READ_DATA_SIZE];  
+    unsigned char md5_value[MD5_SIZE];  
+    MD5_CTX md5;  
+	char md5_str[128]={0};
+  
+    fd = open(filename.c_str(), O_RDONLY);  
+    if (-1 == fd)  
+    {  
+        AfxWriteDebugLog("SuperVPN run at[getFileMD5] open file error=[%s]", filename.c_str());
+        return false;  
+    }  
+  
+    MD5Init(&md5);  
+  
+    while (1)  
+    {  
+        ret = read(fd, data, READ_DATA_SIZE);  
+        if (-1 == ret)  
+        {  
+            AfxWriteDebugLog("SuperVPN run at[getFileMD5] read file error=[%s]", filename.c_str());
+            return false;  
+        }  
+  
+        MD5Update(&md5, data, ret);  
+  
+        if (0 == ret || ret < READ_DATA_SIZE)  
+        {  
+            break;  
+        }  
+    }  
+  
+    close(fd);  
+  
+    MD5Final(md5_value, &md5);  
+  
+    for(i = 0; i < MD5_SIZE; i++)  
+    {  
+        snprintf(md5_str + i*2, 2+1, "%02x", md5_value[i]);  
+    }  
+    md5_str[MD5_STR_LEN] = '\0';
+	fileMd5 = md5_str;
+  
+    return true;  
+}
+
+//ndString strToLower(const ndString &str)
+//{
+//    ndString strTmp = str;
+//    transform(strTmp.begin(),strTmp.end(),strTmp.begin(),tolower);
+//    return strTmp;
+//}
 
 /*********************************************************
 函数说明：下载文件
@@ -259,9 +414,9 @@ ndStatus CHttpRunEvnCK::NodeCheck()
 出参说明：无
 返回值  ：无
 *********************************************************/
-ndStatus CHttpRunEvnCK::Download(ndString filename, list<ndString> urls)
+ndStatus CHttpRunEvnCK::Download(ndString filename, list<ndString> urls, ndString md5)
 {
-	ndStatus ret = ND_SUCCESS;
+	ndStatus ret = ND_ERROR_INVALID_PARAM;
     CHttpFileDown FileDown;
     SDownloadFileReqSt downloadFileReqSt;
     downloadFileReqSt.sLocalFile = filename;
@@ -281,150 +436,41 @@ ndStatus CHttpRunEvnCK::Download(ndString filename, list<ndString> urls)
 	    ret = FileDown.BeginDownload();
 	    if(ret == ND_SUCCESS)
 	    {
-	        AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::AnalysisCheckRsp] Download File=[%s] Success\n", downloadFileReqSt.sUrl.c_str());
+	        AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::Download] Download File=[%s] Success\n", downloadFileReqSt.sUrl.c_str());
+
+			ndString fileMD5;
+			if (!getFileMD5(filename, fileMD5))
+			{
+				AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::Download] MD5 calcute ERROR\n");
+				return ND_ERROR_CRC_CHECK_FAILED;
+			}
+
+			if(strcasecmp(fileMD5.c_str(), md5.c_str()))
+			{
+				AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::Download] MD5 Check ERROR MUST=[%s] REAL=[%s]\n", md5.c_str(), fileMD5.c_str());
+
+				if( remove(filename.c_str()) != 0 )
+        			AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::Download] Remove File Err=[%s]\r\n", filename.c_str());
+							
+				return ND_ERROR_CRC_CHECK_FAILED;	
+			}	
+		
 	        return ND_SUCCESS;
 	    }else{
-	    	AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::AnalysisCheckRsp] Download File Err=[%s] Code=[%d]\n", downloadFileReqSt.sUrl.c_str(), ret);
+	    	AfxWriteDebugLog("SuperVPN run at [CHttpRunEvnCK::Download] Download File Err=[%s] Code=[%d]\n", downloadFileReqSt.sUrl.c_str(), ret);
 	    }
     }
-	
+
 	return ret;
 }
 
 /*********************************************************
-函数说明：覆盖文件并升级
-入参说明：无
-出参说明：无
-返回值  ：无
-*********************************************************/
-ndBool getFileMD5(const ndString& filename, ndString& md5)
-{
-/*
-    std::ifstream fin(filename.c_str(), std::ifstream::in | std::ifstream::binary);
-    if (fin)
-    {
-    
-        MD5_CTX context;
-        MD5Init(&context);
-
-        fin.seekg(0, fin.end);
-        const auto fileLength = fin.tellg();
-        fin.seekg(0, fin.beg);
-
-        const int bufferLen = 8192;
-        std::unique_ptr<unsigned char[]> buffer{ new unsigned char[bufferLen] {} };
-        unsigned long long totalReadCount = 0;
-        decltype(fin.gcount()) readCount = 0;
-        // 读取文件内容，调用MD5Update()更新MD5值
-        while (fin.read(reinterpret_cast<char*>(buffer.get()), bufferLen))
-        {
-            readCount = fin.gcount();
-            totalReadCount += readCount;
-            MD5Update(&context, buffer.get(), static_cast<unsigned int>(readCount));
-        }
-        // 处理最后一次读到的数据
-        readCount = fin.gcount();
-        if (readCount > 0)
-        {
-            totalReadCount += readCount;
-            MD5Update(&context, buffer.get(), static_cast<unsigned int>(readCount));
-        }
-        fin.close();
-
-        // 数据完整性检查
-        if (totalReadCount != fileLength)
-        {
-            return false;
-        }
-
-        unsigned char digest[16];
-        MD5Final(digest, &context);
-
-        // 获取MD5
-        std::ostringstream oss;
-        for (int i = 0; i < 16; ++i)
-        {
-            oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<unsigned int>(digest[i]);
-        }
-        oss << std::ends;
-
-        md5 = std::move(oss.str());
-		return true;
-    }
-    else
-    {
-        return false;
-    }
-*/
-    return true;
-}
-
-/*********************************************************
-函数说明：
-入参说明：无
-出参说明：无
-返回值  ：true为成功,false为失败
-*********************************************************/
-ndBool CHttpRunEvnCK::GenerateUpgradeFile()
-{
-	FILE *pFile;
-	char cmd[512]={0};
-	
-	if ((pFile = fopen(UPGRADE_SH_FILE_NAME, "w+")) == NULL) return false;
-
-	sprintf(cmd, "PROCESS=`ps |grep %s|grep -v grep|grep -v PPID|awk '{ print $1}'`\n", VPN_EXE_FILE_NAME);
-	fputs(cmd, pFile);
-	sprintf(cmd, "for i in $PROCESS\n");
-	fputs(cmd, pFile);
-	sprintf(cmd, "do\n");
-	fputs(cmd, pFile);
-	sprintf(cmd, "\techo \"Kill the $1 process [ $i ]\"\n");
-	fputs(cmd, pFile);
-	sprintf(cmd, "\tkill -9 $i\n");
-	fputs(cmd, pFile);
-	sprintf(cmd, "done\n");
-	fputs(cmd, pFile);
-	
-	sprintf(cmd, "mv %s %s\n", VPN_UPGRADE_TEMP_FILE_NAME, VPN_EXE_FILE_NAME);
-	fputs(cmd, pFile);
-	sprintf(cmd, "chmod 777 %s\n", VPN_EXE_FILE_NAME);
-	fputs(cmd, pFile);
-	sprintf(cmd, "./%s&\n", VPN_EXE_FILE_NAME);
-	fputs(cmd, pFile);	
-	fclose(pFile);
-
-	AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::GenerateUpgradeFile] Exec chmod 777 upgradefile");	
-	sprintf(cmd, "chmod 777 %s", UPGRADE_SH_FILE_NAME);
-	AfxExecCmd(cmd);
-	sprintf(cmd, "./%s", UPGRADE_SH_FILE_NAME);
-	if (AfxExecCmdNotWait(cmd)) exit(0);
-	
-	return true;
-}
-
-/*********************************************************
 函数说明：开始升级检测
 入参说明：无
 出参说明：无
 返回值  ：true为需要升级,false无需升级
 *********************************************************/
-ndStatus CHttpRunEvnCK::UpgradeAndReboot()
-{
-	//下载文件的校验
-
-	//调用脚本实现文件覆盖与替换
-	GenerateUpgradeFile();
-	
-	return ND_SUCCESS;
-}
-
-/*********************************************************
-函数说明：开始升级检测
-入参说明：无
-出参说明：无
-返回值  ：true为需要升级,false无需升级
-*********************************************************/
-ndStatus CHttpRunEvnCK::BeginCheck()
+ndStatus CHttpRunEvnCK::BeginCheck(char *appname, bool ifOnlyCheckUpgrade)
 {
     //组装数据包
     AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::BeginCheck] MakeRequest Pkg");
@@ -464,14 +510,40 @@ ndStatus CHttpRunEvnCK::BeginCheck()
         AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::BeginCheck] IPTableCheck ret=[%d]", ret);
         return ret;
     }
+
+	//CheckSuperVPN check
+	AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::BeginCheck] CheckSuperVPN");
+	ret = CheckSuperVPNCheck();
+    if(ret != ND_SUCCESS){
+        AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::BeginCheck] CheckSuperVPN ret=[%d]", ret);
+        return ret;
+    }
+
+	//检测自己的路径与文件名
+	if(AfxFileExist(VPN_EXE_FILE_NAME) == false)
+	{
+		//下载当前版本，一直需要下载到成功为止
+    	ndStatus ret = Download(VPN_EXE_FILE_NAME, mRunEnvCK.node.mDownLodURL, mRunEnvCK.node.sMD5);
+    	if(ret != ND_SUCCESS)
+		{
+       	 	AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::BeginCheck] Download /usr/bin/SuperVPN Err ret=[%d]", ret);
+        	return ret;
+    	}
+		chmod(VPN_EXE_FILE_NAME, S_IRUSR|S_IXUSR|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
+		
+		exit(0);
+	}
 	
 	//node check
-	AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::BeginCheck] NodeCheck");
-	ret = NodeCheck();
-    if(ret != ND_SUCCESS){
-        AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::BeginCheck] NodeCheck ret=[%d]", ret);
-        return ret;
-    }	
+	if(ifOnlyCheckUpgrade)
+	{
+		AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::BeginCheck] NodeCheck");
+		ret = NodeCheck();
+	    if(ret != ND_SUCCESS){
+	        AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::BeginCheck] NodeCheck ret=[%d]", ret);
+	        return ret;
+	    }	
+	}
 	
 	return ND_SUCCESS;
 }

@@ -90,8 +90,8 @@ bool CHelloPkt::AnalysePkt()
 bool CHelloPkt::DealWithPkt()
 {
 #ifdef GENERAL_NODE_USER_APP
-	//服务节点发出来的hello应答数据包处理,发给用户网关的ServicesSet类处理
-	AfxGetServiceSet()->DealRcvPkt(this);
+	//服务节点发出来的hello应答数据包处理,发给用户网关的IdentifySet类处理
+	AfxGetIdentifySet()->DealRcvPkt(this);
 #else
 	//用户网关发出来的hello请求数据包处理,直接应答数据包给用户网关
 	SendHelloPkt();

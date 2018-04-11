@@ -30,8 +30,7 @@ public:
 
 	//节点初服务器申请配置信息
 	virtual ndStatus NodeEnvSet()=0;
-	//节点Hello
-	virtual ndStatus NodeHello()=0;
+
 	//节点初始化
 	virtual ndStatus NodeInit()=0;
 	//获取服务器列表

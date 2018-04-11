@@ -1,10 +1,8 @@
 // Created by lewis on 2017/3/18.
-// FZ-Zeasn
 
-#ifndef VPN_DPCOMMSTR_H
-#define VPN_DPCOMMSTR_H
+#ifndef __NDSTRUCT_HPP__
+#define __NDSTRUCT_HPP__
 
-#include "NDType.hpp"
 #include <string>
 #include <string.h>
 #include <stdlib.h>
@@ -13,6 +11,7 @@
 #include <map>
 #include <vector>
 #include "Map.hpp"
+#include "NDType.hpp"
 
 using namespace std;
 
@@ -29,15 +28,6 @@ typedef struct
 	ndInt16 CacheTime;		//本地存储时的缓冲时间(分钟，0表示不缓冲);	
 	ndInt16 LogDayNum;		//本地日志的存储的天数(天);
 }SLogConf, *pSLogConf;
-
- /* 下端设备策略路由的信息 */
- typedef struct
-{
-	 //下游设备的IP地址
-	 ndString	 sDeviceIP;
-	 //下游设备的特征码
-	 ndString	 sDeviceFlag;
-}SDeviceFlag; 
 
  /**
  ******************************************************************************
@@ -170,6 +160,15 @@ typedef struct
     ndString	sMD5;
 	//下载的URL链接地址
     list<ndString> mDownLodURL;
+}SUPDeamonCKSt;
+
+
+typedef struct
+{
+	//MD5校验值
+    ndString	sMD5;
+	//下载的URL链接地址
+    list<ndString> mDownLodURL;
 }SEdgeCKSt;
 
 typedef struct
@@ -183,6 +182,7 @@ typedef struct
 typedef struct
 {
 	SNodeCKSt node;
+	SUPDeamonCKSt deamon;
 	SEdgeCKSt edge;
 	SIPTableCKSt iptable;
 }SRunEnvCKSt;
@@ -202,7 +202,6 @@ typedef struct NetParam SNetParam,*pSNetParam;
 //字符串动态数组定义
 typedef vector<string> StrVector;
 typedef vector<string>::iterator StrVtrItr;
-
 
 #endif //VPN_DPCOMMSTR_H
 

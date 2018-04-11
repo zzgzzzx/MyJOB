@@ -9,20 +9,19 @@
 #include "BaseApp.hpp"
 #include "NDFunc.hpp"
 
-CSuperVPNApp TSuperVPNApp;
-
 /*********************************************************
 函数说明：
 入参说明：
 出参说明：
 返回值  ：
 *********************************************************/
-void CBaseApp::Run()
+void CBaseApp::Run(int argc,char *argv[])
 {
 	//线程启动
 	mTimer.Start();
 	//主体程序运行
-	InitApplication();
+	InitApplication(argc, argv);
+	AfxWriteDebugLog("SuperVPN run at [CBaseApp::Run] APP RUN END......");
 }
 
 /*********************************************************
@@ -88,7 +87,7 @@ bool CBaseApp::DeleteSingleTimer(unsigned long callid)
 出参说明：
 返回值  ：
 *********************************************************/
-bool CBaseApp::InitApplication(void)
+bool CBaseApp::InitApplication(int argc,char *argv[])
 {
 	return true;
 }

@@ -30,8 +30,10 @@ public:
 
 	//节点向服务器申请配置信息
 	virtual ndStatus NodeEnvSet();
-	//节点Hello
-	virtual ndStatus NodeHello();
+
+	//清除所有的EDGE进程
+	void CleanAllEdge();
+
 	//获取服务器列表
 	virtual ndBool GetServerList(list<SServerInfo> &mServers);
 };

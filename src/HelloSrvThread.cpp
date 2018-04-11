@@ -75,7 +75,7 @@ void CHelloSrvThread::ProcessVirtual(void)
 *********************************************************/
 void CHelloSrvThread::NodeHelloFunc(ndULong param)
 {
-//lewis
+	AfxGetIdentifySet()->SendHelloAndCheck();
 }
 
 /*********************************************************

@@ -32,15 +32,14 @@ void AfxInsertPktToSysQue(CPacket *pkt);
 
 //获取Hello服务
 CHelloSrvThread *AfxGetHelloSrv();
-//获取服务节点集合
-CServiceSet *AfxGetServiceSet();
 //获取身份识别集合
 CIdentifySet *AfxGetIdentifySet();
 //获取vpn节点
 CNodeBase *AfxGetVPNNode();
 
 //获取网关名称
-ndString AfxGetGatewayName();
+ndBool AfxGetGatewayName(ndString &host);
+
 
 /*---------------------------------------------------------------------------------------
 //日志
@@ -107,9 +106,14 @@ ndDouble AfxFileSize(const string filepath);
 
 bool AfxCheckCmdExist(const string cmd);
 
+bool AfxRunCmdGetResult(const ndString cmd, ndString &result);
+
+
 //执行系统命令
 bool AfxExecCmd(const char *cmd);
-bool AfxExecCmdNotWait(const char *cmd);
+
+//坑宝写ssh key文件目录
+bool AfxKBWriteSSHKey(const char *filename);
 
 
 /*---------------------------------------------------------------------------------------

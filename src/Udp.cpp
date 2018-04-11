@@ -20,10 +20,15 @@ int CUdpSvr::Open(int iPort)//init udp
 {
 	int iRet;
 	struct sockaddr_in stSockAddr;
-	m_iSockfd= socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
+	m_iSockfd= socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (m_iSockfd == -1){
 		return -1;
 	}
+
+	int val = 0;
+	val = fcntl(m_iSockfd, F_GETFL, 0) ;
+	fcntl(m_iSockfd, F_SETFD, val|FD_CLOEXEC);
+		
 	int opt = 1;
 	setsockopt(m_iSockfd,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(opt));
 	::memset(&stSockAddr,0,sizeof(stSockAddr));
@@ -45,8 +50,12 @@ int CUdpSvr::Open(ndUInt32 ip, int iPort)
 {
 	struct sockaddr_in  stSockAddr;
 	int iRet;
-	m_iSockfd= socket(AF_INET,SOCK_DGRAM,0);
+	m_iSockfd= socket(AF_INET, SOCK_DGRAM, 0);
 	if(m_iSockfd == -1)	return -1;
+
+	int val = 0;
+	val = fcntl(m_iSockfd, F_GETFL, 0) ;
+	fcntl(m_iSockfd, F_SETFD, val|FD_CLOEXEC);	
 
 	::memset(&stSockAddr,0,sizeof(stSockAddr));
 	int opt = 1;
@@ -98,7 +107,7 @@ int CUdpSvr::RecvFrom(char *pcMsgBuf,int iBufLen, int iSeconds)
 	tv.tv_sec = iSeconds;
 	tv.tv_usec = 0;
 
-	iRet = select(m_iSockfd+1,&ReadSet,NULL,NULL,&tv);
+	iRet = select(m_iSockfd+1, &ReadSet, NULL, NULL, &tv);
 	if (iRet>0)
 	{	
 	
@@ -125,7 +134,7 @@ int CUdpSvr::SendTo(ndUInt32 IP,unsigned short iPort,const char *pcMsgBuf,int iB
 	struct sockaddr_in sSO;
 	int iSendNum;
 
-	memset(&sSO,0,sizeof(SA));
+	memset(&sSO, 0, sizeof(SA));
 	sSO.sin_family = AF_INET;
 	sSO.sin_addr.s_addr = HTONL(IP);
 	sSO.sin_port = HTONS(iPort);
@@ -154,7 +163,7 @@ int CUdpSvr::Close()
 void CUdpSvr::SetRecvBuffer(unsigned long ulBufferSize)
 {
 	//改变接收缓冲区大小
-	setsockopt(m_iSockfd,SOL_SOCKET,SO_RCVBUF,&ulBufferSize,sizeof(ulBufferSize));
+	setsockopt(m_iSockfd, SOL_SOCKET,SO_RCVBUF, &ulBufferSize, sizeof(ulBufferSize));
 }
 
 /*********************************************************
@@ -168,9 +177,9 @@ int CUdpCli::SendTo(char *pcIP,unsigned short iPort,char *pcMsgBuf,int iBufLen)
 	struct sockaddr_in stSockAddr;
 	int iSendNum;
 	int iSockfd;	
-	iSockfd= socket(AF_INET,SOCK_DGRAM,0);
+	iSockfd= socket(AF_INET, SOCK_DGRAM, 0);
 
-	memset(&stSockAddr,0,sizeof(stSockAddr));
+	memset(&stSockAddr, 0, sizeof(stSockAddr));
 	stSockAddr.sin_family=AF_INET;
 	//saAddr.sin_addr.s_addr=HTONL(INADDR_ANY);
 	stSockAddr.sin_addr.s_addr=inet_addr(pcIP);
@@ -192,13 +201,13 @@ int CUdpCli::SendTo(char *pcIP,unsigned short iPort,const void *pcMsgBuf,int iBu
 	struct sockaddr_in stSockAddr;
 	int iSendNum;
 	int iSockfd;	
-	iSockfd= socket(AF_INET,SOCK_DGRAM,0);
+	iSockfd= socket(AF_INET, SOCK_DGRAM, 0);
 
-	memset(&stSockAddr,0,sizeof(stSockAddr));
+	memset(&stSockAddr, 0, sizeof(stSockAddr));
 	stSockAddr.sin_family = AF_INET;
 	stSockAddr.sin_addr.s_addr = inet_addr(pcIP);
 	stSockAddr.sin_port = HTONS(iPort);
-	iSendNum = sendto(iSockfd,pcMsgBuf,iBufLen,0,(SA*)&stSockAddr,sizeof(stSockAddr));
+	iSendNum = sendto(iSockfd, pcMsgBuf, iBufLen, 0, (SA*)&stSockAddr, sizeof(stSockAddr));
 	
 	close(iSockfd);
 	return iSendNum;
@@ -215,14 +224,20 @@ bool CUdpCli::Create(unsigned short iLocalPort)
 	struct sockaddr_in sSA;
 	int opt = 1;
 	
-	iSockfd = socket(PF_INET,SOCK_DGRAM,IPPROTO_UDP);
-	setsockopt(iSockfd,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(opt));	
+	iSockfd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
+	if(iSockfd==-1) return false;
+
+	int val = 0;
+	val = fcntl(iSockfd, F_GETFL, 0) ;
+	fcntl(iSockfd, F_SETFD, val|FD_CLOEXEC);	
+	
+	setsockopt(iSockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));	
 	sSA.sin_family = AF_INET;
 	sSA.sin_port = HTONS(iLocalPort);
 	sSA.sin_addr.s_addr = HTONL(INADDR_ANY);
 	bzero(&(sSA.sin_zero), 8);
-	if(bind(iSockfd, (struct sockaddr *)&sSA, sizeof(struct sockaddr_in))<0) return false;
-	if(iSockfd==-1) return false;
+	if(bind(iSockfd, (struct sockaddr *)&sSA, sizeof(struct sockaddr_in))<0) return false;	
 
 	return true;
 }
@@ -238,13 +253,19 @@ bool CUdpCli::Create(unsigned long uIP,unsigned short iLocalPort)
 	struct sockaddr_in sSA;
 	int opt = 1;
 	
-	iSockfd = socket(PF_INET,SOCK_DGRAM,IPPROTO_UDP);
-	setsockopt(iSockfd,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(opt));	
+	iSockfd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
+	if(iSockfd==-1) return false;
+
+	int val = 0;
+	val = fcntl(iSockfd, F_GETFL, 0) ;
+	fcntl(iSockfd, F_SETFD, val|FD_CLOEXEC);	
+	
+	setsockopt(iSockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));	
 	sSA.sin_family = AF_INET;
 	sSA.sin_port = HTONS(iLocalPort);
 	sSA.sin_addr.s_addr = HTONL(uIP);
 	if(bind(iSockfd, (struct sockaddr *)&sSA, sizeof(struct sockaddr_in))<0) return false;
-	if(iSockfd==-1) return false;
 
 	return true;
 }
@@ -275,7 +296,7 @@ int CUdpCli::SendTo(ndUInt32 IP,unsigned short iPort,char *pcMsgBuf,int iBufLen)
 	sSO.sin_family = AF_INET;
 	sSO.sin_addr.s_addr = HTONL(IP);
 	sSO.sin_port = HTONS(iPort);
-	iSendNum = sendto(iSockfd,pcMsgBuf,iBufLen,0,(SA*)&sSO,sizeof(SA));	
+	iSendNum = sendto(iSockfd, pcMsgBuf, iBufLen, 0, (SA*)&sSO, sizeof(SA));	
 
 	return iSendNum;	
 }

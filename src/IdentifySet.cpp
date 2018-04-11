@@ -8,6 +8,7 @@
 **********************************************************/
 #include "IdentifySet.hpp"
 #include "NDFunc.hpp"
+#include "NodeUser.hpp"
 
 /*********************************************************
 函数说明：构造函数
@@ -32,14 +33,21 @@ CIdentifySet::~CIdentifySet()
 }
 
 /*********************************************************
-函数说明：接收处理数据包
+函数说明：接收处理数据包(只有网关才会触发)
 入参说明：
 出参说明：
 返回值  ：
 *********************************************************/
 bool CIdentifySet::DealRcvPkt(CHelloPkt *pkt)
 {
-	return true;
+	//接收到服务节点的数据包，针对服务节点的IP进行查找
+	ServiceInform *pSI;
+	if (mServiceMap.find(AfxHostIPToStr(pkt->GetRcvNetParam().lSrcIP), pSI))
+	{
+		pSI->iHelloNum = MAX_VALUE_HELLO_CHECK_TIMES;
+		return true;
+	}
+	return false;
 }
 
 /*********************************************************
@@ -48,9 +56,9 @@ bool CIdentifySet::DealRcvPkt(CHelloPkt *pkt)
 出参说明：
 返回值  ：
 *********************************************************/
-bool CIdentifySet::ReadMacIdentifyFromGW()
+bool CIdentifySet::ReadMacIdentifyFromGW(list<SBindInform> &ltSI)
 {
-	//lewis
+	//need complete by lewis
 	return false;
 }
 
@@ -58,21 +66,23 @@ bool CIdentifySet::ReadMacIdentifyFromGW()
 函数说明:从网关配置数据库中读取MAC与身份的识别码并处理业务
 入参说明：
 出参说明：
-返回值  ：lewis
+返回值  ：
 *********************************************************/
 bool CIdentifySet::InitIdentifyFromGW()
 {
+	list<SBindInform> ltSI;
+
 	//=============================================================================
 	//1、获取下游设备MAC与身份ID对应的关系(从网关数据库获取),并进行数据的初始化
 	//读出Mac与身份ID
 	//=============================================================================
-	ReadMacIdentifyFromGW();
+	ReadMacIdentifyFromGW(ltSI);
 
 	//=============================================================================
 	//2、根据获取的MAC与身份ID，向中心请求身份ID与出口的对应关系(向中心服务器获取)
 	//=============================================================================
-	CNodeUser pNode= dynamic_cast(AfxGetVPNNode());
-	pNode->BindIdentifyService();
+	CNodeUser *pNode= dynamic_cast<CNodeUser *>(AfxGetVPNNode());
+	pNode->BindIdentifyService(ltSI);
 
 	return false;
 }
@@ -81,22 +91,78 @@ bool CIdentifySet::InitIdentifyFromGW()
 函数说明:从ARP表中读取MAC与IP对应关系
 入参说明：
 出参说明：
-返回值  ：lewis
+返回值  ：
 *********************************************************/
-bool CIdentifySet::ReadARP()
+bool CIdentifySet::ReadARP(list<SBindInform> &ltBSer)
 {
+	//need complet by lewis
 	return false;
 }
 
 /*********************************************************
-函数说明：超时检测
+函数说明：发送Hello包并检测服务是否掉线
 入参说明：
 出参说明：
 返回值  ：
 *********************************************************/
-void CIdentifySet::CheckTimeOut()
+void CIdentifySet::SendHelloAndCheck()
 {
+	ServiceInform *pService;
+	SBindInform sBI;
+	ndStatus ret;
 
+	CNodeUser *pNode= dynamic_cast<CNodeUser *>(AfxGetVPNNode());	
+	
+	bool have = mServiceMap.GetBegin(pService);
+	while(have)
+	{
+		//服务器已失联，通知服务器更换
+		if(pService->iHelloNum <= 0)
+		{	
+			//所有服务相关联的设备通道与路由进行释放
+			BindInformItr iter = pService->ltBindInform.begin();
+			while(iter != pService->ltBindInform.end())
+			{
+				//通知服务器变更出口信息，如果失败
+				sBI = *iter;
+				ret = pNode->ServiceErrorNotify(sBI);
+				if (ret != ND_SUCCESS)
+				{
+					AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::SendHelloAndCheck] ServiceErrorNotify Err=[%d]", ret);
+					iter++; 
+					continue;
+				}
+				//移除旧的
+				pNode->RemoveEdgeAndRoute(*iter);
+				//增加新的
+				pNode->BindIdentifyService(sBI);
+				BindInformItr iterBak = iter;
+				iterBak++;
+				pService->ltBindInform.erase(iter);
+				iter = iterBak;
+			}
+			//判断是否下游设备都更新出口服务完成，如果全部完成，进行移除出口服务
+			if(pService->ltBindInform.size() <= 0)
+			{
+				mServiceMap.EraseCurMNext();
+				have = mServiceMap.GetCurrent(pService);
+				continue;
+			}
+		}
+
+		//发送Hello
+		CHelloPkt hellPkt;
+		SNetParam sNP;
+		sNP.lDesIP = inet_addr(pService->sServiceIP.c_str());
+		sNP.uDesPort = HELLO_SRV_LOCAL_PORT;
+		hellPkt.SetSndNetParam(sNP);
+		hellPkt.SendHelloPkt();
+
+		//Hello剩余次数--
+		pService->iHelloNum--;
+		
+		have = mServiceMap.GetNext(pService);
+	}
 }
 
 /*********************************************************
@@ -105,9 +171,25 @@ void CIdentifySet::CheckTimeOut()
 出参说明：
 返回值  ：
 *********************************************************/
-bool CIdentifySet::AddItem(ndString Key,SBindInform *pBI)
+bool CIdentifySet::AddItem(ndString Key, SBindInform *pBI)
 {
-	mMacMap.insert(pBI->mDevMac, pBI);
+	mMacMap.insert(pBI->sDeviceMac, pBI);
+
+	ServiceInform *pSI;
+	bool bFind = mServiceMap.find(pBI->sServiceIP, pSI);
+	if(!bFind)
+	{
+		pSI = new ServiceInform();
+		pSI->iHelloNum = MAX_VALUE_HELLO_CHECK_TIMES;
+		pSI->ltBindInform.push_back(*pBI);
+		pSI->sServiceIP = pBI->sServiceIP;
+		mServiceMap.insert(pBI->sServiceIP, pSI);	
+	}
+	else
+	{
+		pSI->ltBindInform.push_back(*pBI);
+	}
+	
 	return insert(Key,pBI);
 }
 
@@ -119,12 +201,31 @@ bool CIdentifySet::AddItem(ndString Key,SBindInform *pBI)
 *********************************************************/
 bool CIdentifySet::DelItem(ndString Key)
 {
-	SBindInform *pBI;
+	SBindInform *pBI, sBI;
 	if (!nlfind(Key, pBI)) return false;
 
-	delete pBI;
+	mMacMap.erase(pBI->sDeviceMac);
 
-	mMacMap.erase(Key);
+	ServiceInform *pSI;
+	bool bFind = mServiceMap.find(pBI->sServiceIP, pSI);
+	if(bFind)
+	{
+		BindInformItr iter = pSI->ltBindInform.begin();
+		while(iter != pSI->ltBindInform.end())
+		{
+			sBI = *iter;
+			if(sBI.sDeviceFlag == pBI->sDeviceFlag)
+			{
+				pSI->ltBindInform.erase(iter);
+				break;
+			}
+			iter++;
+		}
+		if(pSI->ltBindInform.empty())
+			mServiceMap.erase(pBI->sServiceIP);
+	}	
+	delete pBI;
+	
 	return nlerase(Key);
 }
 

@@ -20,8 +20,10 @@ class CIdentifySet: public CMap<ndString, SBindInform *>
 private:
 	//以mac为key的map
 	CMap<ndString, SBindInform*>mMacMap;
+	//以出口服务为key的map
+	CMap<ndString, ServiceInform*> mServiceMap;
 	//从网关配置文件中读取mac与身份识别的关联表
-	bool ReadMacIdentifyFromGW();
+	bool ReadMacIdentifyFromGW(list<SBindInform> &ltSI);
 
 public:
 	//构造函数
@@ -49,7 +51,7 @@ public:
 	bool ReadARP(list<SBindInform> &ltBSer);
 
 	//是否有超时的检测
-	void CheckTimeOut();
+	void SendHelloAndCheck();
 };
 
 #endif

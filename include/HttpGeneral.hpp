@@ -9,7 +9,7 @@
 #include "NDType.hpp"
 #include "HttpClient.hpp"
 #include "NodeBase.hpp"
-
+#include "Inform.hpp"
 
 using namespace network;
 
@@ -47,6 +47,14 @@ protected:
 	ndStatus MakeBindServerReq(ndString devidentify);
 	ndStatus AnalysisBindServerRsp(list<SBindInform> &mServers);	
 
+	//失联服务通知
+	ndStatus MakeServiceErrorReq(SBindInform &sBI);
+	ndStatus AnalysisServiceErrorRsp(SBindInform &sBI);		
+
+	//释放服务出口
+	ndStatus MakeUnBindServerReq(SBindInform sBI);
+	ndStatus AnalysisUnBindServerRsp();		
+
 	//数据包发送并接收处理
 	ndStatus PkgSendAndRecv(ndString url);	
 
@@ -57,10 +65,12 @@ public:
 	ndStatus NodeEnvSet();
 	ndStatus NodeHello();
 	ndStatus NodeInit();
-	virtual ndStatus NodeGetIPPool();
 	
 	ndBool GetServerList(list<SServerInfo> &mServers);
 	ndStatus GetIdentifyService(list<SBindInform> &ltBSer);
+	ndStatus ReleaseIdentifyService(SBindInform sBI);
+
+	ndStatus ServiceErrorNotify(SBindInform &sBindInform);
 	
     virtual ~CHttpGeneral();
 

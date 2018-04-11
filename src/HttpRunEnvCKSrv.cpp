@@ -35,8 +35,14 @@ ndStatus CHttpRunEvnCKSrv::IPTableCheck()
 	ndStatus ret = CHttpRunEvnCK::IPTableCheck();
 	if (ret != ND_SUCCESS) return ret;
 
+	AfxExecCmd("iptables -F");
+	AfxExecCmd("iptables -F -t nat");
+	AfxExecCmd("iptables -X");
+	AfxExecCmd("iptables -X -t nat");
+	AfxExecCmd("iptables -A FORWARD -j ACCEPT");
+	AfxExecCmd("iptables -t nat -I POSTROUTING -o eth0 -j MASQUERADE");
+
 	AfxExecCmd("echo \"1\"> /proc/sys/net/ipv4/ip_forward");
-	AfxExecCmd("iptables -t nat -A POSTROUTING -o ppp0 -j MASQUERADE");
 	
 	return ND_SUCCESS;
 }

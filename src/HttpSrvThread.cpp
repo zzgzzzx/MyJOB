@@ -9,7 +9,7 @@
 #include "HttpSrvThread.hpp"
 #include "NDFunc.hpp"
 #include "microhttpd.h"
-
+#include "NodeUser.hpp"
 
 /*********************************************************
 函数说明：构造函数
@@ -75,24 +75,28 @@ int  connectionHandler(
     size_t *upload_data_size,
     void **con_cls)
 {
-    const char* pageBufferOK = "<html><body>Hello, I'm lgxZJ!</body></html>";
+/*    const char* pageBufferOK = "<html><body>Hello, I'm lgxZJ!</body></html>";
 	const char* pageBufferERR = "<html><body>Hello, I'm lgxZJ!</body></html>";
 
 	//接收HTTP数据包
 	struct sockaddr *clientaddr = (struct sockaddr *)MHD_get_connection_info(connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
 	const char *value = MHD_lookup_connection_value(connection, MHD_GET_ARGUMENT_KIND, "value");
 	
-	SDeviceFlag deviceFlag;
 	struct sockaddr_in *addr_in;
 	addr_in= (struct sockaddr_in *)clientaddr;
-	deviceFlag.sDeviceIP = inet_ntoa(addr_in->sin_addr);
-	AfxWriteDebugLog( "MHD Request Client address=[%s]", deviceFlag.sDeviceIP.c_str());
+
+	SBindInform sBindInform;
+	//need complet by lewis
+	//sBindInform.sDeviceIP = AfxNetIPToStr(addr_in->sin_addr);
+	AfxWriteDebugLog( "MHD Request Client address=[%s]", sBindInform.sDeviceIP.c_str());
 	AfxWriteDebugLog( "MHD Request URL=[%s]", value);
-	AfxWriteDebugLog( "MHD Request sDeviceFlag=[%s]", deviceFlag.sDeviceFlag.c_str());
+	AfxWriteDebugLog( "MHD Request sDeviceFlag=[%s]", sBindInform.sDeviceFlag.c_str());
 
 	//===================================================================================================================
-	// 1、下端用户标识请求数据包的处理
-	//===================================================================================================================
+	// 1、下端用户标识请求数据包的处理(包括上线、下线通知)
+	//===================================================================================================================	
+	CNodeUser *pNode= dynamic_cast<CNodeUser *>(AfxGetVPNNode());
+	pNode->BindIdentifyService(sBindInform);
 
 
 	//===================================================================================================================
@@ -100,10 +104,6 @@ int  connectionHandler(
 	//===================================================================================================================
 
 	
-	//进行策略路由设置
-	//CNodeUser *pNodeUser = dynamic_cast<CNodeUser *>(AfxVPNNode());
-	//pNodeUser->SetPolicyRoute(deviceFlag);
-
 	//回应数据包
     struct MHD_Response *response;
     response = MHD_create_response_from_buffer(strlen(pageBufferOK),
@@ -120,6 +120,8 @@ int  connectionHandler(
     MHD_destroy_response(response);
 
     return MHD_YES;
+    */
+    return 0;
 }
 
 
@@ -132,7 +134,7 @@ int  connectionHandler(
 bool CHttpSrvThread::StartService()
 {
     const int port = 8888;
-
+/*
     struct MHD_Daemon* daemon = 
         MHD_start_daemon(MHD_USE_SELECT_INTERNALLY, port
         , NULL, NULL, connectionHandler, NULL, MHD_OPTION_END);
@@ -146,6 +148,7 @@ bool CHttpSrvThread::StartService()
 		sleep(60);
 
     MHD_stop_daemon(daemon);
+    */
     
     return true;
 

@@ -15,7 +15,7 @@
 #include "Packet.hpp"
 #include "HelloSrvThread.hpp"
 #include "HttpSrvThread.hpp"
-#include "ServiceSet.hpp"
+#include "IdentifySet.hpp"
 
 //**********************************
 //应用工程基类                       
@@ -28,7 +28,7 @@ private:
 
 protected:
 	//应用程序初始化工作
-	virtual bool InitApplication(void);
+	virtual bool InitApplication(int argc,char *argv[]);
 public:	
 	//插入单回定时器	
 	bool InsertSingleTimer(unsigned long callid,unsigned long timeout,void (*CallBack)(ndULong));
@@ -41,7 +41,7 @@ public:
 	bool DeleteSingleTimer(unsigned long callid);
 
 	//应用程序启动运行
-	void Run();
+	void Run(int argc,char *argv[]);
 
 	//构造函数
 	CBaseApp();
@@ -50,7 +50,7 @@ public:
 };
 
 //**********************************
-//宽带路由设备工程类                       
+//SuperVPN工程类                       
 //**********************************
 class CSuperVPNApp: public CBaseApp
 {
@@ -59,21 +59,27 @@ private:
 	CMsgFIFO<CPacket*> mPktQueue;	
 	
 	//系统数据初始化
-	bool InitSystem(void);
+	bool InitSystem(char *appname, bool ifOnlyCheckUpgrade);
 	//服务器列表检测
 	ndStatus ServerListCheck();
  	//系统运行环境检测
- 	ndStatus RunEnvCheck();
+ 	ndStatus RunEnvCheck(char *appname, bool ifOnlyCheckUpgrade);
 	//节点初始化编号检测
 	ndStatus NodeInitCheck();
 	//启动http服务器
 	ndStatus StartHttpd();
 	//数据包队列循环处理
 	void TranslatePkt(void);
+	//坑宝初始化
+	void KBInit();
+	//锁检测控制机制
+	ndBool GetRunLock();
+	//升级锁检测控制机制
+	ndBool GetUpgradeLock();	
 	
 protected:
 	//应用程序初始化工作
-	bool InitApplication(void);
+	bool InitApplication(int argc,char *argv[]);
 
 public:
 	//节点
@@ -82,8 +88,6 @@ public:
 	CHelloSrvThread mHelloSrv;
 	//http服务
 	CHttpSrvThread mHttpSrv;
-	//服务节点集合类
-	CServiceSet mServiceSet;
 	//身份识别管理类
 	CIdentifySet mIdentifySet;
 	
@@ -97,6 +101,29 @@ public:
 
 	//消息数据包入队
 	void InsertPktToQueue(CPacket *pkt);	
+};
+
+//**********************************
+//SuperVPN检测工程类                       
+//**********************************
+class CCheckSuperVPNApp: public CBaseApp
+{
+private:	
+	//系统数据初始化
+	bool InitSystem(void);
+	void StopSuperVPNAndUpgrade();
+	void CheckVPNAndRun();
+
+protected:
+	//应用程序初始化工作
+	bool InitApplication(int argc,char *argv[]);
+
+public:
+	
+	//构造函数
+	CCheckSuperVPNApp();
+	//析构函数
+	~CCheckSuperVPNApp();	
 };
 
 #endif

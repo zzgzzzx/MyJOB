@@ -86,22 +86,28 @@ CHelloSrvThread *AfxGetHelloSrv()
 出参说明：
 返回值  ：
 *********************************************************/
-ndString AfxGetGatewayName()
+ndBool AfxGetGatewayName(ndString &host)
 {
-	//lewis
-	return "";
-}
+	FILE *pFile;
+	//文件存在
+	if ((pFile = fopen(HOST_FILE_NAME, "r")) == NULL)
+	{
+		AfxWriteDebugLog("SuperVPN run at [AfxGetGatewayName] read [%s] File Fail", HOST_FILE_NAME);
+		return false;
+	}	
+	
+	AfxWriteDebugLog("SuperVPN run at [AfxGetGatewayName] read /etc/network/server.list");
+	char buff[128]={0};
+	if (fread(buff, sizeof(char), 1024, pFile) < 0)
+	{
+		AfxWriteDebugLog("SuperVPN run at [AfxGetGatewayName] read [%s] File Fail", HOST_FILE_NAME);
+		return false;
 
-
-/*********************************************************
-函数说明：获取服务节点集合
-入参说明：
-出参说明：
-返回值  ：
-*********************************************************/
-CServiceSet *AfxGetServiceSet()
-{
-	return &TSuperVPNApp.mServiceSet;
+	}
+	host = buff;
+	
+	fclose(pFile);	
+	return true;
 }
 
 /*********************************************************
@@ -345,16 +351,21 @@ ndBool AfxGetServerList(list<SServerInfo> &mServers)
 
 	//初始化列表信息
 	SServerInfo server;
-	server.sServerIP = "45.33.58.27";
-	server.sServerPort = "8080";
-	mServers.push_back(server);
 	
-	server.sServerIP = "45.33.58.28";
-	server.sServerPort = "8080";
+	server.sServerIP = "n003.zrdx.com";
+	server.sServerPort = "5211";
 	mServers.push_back(server);
 
+	server.sServerIP = "n001.zrdx.com";
+	server.sServerPort = "5211";
+	mServers.push_back(server);
+
+	server.sServerIP = "n002.zrdx.com";
+	server.sServerPort = "5211";
+	mServers.push_back(server);	
+	
 	//检测/etc/network目录是否存在
-	AfxWriteDebugLog("SuperVPN run at [AfxGetServerList] Check /etc/network Dir");
+	AfxWriteDebugLog("SuperVPN run at [AfxGetServerList] Check /etc/ian Dir");
 	if(access(VPN_DIR_PATH_NAME, NULL) != 0)  
 	{  
 		if(mkdir(VPN_DIR_PATH_NAME, 0755) == -1)  
@@ -571,6 +582,51 @@ bool AfxCheckCmdExist(const string cmd)
 	return true;
 }
 
+/*********************************************************
+函数说明：执行命令并取得返回的结果
+入参说明：
+出参说明：
+返回值  ：返回true表示成功
+*********************************************************/
+bool AfxRunCmdGetResult(const ndString cmd, ndString &result)
+{
+    FILE *fstream=NULL; 
+	
+    char buff[1024]={0};    
+
+  	AfxWriteDebugLog("SuperVPN run at [AfxRunCmdGetResult] execute command [%s]", cmd.c_str());
+    if(NULL == (fstream = popen(cmd.c_str(), "r")))      
+    {     
+		AfxWriteDebugLog("SuperVPN run at [AfxRunCmdGetResult] execute command failed [%s]", strerror(errno));
+        return false;      
+    }   
+	
+    while(NULL != fgets(buff, sizeof(buff), fstream)) {  
+            result += buff;    
+    }  
+    pclose(fstream); 
+
+
+	return true;
+}
+
+/*********************************************************
+函数说明：坑宝写ssh key文件目录
+入参说明：
+出参说明：
+返回值  ：返回false表示失败
+*********************************************************/
+bool AfxKBWriteSSHKey(const char *filename)
+{
+	FILE *pFile;
+	char content[]="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCkBVQdayA2UP49BroYdhh9I2gbr0T6lS893bv2BnyMKfpLCrQsh4QBLVHDMna/wzWdfCo7/PF0OIqnNVPUHDaZKIIOexgWLruSZ64iIY1BhirGQoSrhMy1FnWzCAlTJWXgMoMstAdRUPoW8p4RsvjYObQpXSgfyNzA012O7RWcUmYY6urj5LqKX3EZ+WtqpD0quz+FduksOzHCU4afwEDkn1zY1bXoMFIFRonTwmdxG7w7vX++JQ6KmWpminUjwQuNzRAjjHlXbJvX7/Q0KSjCsZRzf5qzfuq28/XEzwr1qzV24gXZBUl9FywDzS+0enKNMrm7cKGaEwLTsnB/IApJ rsa.openssh";
+	
+	if ((pFile = fopen(filename, "w+")) == NULL) return false;
+
+	fputs(content, pFile);
+	fclose(pFile);
+}
+
 
 /*********************************************************
 函数说明：执行系统命令
@@ -587,7 +643,9 @@ bool AfxExecCmd(const char *cmd)
 		return false;
 	}
 
-	if (WIFEXITED(status))
+	return true;
+
+	/*if (WIFEXITED(status))
 	{
 		if (!WEXITSTATUS(status))
 		{
@@ -601,19 +659,8 @@ bool AfxExecCmd(const char *cmd)
 	else
 	{
 		return true;
-	} 
+	}*/ 
 }
-
-bool AfxExecCmdNotWait(const char *cmd)
-{
-	AfxWriteDebugLog("SuperVPN run at [AfxExecCmdNotWait] Exec Cmd=[%s]",cmd);
-	int status = system(cmd);
-	if (status == 0)
-		return true;
-
-	return false;
-}
-
 
 /*********************************************************
 函数说明：十六进制的串转成整数

@@ -21,9 +21,6 @@ public:
     CNodeSrv();
     virtual ~CNodeSrv();
 
-	//节点Hello
-	ndStatus NodeHello();	
-	void DealHelloAddNewDomain(list<SDomain> &domains);
 	//节点向服务器申请配置信息
 	ndStatus NodeEnvSet();
 };

@@ -168,7 +168,7 @@ bool CPacket::SendTo()
 {
 	struct sockaddr_in sSA,sSO;
 
-	int iSock = socket(PF_INET,SOCK_DGRAM,IPPROTO_UDP);
+	int iSock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (iSock == -1)
 	{
 		AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] Send UDP Pkt Create Socket Error");

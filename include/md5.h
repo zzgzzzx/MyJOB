@@ -10,14 +10,9 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 
-#ifndef PROTOTYPES
-#define PROTOTYPES 0
-#endif
-
-#if PROTOTYPES
-#define PROTO_LIST(list) list
-#else
-#define PROTO_LIST(list) ()
+#ifdef __cplusplus
+extern "C"
+{
 #endif
 
 typedef unsigned char *POINTER;
@@ -37,6 +32,11 @@ typedef struct
   unsigned char buffer[64];			/*  ‰»Îª∫≥Â∆˜ */
 } MD5_CTX;
 
-void MD5Init PROTO_LIST ((MD5_CTX *));
-void MD5Update PROTO_LIST ((MD5_CTX *, unsigned char *, unsigned int));
-void MD5Final PROTO_LIST ((unsigned char [16], MD5_CTX *));
+void MD5Init (MD5_CTX *);
+void MD5Update (MD5_CTX *, unsigned char *, unsigned int);
+void MD5Final (unsigned char [16], MD5_CTX *);
+
+#ifdef __cplusplus
+}
+#endif
+

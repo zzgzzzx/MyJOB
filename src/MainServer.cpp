@@ -8,12 +8,12 @@
 **********************************************************/
 #include "BaseApp.hpp"
 
-extern CSuperVPNApp TSuperVPNApp;
+CSuperVPNApp TSuperVPNApp;
 
-int main()
+int main(int argc,char *argv[])
 {
 	
-	TSuperVPNApp.Run();
+	TSuperVPNApp.Run(argc, argv);
 
 	return true;
 }

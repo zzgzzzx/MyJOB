@@ -10,6 +10,8 @@
 #define __INFORM_HPP__
 
 #include "Packet.hpp"
+#include "NDStruct.hpp"
+#include "NDType.hpp"
 
 //**********************************
 //信息基类                       
@@ -22,17 +24,7 @@ public:
 };
 
 //**********************************
-//远程服务节点信息类                       
-//**********************************
-class CServiceInform: public CBaseInform
-{
-public:
-	CServiceInform();
-	virtual ~CServiceInform();
-};
-
-//**********************************
-//用户节点信息类                       
+//设备身份绑定出口信息类                       
 //**********************************
 class SBindInform: public CBaseInform
 {
@@ -55,6 +47,25 @@ public:
 	SBindInform();
 	virtual ~SBindInform();
 };
+
+//**********************************
+//出口信息类                       
+//**********************************
+class ServiceInform: public CBaseInform
+{
+public:
+	 //服务节点当前的HelloNumber
+	 ndInt8 iHelloNum;
+	 //vpn服务节点的IP地址
+	 ndString	sServiceIP;	 
+	 //关联的设备信息
+	 list<SBindInform> 	ltBindInform;
+public:
+	ServiceInform();
+	virtual ~ServiceInform();
+};
+
+typedef list<SBindInform>::iterator BindInformItr;
 
 
 #endif

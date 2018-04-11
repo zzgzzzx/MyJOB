@@ -89,30 +89,41 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 /*---------------------------------------------------------------------------------------
 //目录路径
 -----------------------------------------------------------------------------------------*/
-#define VPN_DIR_PATH_NAME	"/etc/network/"
+#define VPN_DIR_PATH_NAME	"/etc/ian/"
 
 /*---------------------------------------------------------------------------------------
 //升级文件名
 -----------------------------------------------------------------------------------------*/
-#define UPGRADE_SH_FILE_NAME	"upgrade.sh"
+#define UPGRADE_SH_FILE_NAME	"/dev/shm/upgrade.sh"
+
 /*---------------------------------------------------------------------------------------
 //重启脚本文件名
 -----------------------------------------------------------------------------------------*/
-#define RESTART_SH_FILE_NAME	"restart.sh"
+#define RESTART_SH_FILE_NAME	"/dev/shm/restart.sh"
+
+/*---------------------------------------------------------------------------------------
+//检测启动SuperVPN脚本文件名
+-----------------------------------------------------------------------------------------*/
+#define CHECK_START_SH_FILE_NAME	"/dev/shm/checkandstartvpn.sh"
+
+
 /*---------------------------------------------------------------------------------------
 //edge结束脚本文件名
 -----------------------------------------------------------------------------------------*/
-#define CLEAN_EDGE_SH_FILE_NAME	"stopedge.sh"
+#define CLEAN_EDGE_SH_FILE_NAME	"/dev/shm/stopedge.sh"
 
 /*---------------------------------------------------------------------------------------
 //节点编号文件名
 -----------------------------------------------------------------------------------------*/
-#define NODEID_FILE_NAME	"/etc/network/node.id"
+#define NODEID_FILE_NAME	"/etc/ian/node.id"
 
 /*---------------------------------------------------------------------------------------
 //服务器列表 IP:Port
 -----------------------------------------------------------------------------------------*/
-#define SERVER_LIST_FILE_NAME	"/etc/network/server.list"
+#define SERVER_LIST_FILE_NAME	"/etc/ian/server.list"
+//主机名的文件
+#define HOST_FILE_NAME	"/etc/hosts"
+
 
 /**
  ******************************************************************************
@@ -150,8 +161,8 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 /*---------------------------------------------------------------------------------------
 //VPN版本号
 -----------------------------------------------------------------------------------------*/
-#define SUPER_VPN_CLIENT_VER_SERVER 1010
-#define SUPER_VPN_CLIENT_VER_NODE 1010
+#define SUPER_VPN_CLIENT_VER_SERVER 1002
+#define SUPER_VPN_CLIENT_VER_NODE 1001
 
 /*---------------------------------------------------------------------------------------
 //系统支持的最大消息队列数
@@ -174,7 +185,7 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 //定时器时间设置(秒数)
 -----------------------------------------------------------------------------------------*/
 #define TIMER_VALUE_NODE_HELLO_CHECK	60			//节点Hello检测
-#define MAX_VALUE_HELLO_CHECK_TIMES 3				//hello检测的次数
+#define MAX_VALUE_HELLO_CHECK_TIMES 5				//hello检测的次数
 
 /*---------------------------------------------------------------------------------------
 //curl连接服务器超时时间（秒）
@@ -201,8 +212,15 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 /*---------------------------------------------------------------------------------------
 //升级文件的临时文件名
 -----------------------------------------------------------------------------------------*/
-#define VPN_UPGRADE_TEMP_FILE_NAME  "upgrade_SuperVPN_app"
-#define VPN_EXE_FILE_NAME  "SuperVPN"
+#define VPN_UPGRADE_FILE_NAME  "/dev/shm/upgrade_SuperVPN_app"
+#define VPN_UPGRADE_TEMP_FILE_NAME  "/dev/shm/upgrade_SuperVPN_app_tmp"
+
+#define VPN_EXE_FILE_NAME  "/usr/bin/SuperVPN"
+#define CHECK_VPN_EXE_FILE_NAME  "/usr/bin/CheckSuperVPN"
+
+#define RUN_LOCK_FILE_NAME  "/var/run/supervpn.lock"
+#define UPGRADE_LOCK_FILE_NAME  "/var/run/checkupgrade.lock"
+
 
 /*---------------------------------------------------------------------------------------
 //数据包Action标签名称定义
@@ -223,6 +241,10 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 #define SUPER_ACTION_NODE_GET_SERVER_LIST "server-list-inform"
 
 #define SUPER_ACTION_NODE_GET_SERVICES "user-node-get-services"
+#define SUPER_ACTION_NODE_RELEASE_SERVICES "user-node-release-services"
+
+#define SUPER_ACTION_NODE_SERVICES_ERROR "user-node-notify-services-error"
+
 
 
 #define VALUE_CURLOPT_DOWNLOAD_RETRY_TIMES 5
@@ -328,8 +350,14 @@ typedef enum
 	//解密失败26
 	ND_ERROR_DECRYPTION_FAILED,
 
-	//hello接收超过规定的次数失败
-	ND_ERROR_NOT_RECVIVE_HELLO
+	//hello接收超过规定的次数失败27
+	ND_ERROR_NOT_RECVIVE_HELLO,
+
+	//需要重启28
+	ND_NEED_RESTART,
+
+	//文件已存在29
+	ND_FILE_ALREADY_EXISTS
 }ndErrorEn;
 
 

@@ -95,17 +95,17 @@ ndStatus CNodeGeneral::NodeEnvSet()
 }
 
 /*********************************************************
-函数说明：节点Hello
+函数说明：清除所有的EDGE进程
 入参说明：无
 出参说明：无
-返回值  ：DP_SUCCESS-成功
-          Others-失败
+返回值  ：无
 *********************************************************/
-ndStatus CNodeGeneral::NodeHello()
+void CNodeGeneral::CleanAllEdge()
 {
-    //Hello
-    return mPHttpClient->NodeHello();
+	char cmd[512]= "killall edge";
+	AfxExecCmd(cmd);
 }
+
 
 /*********************************************************
 函数说明：GetServerList

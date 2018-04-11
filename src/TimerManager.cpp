@@ -54,7 +54,7 @@ void CTimerManager::ProcessVirtual(void)
 {
 	STimerNode *STNode;
 	
-	AfxWriteDebugLog("SuperVPN run at [CTimerManager::ProcessVirtual] ROUTER SYSTEM TIMER BEGIN WORKING......");
+	AfxWriteDebugLog("SuperVPN run at [CTimerManager::ProcessVirtual] SUPERVPN TIMER BEGIN WORKING......");
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,NULL);
 
 	while (true) 

@@ -42,7 +42,7 @@ CBaseInform::~CBaseInform()
 出参说明：
 返回值  ：
 *********************************************************/
-CServiceInform::CServiceInform()
+ServiceInform::ServiceInform()
 {
 
 }
@@ -53,7 +53,7 @@ CServiceInform::CServiceInform()
 出参说明：
 返回值  ：
 *********************************************************/
-CServiceInform::~CServiceInform()
+ServiceInform::~ServiceInform()
 {
 
 }

