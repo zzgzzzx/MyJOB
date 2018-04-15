@@ -9,6 +9,7 @@
 #include "IdentifySet.hpp"
 #include "NDFunc.hpp"
 #include "NodeUser.hpp"
+#include "MyDB.hpp"
 
 /*********************************************************
 函数说明：构造函数
@@ -58,8 +59,8 @@ bool CIdentifySet::DealRcvPkt(CHelloPkt *pkt)
 *********************************************************/
 bool CIdentifySet::ReadMacIdentifyFromGW(list<SBindInform> &ltSI)
 {
-	//need complete by lewis
-	return false;
+	MyDB myDB;
+	return myDB.GetIndetifyMac(ltSI);
 }
 
 /*********************************************************
@@ -93,9 +94,31 @@ bool CIdentifySet::InitIdentifyFromGW()
 出参说明：
 返回值  ：
 *********************************************************/
+bool GetSubString(string sou, string bFlag, string eFlag, string &out)
+{
+	int bPos = sou.find(bFlag);
+	if (bPos == string::npos) return false;
+
+	string tmp = sou.substr(bPos+bFlag.length(), sou.length()-bPos-bFlag.length());
+	int ePos = tmp.find(eFlag);
+	if (ePos == string::npos) return false;
+
+	out = tmp.substr(0, ePos);
+
+	return true;
+}
+
 bool CIdentifySet::ReadARP(list<SBindInform> &ltBSer)
 {
-	//need complet by lewis
+	//bogon (192.168.204.254) at 00:50:56:f0:93:b4 [ether] on eth0
+	ndString ip, mac, arptable;
+
+	if (!AfxRunCmdGetResult("arp -a", arptable))
+	{
+		return false;
+	}
+	
+	//GetSubString();
 	return false;
 }
 

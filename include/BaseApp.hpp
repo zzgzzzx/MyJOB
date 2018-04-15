@@ -11,7 +11,7 @@
 
 #include "MsgQueue.hpp"
 #include "TimerManager.hpp"
-#include "NodeBase.hpp"
+#include "NodeGeneral.hpp"
 #include "Packet.hpp"
 #include "HelloSrvThread.hpp"
 #include "HttpSrvThread.hpp"
@@ -83,7 +83,7 @@ protected:
 
 public:
 	//节点
-	CNodeBase *mPNode;
+	CNodeGeneral *mPNode;
 	//hello服务
 	CHelloSrvThread mHelloSrv;
 	//http服务

@@ -96,9 +96,9 @@ ndBool AfxGetGatewayName(ndString &host)
 		return false;
 	}	
 	
-	AfxWriteDebugLog("SuperVPN run at [AfxGetGatewayName] read /etc/network/server.list");
+	AfxWriteDebugLog("SuperVPN run at [AfxGetGatewayName] read /etc/hosts");
 	char buff[128]={0};
-	if (fread(buff, sizeof(char), 1024, pFile) < 0)
+	if (fread(buff, sizeof(char), 128, pFile) < 0)
 	{
 		AfxWriteDebugLog("SuperVPN run at [AfxGetGatewayName] read [%s] File Fail", HOST_FILE_NAME);
 		return false;
@@ -310,11 +310,22 @@ ndString ServerListToString(list<SServerInfo> &mServers)
 	return result;
 }
 
+int GetRandomNumber()
+{
+	int RandomNumber;
+	srand((unsigned)time(NULL));//为rand()函数生成不同的随机种子
+	RandomNumber = rand()%10;//生成10以内的随机数
+
+	return RandomNumber;
+}
+
 void StringToServerList(ndString json, list<SServerInfo> &mServers)
 {
     cJSON *root;
 	SServerInfo sInfo;
-	
+	int RandomNumber;
+
+	//从内容串中分析出服务器列表信息
     root = cJSON_Parse(json.c_str());
     if (!root)
     {
@@ -325,6 +336,7 @@ void StringToServerList(ndString json, list<SServerInfo> &mServers)
     cJSON *serverArray = cJSON_GetObjectItem(root, "servers");
     if(serverArray != NULL)
     {
+	    srand((unsigned)time(NULL));
         cJSON *serverlist = serverArray->child;
 		while(serverlist != NULL)
 		{
@@ -338,10 +350,27 @@ void StringToServerList(ndString json, list<SServerInfo> &mServers)
 		        sInfo.sServerPort = cJSON_GetObjectItem(serverlist, "port")->valuestring;
 			AfxWriteDebugLog("SuperVPN run at [StringToServerList] port=[%s]", sInfo.sServerPort.c_str());
 
-		    mServers.push_back(sInfo);
+			switch(rand()%10){
+			    case 1: 
+					case 3: 
+						case 5: 
+							case 7: 
+								case 9:
+			       mServers.push_back(sInfo);
+			       break; 
+			    case 2:
+					case 4:
+						case 6:
+							case 8:
+								case 10:
+			       mServers.push_front(sInfo);
+			       break;
+			    default:
+			       mServers.push_front(sInfo);
+			}			
 		    serverlist = serverlist->next;
 		}
-     }
+     }	
 }
 
 ndBool AfxGetServerList(list<SServerInfo> &mServers)

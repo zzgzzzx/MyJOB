@@ -231,16 +231,16 @@ ndStatus CHttpRunEvnCK::AnalysisCheckRsp()
 ndStatus CHttpRunEvnCK::EdgeCheck()
 {
 	//≈–∂œedge√¸¡Ó «∑Ò¥Ê‘⁄
-	if(AfxCheckCmdExist("edge"))
+	if(AfxCheckCmdExist(EDGE_EXE_FILE_NAME))
 		return ND_SUCCESS;
 
-	ndStatus ret = Download("/usr/bin/edge", mRunEnvCK.edge.mDownLodURL, mRunEnvCK.edge.sMD5);
+	ndStatus ret = Download(EDGE_EXE_PATH_NAME, mRunEnvCK.edge.mDownLodURL, mRunEnvCK.edge.sMD5);
     if(ret != ND_SUCCESS){
         AfxWriteDebugLog("SuperVPN run at[CHttpRunEvnCK::EdgeCheck] Download edge command Err ret=[%d]", ret);
         return ret;
     }
 
-	chmod("/usr/bin/edge", S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
+	chmod(EDGE_EXE_PATH_NAME, S_IRWXU|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH);
 
 	return ND_SUCCESS;
 }

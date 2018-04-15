@@ -18,11 +18,11 @@ C_OBJ = $(patsubst %.c,${DIR_OBJ}/%.o,$(notdir ${C_SRC}))
 BIN = SuperVPN
 BIN_TARGET = ${DIR_BIN}/${BIN}
 
-DFLAGS  = -w -Wall -DDEBUG  -D_RAW -g -DGENERAL_NODE_USER_APP_S
-RFLAGS  = -w -o2 -Wall -D_RAW -DGENERAL_NODE_USER_APP_S
+DFLAGS  = -w -Wall -DDEBUG  -D_RAW -g
+RFLAGS  = -w -o2 -Wall -D_RAW
 
 CFLAGS = ${DIR_INC} ${DFLAGS} -fPIC
-LDFLAGS = -L/home/zhangzx/amlogic/curl/lib -L/home/zhangzx/N2N/httpd/lib -lcurl -pthread
+LDFLAGS = -L/home/zhangzx/amlogic/curl/lib  -lcurl -pthread
 
 ${BIN_TARGET}:${CPP_OBJ} ${C_OBJ}
 	$(CXX) -o $@ $(CPP_OBJ) ${C_OBJ} $(LDFLAGS)

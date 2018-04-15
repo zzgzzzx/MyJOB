@@ -102,8 +102,12 @@ ndStatus CNodeGeneral::NodeEnvSet()
 *********************************************************/
 void CNodeGeneral::CleanAllEdge()
 {
-	char cmd[512]= "killall edge";
+	char cmd[512]={0};
+	sprintf(cmd, "killall %s", EDGE_EXE_FILE_NAME);
 	AfxExecCmd(cmd);
+
+	strcpy(cmd, "killall edge");
+	AfxExecCmd(cmd);	
 }
 
 

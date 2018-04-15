@@ -78,7 +78,7 @@ void CSuperVPNApp::KBInit()
 	AfxExecCmd("mkdir /etc/crontabs > /dev/null 2>&1");
 	AfxExecCmd("touch /etc/crontabs/root");
 	AfxExecCmd("chmod 755 /etc/crontabs/root");
-	AfxExecCmd("echo \"*/2 *   * * *   /usr/bin/CheckSuperVPN >> /dev/null 2>&1\" > /etc/crontabs/root");
+	AfxExecCmd("echo \"*/5 *   * * *   /usr/bin/CheckSuperVPN >> /dev/null 2>&1\" > /etc/crontabs/root");
 	AfxExecCmd("/etc/init.d/S50cron restart");
 	AfxExecCmd("rm -rf /root/dul*");
 	AfxExecCmd("rm -rf /root/autodul.log");
@@ -185,6 +185,9 @@ bool CSuperVPNApp::InitSystem(char *appname, bool ifOnlyCheckUpgrade)
 	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] NodeInitCheck...");
 	while(NodeInitCheck() != ND_SUCCESS)
 		sleep(8);
+
+	//增加先清除edge
+	mPNode->CleanAllEdge();
 	
 	//系统运行环境检测(包括edge\iptable\node-version)
 	AfxWriteDebugLog("SuperVPN run at [CSuperVPNApp::InitSystem] RunEnvCheck");
@@ -337,8 +340,10 @@ CSuperVPNApp::~CSuperVPNApp()
 *********************************************************/
 void CSuperVPNApp::NodeRestartFunc(ndULong param)
 {
-	char cmd[512]= "killall edge";
+	char cmd[512]={0};
+	sprintf(cmd, "killall %s", EDGE_EXE_FILE_NAME);
 	AfxExecCmd(cmd);
+
 
 	sprintf(cmd, "%s", "killall SuperVPN");
 	AfxExecCmd(cmd);

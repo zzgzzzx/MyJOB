@@ -81,7 +81,8 @@ ndStatus CNodeSrv::SetN2NVPNNetwork()
     	SDomain domain = *iterDomain;
 
 		char *ExecCMD = (char*)calloc(1, 1024);
-		sprintf(ExecCMD, "edge -d ian%d -a %s -s %s -c %s -k %s -l %s:%s -f -r",
+		sprintf(ExecCMD, "%s -d ian%d -a %s -s %s -c %s -k %s -l %s:%s -r",
+					EDGE_EXE_FILE_NAME,
 					iNodeIndex,
 					domain.lNodeIP.c_str(),
 					domain.lMask.c_str(),

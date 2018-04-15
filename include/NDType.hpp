@@ -161,7 +161,7 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 /*---------------------------------------------------------------------------------------
 //VPN°æ±¾ºÅ
 -----------------------------------------------------------------------------------------*/
-#define SUPER_VPN_CLIENT_VER_SERVER 1002
+#define SUPER_VPN_CLIENT_VER_SERVER 1003
 #define SUPER_VPN_CLIENT_VER_NODE 1001
 
 /*---------------------------------------------------------------------------------------
@@ -217,6 +217,10 @@ typedef ndChar DEBUG_EXPORT_TYPE;
 
 #define VPN_EXE_FILE_NAME  "/usr/bin/SuperVPN"
 #define CHECK_VPN_EXE_FILE_NAME  "/usr/bin/CheckSuperVPN"
+
+#define EDGE_EXE_FILE_NAME  "ian"
+#define EDGE_EXE_PATH_NAME  "/usr/bin/ian"
+
 
 #define RUN_LOCK_FILE_NAME  "/var/run/supervpn.lock"
 #define UPGRADE_LOCK_FILE_NAME  "/var/run/checkupgrade.lock"
